@@ -1,0 +1,80 @@
+.toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background-color: rgba(26, 26, 26, 0.95);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--reader-border);
+  color: var(--reader-text);
+  padding: var(--space-3) var(--space-6);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.backLink {
+  color: var(--reader-text-muted);
+  font-size: var(--font-size-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  transition: color 0.15s ease;
+}
+
+.backLink:hover {
+  color: var(--reader-text);
+}
+
+.titleGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.seriesTitle {
+  font-size: var(--font-size-xs);
+  color: var(--reader-text-muted);
+}
+
+.episodeTitle {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--reader-text);
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.progressText {
+  font-size: var(--font-size-xs);
+  color: var(--reader-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.navButton {
+  background-color: var(--reader-surface-muted);
+  border: 1px solid var(--reader-border);
+  color: var(--reader-text);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.navButton:hover:not(:disabled) {
+  background-color: #333333;
+}
+
+.navButton:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
