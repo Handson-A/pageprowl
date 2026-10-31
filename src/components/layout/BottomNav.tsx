@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { motion } from "framer-motion";
 import styles from "./BottomNav.module.css";
 import { LuHouse, LuCompass, LuLayers, LuUser } from "react-icons/lu";
 
@@ -36,6 +37,13 @@ export function BottomNav() {
               className={`${styles.item} ${active ? styles.active : ""}`}
               aria-current={active ? "page" : undefined}
             >
+              {active && (
+                <motion.span
+                  layoutId="bottomNavIndicator"
+                  className={styles.activeIndicator}
+                  transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                />
+              )}
               <span className={styles.iconWrapper}>
                 <Icon size={20} aria-hidden="true" />
               </span>

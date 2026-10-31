@@ -1,0 +1,81 @@
+.skeleton {
+  background-color: var(--color-surface-muted);
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+}
+
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    transparent 100%
+  );
+  animation: shimmer 1.6s infinite ease-in-out;
+}
+
+:global([data-theme="light"]) .skeleton::after,
+:global(.theme-light) .skeleton::after {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.45) 50%,
+    transparent 100%
+  );
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton::after {
+    animation: none;
+    display: none;
+  }
+}
+
+/* Shapes */
+.text {
+  height: 1em;
+  border-radius: 4px;
+  margin-bottom: 0.35em;
+  width: 100%;
+}
+
+.circle {
+  border-radius: var(--radius-full);
+}
+
+.rect {
+  border-radius: var(--radius-md);
+}
+
+.card {
+  border-radius: var(--pv-radius-md);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.cardCover {
+  aspect-ratio: 16 / 10;
+  width: 100%;
+  background-color: var(--color-surface-muted);
+}
+
+.cardBody {
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}

@@ -7,6 +7,8 @@ import { BottomNav } from "@/components/layout/BottomNav";
 import { SeriesCard } from "@/components/ui/SeriesCard";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/Button";
+import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { MotionReveal } from "@/components/ui/MotionReveal";
 import { getPublicSeriesList } from "@/lib/data/series";
 import { LuSearch } from "react-icons/lu";
 import type { ComicFormat } from "@/types/database";
@@ -32,6 +34,39 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
     format: currentFormat,
   });
 
+  const genreOptions = GENRES.map((g) => ({
+    value: g,
+    label: g,
+    href: `/browse?genre=${encodeURIComponent(g)}${
+      currentSearch ? `&q=${encodeURIComponent(currentSearch)}` : ""
+    }${currentFormat ? `&format=${currentFormat}` : ""}`,
+  }));
+
+  const activeFormatValue = currentFormat || "all";
+  const formatOptions = [
+    {
+      value: "all",
+      label: "All Formats",
+      href: `/browse?genre=${encodeURIComponent(currentGenre)}${
+        currentSearch ? `&q=${encodeURIComponent(currentSearch)}` : ""
+      }`,
+    },
+    {
+      value: "scroll",
+      label: "Vertical Scroll",
+      href: `/browse?genre=${encodeURIComponent(currentGenre)}&format=scroll${
+        currentSearch ? `&q=${encodeURIComponent(currentSearch)}` : ""
+      }`,
+    },
+    {
+      value: "page",
+      label: "Page-by-Page",
+      href: `/browse?genre=${encodeURIComponent(currentGenre)}&format=page${
+        currentSearch ? `&q=${encodeURIComponent(currentSearch)}` : ""
+      }`,
+    },
+  ];
+
   return (
     <div className={styles.container}>
       <PublicHeader />
@@ -46,94 +81,89 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
 
         <div className={styles.filterBar}>
           <form method="GET" action="/browse" className={styles.searchForm}>
-            <input
-              type="search"
-              name="q"
-              defaultValue={currentSearch}
-              placeholder="Search by series title..."
-              className={styles.searchInput}
-            />
+            <div className={styles.searchInputWrapper}>
+              <LuSearch size={18} className={styles.searchIcon} aria-hidden="true" />
+              <input
+                type="search"
+                name="q"
+                defaultValue={currentSearch}
+                placeholder="Search comic series by title or theme..."
+                className={styles.searchInput}
+              />
+            </div>
             {currentGenre !== "All" && (
               <input type="hidden" name="genre" value={currentGenre} />
             )}
             {currentFormat && (
               <input type="hidden" name="format" value={currentFormat} />
             )}
-            <Button type="submit" variant="primary" size="sm">
-              <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
-                <LuSearch size={14} aria-hidden="true" />
-                <span>Search</span>
-              </span>
+            <Button type="submit" variant="primary" size="md">
+              Search
             </Button>
           </form>
 
-          <div className={styles.chipRow}>
-            <span className={styles.filterLabel}>Genre:</span>
-            {GENRES.map((g) => {
-              const isActive = currentGenre === g;
-              const href = `/browse?genre=${encodeURIComponent(g)}${
-                currentSearch ? `&q=${encodeURIComponent(currentSearch)}` : ""
-              }${currentFormat ? `&format=${currentFormat}` : ""}`;
-
-              return (
-                <Link
-                  key={g}
-                  href={href}
-                  className={`${styles.chip} ${isActive ? styles.chipActive : ""}`}
-                >
-                  {g}
-                </Link>
-              );
-            })}
+          {/* Primary Top-level Categories: The Segmented Control / Tabs Hybrid */}
+          <div className={styles.filterGroup}>
+            <div className={styles.filterHeader}>
+              <span className={styles.filterLabel}>Category</span>
+            </div>
+            <SegmentedControl
+              options={genreOptions}
+              value={currentGenre}
+              variant="pill"
+              size="md"
+              layoutId="browseGenreIndicator"
+              ariaLabel="Comic Genre Selection"
+            />
           </div>
 
-          <div className={styles.chipRow}>
-            <span className={styles.filterLabel}>Format:</span>
-            <Link
-              href={`/browse?genre=${encodeURIComponent(currentGenre)}${
-                currentSearch ? `&q=${encodeURIComponent(currentSearch)}` : ""
-              }`}
-              className={`${styles.chip} ${!currentFormat ? styles.chipActive : ""}`}
-            >
-              All Formats
-            </Link>
-            <Link
-              href={`/browse?genre=${encodeURIComponent(currentGenre)}&format=scroll${
-                currentSearch ? `&q=${encodeURIComponent(currentSearch)}` : ""
-              }`}
-              className={`${styles.chip} ${
-                currentFormat === "scroll" ? styles.chipActive : ""
-              }`}
-            >
-              Vertical Scroll
-            </Link>
-            <Link
-              href={`/browse?genre=${encodeURIComponent(currentGenre)}&format=page${
-                currentSearch ? `&q=${encodeURIComponent(currentSearch)}` : ""
-              }`}
-              className={`${styles.chip} ${
-                currentFormat === "page" ? styles.chipActive : ""
-              }`}
-            >
-              Page-by-Page
-            </Link>
+          {/* Secondary Reading Format Filter */}
+          <div className={styles.filterGroup}>
+            <div className={styles.filterHeader}>
+              <span className={styles.filterLabel}>Format</span>
+            </div>
+            <SegmentedControl
+              options={formatOptions}
+              value={activeFormatValue}
+              variant="pill"
+              size="sm"
+              layoutId="browseFormatIndicator"
+              ariaLabel="Reading Format Selection"
+            />
           </div>
         </div>
 
         {seriesList.length > 0 ? (
-          <div className={styles.grid}>
-            {seriesList.map((series) => (
-              <SeriesCard key={series.id} series={series} />
-            ))}
-          </div>
+          <MotionReveal delay={0.1}>
+            <div className={styles.grid}>
+              {seriesList.map((series) => (
+                <SeriesCard key={series.id} series={series} />
+              ))}
+            </div>
+          </MotionReveal>
+        ) : currentSearch.trim() || currentGenre !== "All" || currentFormat ? (
+          <EmptyState
+            icon={<LuSearch size={40} color="var(--color-primary)" />}
+            title="No matching comics found"
+            description={
+              currentSearch.trim()
+                ? `No titles found matching "${currentSearch.trim()}". Check your spelling, try fewer keywords, or reset your filters.`
+                : `No comics found matching category "${currentGenre}" with the selected reading format.`
+            }
+            action={
+              <Link href="/browse">
+                <Button variant="secondary">Clear All Filters</Button>
+              </Link>
+            }
+          />
         ) : (
           <EmptyState
             icon={<LuSearch size={40} color="var(--color-text-muted)" />}
-            title="No matching comics found"
-            description="Try adjusting your search terms or filters to find published titles."
+            title="The comic catalog is currently empty"
+            description="Independent creators and creative teams are currently crafting their series. Be among the first to publish on Panelverse!"
             action={
-              <Link href="/browse">
-                <Button variant="secondary">Reset Filters</Button>
+              <Link href="/studio">
+                <Button variant="primary">Go to Creator Studio</Button>
               </Link>
             }
           />

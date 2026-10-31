@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { SeriesCard } from "@/components/ui/SeriesCard";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { HomeHero } from "@/components/home/HomeHero";
+import { MotionReveal } from "@/components/ui/MotionReveal";
 import { getFeaturedSeries, getPublicSeriesList } from "@/lib/data/series";
 import { LuBookOpen, LuArrowRight, LuSparkles } from "react-icons/lu";
 
@@ -29,23 +30,27 @@ export default async function HomePage() {
         {/* Featured Stories Section */}
         <section className={styles.featuredSection}>
           <div className={styles.sectionInner}>
-            <div className={styles.sectionHeader}>
-              <div>
-                <span className={styles.eyebrow}>Curated Spotlight</span>
-                <h2 className={styles.sectionTitle}>Featured Series</h2>
+            <MotionReveal delay={0.1}>
+              <div className={styles.sectionHeader}>
+                <div>
+                  <span className={styles.eyebrow}>Curated Spotlight</span>
+                  <h2 className={styles.sectionTitle}>Featured Series</h2>
+                </div>
+                <Link href="/browse" className={styles.viewAllLink}>
+                  <span>View all</span>
+                  <LuArrowRight size={15} aria-hidden="true" />
+                </Link>
               </div>
-              <Link href="/browse" className={styles.viewAllLink}>
-                <span>View all</span>
-                <LuArrowRight size={15} aria-hidden="true" />
-              </Link>
-            </div>
+            </MotionReveal>
 
             {displayList.length > 0 ? (
-              <div className={styles.grid}>
-                {displayList.slice(0, 6).map((s) => (
-                  <SeriesCard key={s.id} series={s} aspectRatio="cinematic" />
-                ))}
-              </div>
+              <MotionReveal delay={0.15}>
+                <div className={styles.grid}>
+                  {displayList.slice(0, 6).map((s) => (
+                    <SeriesCard key={s.id} series={s} aspectRatio="cinematic" />
+                  ))}
+                </div>
+              </MotionReveal>
             ) : (
               <EmptyState
                 icon={<LuBookOpen size={44} color="var(--color-primary)" />}
@@ -62,32 +67,34 @@ export default async function HomePage() {
             )}
 
             {/* Creator Invitation Banner */}
-            <div className={styles.creatorBanner}>
-              <div className={styles.creatorContent}>
-                <div className={styles.creatorBadge}>
-                  <LuSparkles size={14} color="#F2C14E" aria-hidden="true" />
-                  <span>Creator Studio</span>
+            <MotionReveal delay={0.2}>
+              <div className={styles.creatorBanner}>
+                <div className={styles.creatorContent}>
+                  <div className={styles.creatorBadge}>
+                    <LuSparkles size={14} color="#F2C14E" aria-hidden="true" />
+                    <span>Creator Studio</span>
+                  </div>
+                  <h3 className={styles.creatorTitle}>
+                    Are you a comic creator, artist, or studio?
+                  </h3>
+                  <p className={styles.creatorDesc}>
+                    Organize your creative team, assemble episodes with batch artwork uploads,
+                    manage revisions, and publish with complete creative ownership.
+                  </p>
                 </div>
-                <h3 className={styles.creatorTitle}>
-                  Are you a comic creator, artist, or studio?
-                </h3>
-                <p className={styles.creatorDesc}>
-                  Organize your creative team, assemble episodes with batch artwork uploads,
-                  manage revisions, and publish with complete creative ownership.
-                </p>
-              </div>
 
-              <div className={styles.creatorActions}>
-                <Link href="/studio">
-                  <Button variant="primary" size="lg">
-                    <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
-                      <span>Start Publishing</span>
-                      <LuArrowRight size={16} aria-hidden="true" />
-                    </span>
-                  </Button>
-                </Link>
+                <div className={styles.creatorActions}>
+                  <Link href="/studio">
+                    <Button variant="primary" size="lg">
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                        <span>Start Publishing</span>
+                        <LuArrowRight size={16} aria-hidden="true" />
+                      </span>
+                    </Button>
+                  </Link>
+                </div>
               </div>
-            </div>
+            </MotionReveal>
           </div>
         </section>
       </main>

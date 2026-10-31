@@ -95,6 +95,12 @@ function NewSeriesForm() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    if (typeof window !== "undefined" && !navigator.onLine) {
+      setUploadError("You are currently offline. Please reconnect before uploading a cover.");
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
+
     // Validate type and size (<5MB)
     const validTypes = ["image/jpeg", "image/png", "image/webp"];
     if (!validTypes.includes(file.type)) {
@@ -178,6 +184,11 @@ function NewSeriesForm() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (typeof window !== "undefined" && !navigator.onLine) {
+      setError("You are currently offline. Please reconnect before creating a series.");
+      return;
+    }
+
     setError(null);
     setIsLoading(true);
 

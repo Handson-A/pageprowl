@@ -27,6 +27,11 @@ function SignUpForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (typeof window !== "undefined" && !navigator.onLine) {
+      setError("You appear to be offline. Please connect to the internet to create an account.");
+      return;
+    }
+
     setError(null);
     setSuccess(null);
     setIsLoading(true);

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import React from "react";
 import { MotionProvider } from "@/components/providers/MotionProvider";
+import { NetworkStatusProvider } from "@/components/providers/NetworkStatusProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -27,7 +28,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <MotionProvider>{children}</MotionProvider>
+        <NetworkStatusProvider>
+          <MotionProvider>{children}</MotionProvider>
+        </NetworkStatusProvider>
       </body>
     </html>
   );

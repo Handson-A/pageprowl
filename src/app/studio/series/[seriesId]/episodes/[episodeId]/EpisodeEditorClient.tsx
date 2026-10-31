@@ -151,9 +151,25 @@ export function EpisodeEditorClient({
     const files = e.target.files;
     if (!files || files.length === 0 || !canEdit) return;
 
+    if (typeof window !== "undefined" && !navigator.onLine) {
+      setMessage({
+        type: "error",
+        text: "You are currently offline. Please check your internet connection before uploading artwork.",
+      });
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
+
     setIsUploading(true);
     setMessage(null);
     setUploadStatus("Validating selected files...");
+
+    // Setup slow network warning timeout
+    const slowWarningTimer = setTimeout(() => {
+      setUploadStatus((prev) =>
+        prev ? `${prev} (taking longer than expected due to network latency...)` : null
+      );
+    }, 8000);
 
     // Natural alphabetical sort so page_01, page_02 are in order
     const fileList = Array.from(files).sort((a, b) =>
@@ -172,12 +188,14 @@ export function EpisodeEditorClient({
 
     const filesToUpload = fileList.filter((f) => validTypes.includes(f.type) && f.size <= 10 * 1024 * 1024);
     if (filesToUpload.length === 0) {
+      clearTimeout(slowWarningTimer);
       setIsUploading(false);
       setUploadStatus(null);
       return;
     }
 
     const uploadedItems: PageItem[] = [];
+    const failedFiles: string[] = [];
     let currentStartIndex = pages.length;
 
     for (let i = 0; i < filesToUpload.length; i++) {
@@ -250,12 +268,11 @@ export function EpisodeEditorClient({
         });
       } catch (err: any) {
         console.error(`Failed to upload ${file.name}:`, err);
-        setMessage({
-          type: "error",
-          text: `Failed to upload ${file.name}: ${err.message}. Successfully uploaded ${uploadedItems.length} pages.`,
-        });
+        failedFiles.push(`${file.name} (${err.message || "Network error"})`);
       }
     }
+
+    clearTimeout(slowWarningTimer);
 
     if (uploadedItems.length > 0) {
       const mergedPages = [...pages, ...uploadedItems];
@@ -264,9 +281,17 @@ export function EpisodeEditorClient({
       });
       setPages(mergedPages);
       setHasUnsavedChanges(true);
+    }
+
+    if (failedFiles.length > 0) {
+      setMessage({
+        type: "error",
+        text: `Uploaded ${uploadedItems.length} of ${filesToUpload.length} pages. Failed: ${failedFiles.join("; ")}. You can retry uploading the failed pages without re-uploading completed pages.`,
+      });
+    } else if (uploadedItems.length > 0) {
       setMessage({
         type: "success",
-        text: `Successfully uploaded ${uploadedItems.length} pages. Remember to click 'Save Order' to persist.`,
+        text: `Successfully uploaded all ${uploadedItems.length} pages. Click 'Save Order' to persist the reading sequence.`,
       });
     }
 
@@ -278,6 +303,14 @@ export function EpisodeEditorClient({
   // Save draft pages order to database
   const handleSaveOrder = async () => {
     if (!canEdit) return;
+    if (typeof window !== "undefined" && !navigator.onLine) {
+      setMessage({
+        type: "error",
+        text: "You are currently offline. Please reconnect to save page order.",
+      });
+      return;
+    }
+
     setIsSavingPages(true);
     setMessage(null);
 
@@ -309,6 +342,13 @@ export function EpisodeEditorClient({
   const handleMetadataSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!canEdit) return;
+    if (typeof window !== "undefined" && !navigator.onLine) {
+      setMessage({
+        type: "error",
+        text: "You are currently offline. Please reconnect to update episode details.",
+      });
+      return;
+    }
 
     setIsSavingMeta(true);
     setMessage(null);
@@ -930,29 +970,38 @@ export function EpisodeEditorClient({
 
             <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginTop: "8px" }}>
               {status === "draft" && (
-                <Button
-                  variant="secondary"
-                  onClick={() => handleStatusChange("in_review")}
-                  isLoading={isTransitioning}
-                >
-                  <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
-                    <span>Submit for Review</span>
-                    <LuArrowRight size={14} aria-hidden="true" />
-                  </span>
-                </Button>
-              )}
-
-              {status === "in_review" && (
                 <>
                   <Button
                     variant="primary"
-                    onClick={() => handleStatusChange("ready_to_publish")}
+                    onClick={() => handleStatusChange("in_production")}
+                    isLoading={isTransitioning}
+                  >
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                      <span>Start Production</span>
+                      <LuArrowRight size={14} aria-hidden="true" />
+                    </span>
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    onClick={() => handleStatusChange("in_review")}
+                    isLoading={isTransitioning}
+                  >
+                    <span>Submit for Review Directly</span>
+                  </Button>
+                </>
+              )}
+
+              {status === "in_production" && (
+                <>
+                  <Button
+                    variant="primary"
+                    onClick={() => handleStatusChange("in_review")}
                     isLoading={isTransitioning}
                     disabled={pages.length === 0}
                   >
                     <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
-                      <LuCheck size={16} />
-                      <span>Approve (Ready to Publish)</span>
+                      <span>Submit for Review</span>
+                      <LuArrowRight size={14} aria-hidden="true" />
                     </span>
                   </Button>
                   <Button
@@ -960,12 +1009,55 @@ export function EpisodeEditorClient({
                     onClick={() => handleStatusChange("draft")}
                     isLoading={isTransitioning}
                   >
-                    Return to Draft for Revisions
+                    Back to Draft
                   </Button>
                 </>
               )}
 
-              {status === "ready_to_publish" && (
+              {status === "in_review" && (
+                <>
+                  <Button
+                    variant="primary"
+                    onClick={() => handleStatusChange("approved")}
+                    isLoading={isTransitioning}
+                    disabled={pages.length === 0}
+                  >
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                      <LuCheck size={16} />
+                      <span>Approve Episode</span>
+                    </span>
+                  </Button>
+                  <Button
+                    variant="danger"
+                    onClick={() => handleStatusChange("revisions_required")}
+                    isLoading={isTransitioning}
+                  >
+                    Request Revisions
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={() => handleStatusChange("draft")}
+                    isLoading={isTransitioning}
+                  >
+                    Return to Draft
+                  </Button>
+                </>
+              )}
+
+              {status === "revisions_required" && (
+                <Button
+                  variant="primary"
+                  onClick={() => handleStatusChange("in_production")}
+                  isLoading={isTransitioning}
+                >
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                    <span>Return to Production</span>
+                    <LuArrowRight size={14} aria-hidden="true" />
+                  </span>
+                </Button>
+              )}
+
+              {(status === "approved" || status === "ready_to_publish") && (
                 <>
                   <Button
                     variant="primary"
@@ -975,15 +1067,15 @@ export function EpisodeEditorClient({
                   >
                     <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
                       <LuUpload size={16} aria-hidden="true" />
-                      <span>Publish Revision to Reader Now</span>
+                      <span>Publish Episode to Public Reader</span>
                     </span>
                   </Button>
                   <Button
                     variant="ghost"
-                    onClick={() => handleStatusChange("draft")}
+                    onClick={() => handleStatusChange("in_production")}
                     isLoading={isTransitioning}
                   >
-                    Return to Draft
+                    Return to Production
                   </Button>
                 </>
               )}

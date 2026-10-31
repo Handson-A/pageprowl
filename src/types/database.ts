@@ -21,11 +21,30 @@ export type ContributorRoleCategory =
   | "other";
 export type RevisionStatus =
   | "draft"
+  | "in_production"
   | "in_review"
+  | "revisions_required"
+  | "approved"
   | "ready_to_publish"
   | "published"
   | "unpublished"
   | "archived";
+export type TaskStatus = "backlog" | "todo" | "in_progress" | "in_review" | "done";
+export type TaskPriority = "low" | "medium" | "high" | "urgent";
+export type EpisodeProductionStatus =
+  | "draft"
+  | "in_production"
+  | "in_review"
+  | "revisions_required"
+  | "approved"
+  | "published";
+export type ReviewRequestStatus =
+  | "pending"
+  | "in_review"
+  | "revisions_requested"
+  | "approved"
+  | "closed";
+export type ReviewOutcome = "approved" | "revisions_requested" | "dismissed";
 export type ScheduledPublicationStatus =
   | "scheduled"
   | "processing"
@@ -50,7 +69,11 @@ export type NotificationType =
   | "review"
   | "publishing"
   | "moderation"
-  | "system";
+  | "system"
+  | "task"
+  | "mention"
+  | "approval"
+  | "revision";
 
 export interface Database {
   public: {
@@ -305,6 +328,7 @@ export interface Database {
           episode_number: number;
           title: string;
           slug: string;
+          status: EpisodeProductionStatus;
           published_revision_id: string | null;
           created_at: string;
           updated_at: string;
@@ -315,6 +339,7 @@ export interface Database {
           episode_number: number;
           title: string;
           slug: string;
+          status?: EpisodeProductionStatus;
           published_revision_id?: string | null;
           created_at?: string;
           updated_at?: string;
@@ -323,6 +348,7 @@ export interface Database {
           episode_number?: number;
           title?: string;
           slug?: string;
+          status?: EpisodeProductionStatus;
           published_revision_id?: string | null;
           updated_at?: string;
         };
@@ -406,29 +432,42 @@ export interface Database {
       review_comments: {
         Row: {
           id: string;
-          revision_id: string;
+          revision_id: string | null;
+          studio_id: string | null;
+          episode_id: string | null;
+          task_id: string | null;
+          review_request_id: string | null;
+          parent_comment_id: string | null;
           user_id: string;
           content: string;
           status: ReviewCommentStatus;
           resolved_by: string | null;
           resolved_at: string | null;
           created_at: string;
+          updated_at: string;
         };
         Insert: {
           id?: string;
-          revision_id: string;
+          revision_id?: string | null;
+          studio_id?: string | null;
+          episode_id?: string | null;
+          task_id?: string | null;
+          review_request_id?: string | null;
+          parent_comment_id?: string | null;
           user_id: string;
           content: string;
           status?: ReviewCommentStatus;
           resolved_by?: string | null;
           resolved_at?: string | null;
           created_at?: string;
+          updated_at?: string;
         };
         Update: {
           content?: string;
           status?: ReviewCommentStatus;
           resolved_by?: string | null;
           resolved_at?: string | null;
+          updated_at?: string;
         };
       };
       series_follows: {
@@ -546,6 +585,7 @@ export interface Database {
       audit_logs: {
         Row: {
           id: string;
+          studio_id: string | null;
           actor_id: string;
           action: string;
           entity_type: string;
@@ -555,6 +595,7 @@ export interface Database {
         };
         Insert: {
           id?: string;
+          studio_id?: string | null;
           actor_id: string;
           action: string;
           entity_type: string;
@@ -569,6 +610,7 @@ export interface Database {
       notifications: {
         Row: {
           id: string;
+          studio_id: string | null;
           user_id: string;
           title: string;
           message: string;
@@ -579,6 +621,7 @@ export interface Database {
         };
         Insert: {
           id?: string;
+          studio_id?: string | null;
           user_id: string;
           title: string;
           message: string;
@@ -589,6 +632,130 @@ export interface Database {
         };
         Update: {
           read?: boolean;
+        };
+      };
+      tasks: {
+        Row: {
+          id: string;
+          studio_id: string;
+          series_id: string | null;
+          episode_id: string | null;
+          parent_task_id: string | null;
+          title: string;
+          description: string | null;
+          status: TaskStatus;
+          priority: TaskPriority;
+          assignee_id: string | null;
+          due_date: string | null;
+          created_by: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          studio_id: string;
+          series_id?: string | null;
+          episode_id?: string | null;
+          parent_task_id?: string | null;
+          title: string;
+          description?: string | null;
+          status?: TaskStatus;
+          priority?: TaskPriority;
+          assignee_id?: string | null;
+          due_date?: string | null;
+          created_by: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          studio_id?: string;
+          series_id?: string | null;
+          episode_id?: string | null;
+          parent_task_id?: string | null;
+          title?: string;
+          description?: string | null;
+          status?: TaskStatus;
+          priority?: TaskPriority;
+          assignee_id?: string | null;
+          due_date?: string | null;
+          updated_at?: string;
+        };
+      };
+      task_collaborators: {
+        Row: {
+          task_id: string;
+          user_id: string;
+          created_at: string;
+        };
+        Insert: {
+          task_id: string;
+          user_id: string;
+          created_at?: string;
+        };
+        Update: {
+          task_id?: string;
+          user_id?: string;
+        };
+      };
+      review_requests: {
+        Row: {
+          id: string;
+          studio_id: string;
+          series_id: string;
+          episode_id: string;
+          revision_id: string | null;
+          task_id: string | null;
+          requester_id: string;
+          reviewer_id: string | null;
+          round: number;
+          status: ReviewRequestStatus;
+          feedback: string | null;
+          outcome: ReviewOutcome | null;
+          created_at: string;
+          updated_at: string;
+          completed_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          studio_id: string;
+          series_id: string;
+          episode_id: string;
+          revision_id?: string | null;
+          task_id?: string | null;
+          requester_id: string;
+          reviewer_id?: string | null;
+          round?: number;
+          status?: ReviewRequestStatus;
+          feedback?: string | null;
+          outcome?: ReviewOutcome | null;
+          created_at?: string;
+          updated_at?: string;
+          completed_at?: string | null;
+        };
+        Update: {
+          reviewer_id?: string | null;
+          round?: number;
+          status?: ReviewRequestStatus;
+          feedback?: string | null;
+          outcome?: ReviewOutcome | null;
+          updated_at?: string;
+          completed_at?: string | null;
+        };
+      };
+      comment_mentions: {
+        Row: {
+          comment_id: string;
+          user_id: string;
+          created_at: string;
+        };
+        Insert: {
+          comment_id: string;
+          user_id: string;
+          created_at?: string;
+        };
+        Update: {
+          comment_id?: string;
+          user_id?: string;
         };
       };
     };
@@ -605,6 +772,13 @@ export interface Database {
           series_uuid: string;
           user_uuid: string;
           required_roles: string[];
+        };
+        Returns: boolean;
+      };
+      is_studio_member: {
+        Args: {
+          studio_uuid: string;
+          user_uuid: string;
         };
         Returns: boolean;
       };

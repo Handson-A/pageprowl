@@ -1,8 +1,6 @@
 import React from "react";
 import { notFound } from "next/navigation";
-import { ReaderToolbar } from "@/components/reader/ReaderToolbar";
-import { VerticalReader } from "@/components/reader/VerticalReader";
-import { PaginatedReader } from "@/components/reader/PaginatedReader";
+import { ReaderShell } from "@/components/reader/ReaderShell";
 import { getPublicEpisodeContent } from "@/lib/data/series";
 
 interface EpisodeReaderPageProps {
@@ -28,31 +26,22 @@ export default async function EpisodeReaderPage({
   const { series, episode, pages, prevEpisodeSlug, nextEpisodeSlug } = content;
 
   return (
-    <div style={{ backgroundColor: "var(--reader-bg)", minHeight: "100vh" }}>
-      <ReaderToolbar
-        seriesTitle={series.title}
-        seriesSlug={series.slug}
-        episodeTitle={episode.title}
-        episodeNumber={episode.episode_number}
-        currentPage={1}
-        totalPages={pages.length}
-        prevEpisodeSlug={prevEpisodeSlug}
-        nextEpisodeSlug={nextEpisodeSlug}
-      />
-
-      {series.format === "scroll" ? (
-        <VerticalReader
-          pages={pages}
-          seriesSlug={series.slug}
-          nextEpisodeSlug={nextEpisodeSlug}
-        />
-      ) : (
-        <PaginatedReader
-          pages={pages}
-          seriesSlug={series.slug}
-          nextEpisodeSlug={nextEpisodeSlug}
-        />
-      )}
-    </div>
+    <ReaderShell
+      series={{
+        id: series.id,
+        title: series.title,
+        slug: series.slug,
+        format: series.format,
+      }}
+      episode={{
+        id: episode.id,
+        title: episode.title,
+        slug: episode.slug,
+        episode_number: episode.episode_number,
+      }}
+      pages={pages}
+      prevEpisodeSlug={prevEpisodeSlug}
+      nextEpisodeSlug={nextEpisodeSlug}
+    />
   );
 }

@@ -2,7 +2,14 @@ import React from "react";
 import styles from "./StatusBadge.module.css";
 import type { RevisionStatus } from "@/types/database";
 
-export type ExtendedStatus = RevisionStatus | "in_progress" | "restricted" | "scheduled";
+export type ExtendedStatus =
+  | RevisionStatus
+  | "in_progress"
+  | "restricted"
+  | "scheduled"
+  | "backlog"
+  | "todo"
+  | "done";
 
 export interface StatusBadgeProps {
   status: ExtendedStatus;
@@ -15,14 +22,20 @@ const statusDisplayMap: Record<
   { label: string; styleKey: string }
 > = {
   draft: { label: "Draft", styleKey: "draft" },
+  in_production: { label: "In Production", styleKey: "inProgress" },
   in_progress: { label: "In Progress", styleKey: "inProgress" },
   in_review: { label: "In Review", styleKey: "inReview" },
+  revisions_required: { label: "Revisions Required", styleKey: "restricted" },
+  approved: { label: "Approved", styleKey: "readyToPublish" },
   ready_to_publish: { label: "Ready to Publish", styleKey: "readyToPublish" },
   published: { label: "Published", styleKey: "published" },
   unpublished: { label: "Unpublished", styleKey: "draft" },
   archived: { label: "Archived", styleKey: "draft" },
   restricted: { label: "Restricted", styleKey: "restricted" },
   scheduled: { label: "Scheduled", styleKey: "readyToPublish" },
+  backlog: { label: "Backlog", styleKey: "draft" },
+  todo: { label: "To Do", styleKey: "draft" },
+  done: { label: "Done", styleKey: "published" },
 };
 
 export function StatusBadge({ status, label, className }: StatusBadgeProps) {

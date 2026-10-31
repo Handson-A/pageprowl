@@ -21,7 +21,11 @@ export default async function EpisodeWorkspacePage({
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/login");
+    redirect(
+      `/login?redirect=${encodeURIComponent(
+        `/studio/series/${params.seriesId}/episodes/${params.episodeId}`
+      )}`
+    );
   }
 
   // Enforce server-side authorization: caller must be editor or owner

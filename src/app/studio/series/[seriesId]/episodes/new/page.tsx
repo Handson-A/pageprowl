@@ -72,6 +72,11 @@ export default function NewEpisodePage({ params }: NewEpisodePageProps) {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (typeof window !== "undefined" && !navigator.onLine) {
+      setError("You are currently offline. Please reconnect before creating an episode.");
+      return;
+    }
+
     setError(null);
     setIsLoading(true);
 

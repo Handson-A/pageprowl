@@ -2,12 +2,31 @@
   width: 260px;
   background-color: #171717;
   border-right: 1px solid rgba(255, 255, 255, 0.08);
-  min-height: 100vh;
+  height: 100vh;
+  position: sticky;
+  top: 0;
   display: flex;
   flex-direction: column;
   padding: var(--space-6) var(--space-4);
   gap: var(--space-6);
   flex-shrink: 0;
+  overflow-y: auto;
+  z-index: 40;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
+
+.sidebar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
 }
 
 .desktopBrand {
@@ -56,6 +75,7 @@
 }
 
 .navItem {
+  position: relative;
   display: flex;
   align-items: center;
   gap: var(--space-3);
@@ -63,10 +83,11 @@
   border-radius: var(--pv-radius-md);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
-  color: #A3A3A3;
+  color: #9CA3AF;
   text-decoration: none;
   transition: background-color var(--pv-motion-fast) var(--pv-ease-standard),
               color var(--pv-motion-fast) var(--pv-ease-standard);
+  outline: none;
 }
 
 .navItem:hover {
@@ -74,12 +95,31 @@
   color: #F7F0E3;
 }
 
-/* Standout active state from reference */
+.navItem:focus-visible {
+  box-shadow: 0 0 0 2px var(--color-focus);
+}
+
+/* Restrained, elegant active state */
 .active {
-  background-color: var(--color-primary) !important;
-  color: #FFFFFF !important;
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  color: #F7F0E3 !important;
   font-weight: var(--font-weight-semibold);
-  box-shadow: 0 4px 12px rgba(228, 71, 53, 0.35);
+}
+
+.activeIcon {
+  color: var(--color-primary) !important;
+}
+
+/* Sliding left indicator bar in restrained brand red */
+.activeIndicator {
+  position: absolute;
+  left: -2px;
+  top: 6px;
+  bottom: 6px;
+  width: 3.5px;
+  background-color: var(--color-primary);
+  border-radius: 0 3px 3px 0;
+  box-shadow: 0 0 8px rgba(228, 71, 53, 0.35);
 }
 
 .footer {

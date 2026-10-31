@@ -1,0 +1,160 @@
+.wrapper {
+  position: relative;
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+  padding: 2px;
+}
+
+.wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+/* Pill / iOS Segmented Control Variant */
+.pillTrack {
+  display: inline-flex;
+  align-items: center;
+  background-color: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  padding: 3px;
+  gap: 2px;
+  position: relative;
+  min-width: max-content;
+}
+
+/* Line / Tab Bar Variant */
+.lineTrack {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--color-border);
+  gap: var(--space-4);
+  position: relative;
+  min-width: max-content;
+  width: 100%;
+}
+
+/* Segment Item (Link or Button) */
+.item {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-family-body);
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
+  transition: color var(--pv-motion-fast) var(--pv-ease-standard);
+  outline: none;
+}
+
+.item:focus-visible {
+  border-radius: var(--radius-full);
+  box-shadow: 0 0 0 2px var(--color-focus);
+}
+
+/* Sizes for Pill variant */
+.pillSm {
+  padding: 5px 12px;
+  font-size: var(--font-size-xs);
+  border-radius: var(--radius-full);
+}
+
+.pillMd {
+  padding: 7px 16px;
+  font-size: var(--font-size-sm);
+  border-radius: var(--radius-full);
+}
+
+.pillLg {
+  padding: 10px 20px;
+  font-size: var(--font-size-base);
+  border-radius: var(--radius-full);
+}
+
+/* Sizes for Line variant */
+.lineSm {
+  padding: var(--space-2) var(--space-1);
+  font-size: var(--font-size-xs);
+}
+
+.lineMd {
+  padding: var(--space-3) var(--space-2);
+  font-size: var(--font-size-sm);
+}
+
+.lineLg {
+  padding: var(--space-4) var(--space-2);
+  font-size: var(--font-size-base);
+}
+
+/* Item Inactive State */
+.inactive {
+  color: var(--color-text-muted);
+}
+
+.inactive:hover {
+  color: var(--color-text);
+}
+
+/* Item Active State */
+.active {
+  color: #171717;
+  font-weight: var(--font-weight-semibold);
+}
+
+.lineTrack .active {
+  color: var(--color-primary);
+}
+
+/* Pill Sliding Active Indicator */
+.pillIndicator {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-full);
+  background-color: #FFFFFF;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Line Sliding Active Indicator */
+.lineIndicator {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2.5px;
+  background-color: var(--color-primary);
+  border-radius: 2px 2px 0 0;
+  pointer-events: none;
+}
+
+/* Dark Theme Adjustments if in Dark Containers */
+:global([data-theme="dark"]) .pillIndicator,
+:global(.theme-dark) .pillIndicator {
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+:global([data-theme="dark"]) .active,
+:global(.theme-dark) .active {
+  color: #F7F0E3;
+}
+
+@media (max-width: 768px) {
+  .wrapper {
+    margin-left: calc(-1 * var(--space-4));
+    margin-right: calc(-1 * var(--space-4));
+    padding-left: var(--space-4);
+    padding-right: var(--space-4);
+    width: calc(100% + (2 * var(--space-4)));
+  }
+}

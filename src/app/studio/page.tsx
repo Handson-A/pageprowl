@@ -6,18 +6,23 @@ import { CreatorSidebar } from "@/components/layout/CreatorSidebar";
 import { Button } from "@/components/ui/Button";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { MotionReveal, MotionItem } from "@/components/ui/MotionReveal";
 import { createClient } from "@/lib/supabase/server";
 import { getCreatorSeries } from "@/lib/data/series";
+import { getPersonalDashboardData } from "@/lib/data/dashboards";
+import { formatActivityDescription } from "@/lib/data/activity";
 import {
   LuPlus,
   LuArrowRight,
   LuBookOpen,
   LuClock,
-  LuSparkles,
   LuLayers,
   LuBuilding2,
   LuMessageSquare,
   LuCircleCheck,
+  LuListTodo,
+  LuTriangleAlert,
+  LuFileText,
 } from "react-icons/lu";
 
 export default async function CreatorDashboardPage() {
@@ -30,166 +35,212 @@ export default async function CreatorDashboardPage() {
     redirect("/login?redirect=/studio");
   }
 
-  let seriesList: any[] = [];
-  let studiosCount = 0;
-  let pendingReviewsCount = 0;
   let userName = "Creator";
-  let recentProject: any = null;
-  let latestEpisode: any = null;
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("display_name")
+    .eq("id", user.id)
+    .single();
 
-  if (user) {
-    // 1. Fetch user profile
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("display_name")
-      .eq("id", user.id)
-      .single();
+  if (profile?.display_name) {
+    userName = profile.display_name;
+  } else if (user.email) {
+    userName = user.email.split("@")[0];
+  }
 
-    if (profile?.display_name) {
-      userName = profile.display_name;
-    } else if (user.email) {
-      userName = user.email.split("@")[0];
-    }
-
-    // 2. Fetch accessible series
-    seriesList = await getCreatorSeries(user.id);
-
-    // 3. Studio count
-    const { count: sCount } = await supabase
+  // 1. Fetch accessible series and studios count
+  const [seriesList, { count: studiosCount }, personalData] = await Promise.all([
+    getCreatorSeries(user.id),
+    supabase
       .from("studio_members")
       .select("*", { count: "exact", head: true })
-      .eq("user_id", user.id);
+      .eq("user_id", user.id),
+    getPersonalDashboardData(user.id),
+  ]);
 
-    if (sCount !== null) {
-      studiosCount = sCount;
-    }
+  const { myTasks, dueSoonTasks, needsAttention, myReviews, recentActivity } = personalData;
+  const activeTasks = myTasks.filter((t) => t.status !== "done");
 
-    // 4. Pending reviews across user's series
-    if (seriesList.length > 0) {
-      const seriesIds = seriesList.map((s) => s.id);
-      const { count: rCount } = await supabase
-        .from("episode_revisions")
-        .select("id, episodes!inner(series_id)", { count: "exact", head: true })
-        .in("episodes.series_id", seriesIds)
-        .eq("status", "in_review");
+  // Latest project for "Continue Working"
+  const recentProject = seriesList.length > 0 ? seriesList[0] : null;
+  let latestEpisode: any = null;
 
-      if (rCount !== null) {
-        pendingReviewsCount = rCount;
-      }
-
-      // 5. Recent project for "Continue Working"
-      recentProject = seriesList[0];
-      const { data: epData } = await supabase
-        .from("episodes")
-        .select(`
+  if (recentProject) {
+    const { data: epData } = await supabase
+      .from("episodes")
+      .select(`
+        id,
+        episode_number,
+        title,
+        slug,
+        status,
+        episode_revisions (
           id,
-          episode_number,
-          title,
-          slug,
-          episode_revisions (
-            id,
-            revision_number,
-            status,
-            updated_at
-          )
-        `)
-        .eq("series_id", recentProject.id)
-        .order("updated_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
+          revision_number,
+          status,
+          updated_at
+        )
+      `)
+      .eq("series_id", recentProject.id)
+      .order("updated_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
 
-      latestEpisode = epData;
-    }
+    latestEpisode = epData;
   }
+
+  const overdueCount = needsAttention.overdueTasks.length;
+  const pendingReviewsCount = myReviews.length;
+  const attentionTotal = overdueCount + pendingReviewsCount;
 
   return (
     <div className={styles.layout}>
       <CreatorSidebar userName={userName} userRole="Creator" />
 
       <main className={styles.main}>
-        {/* Welcome Banner matching Screen 2 of reference */}
-        <section className={styles.welcomeBanner}>
-          <div className={styles.welcomeContent}>
-            <div className={styles.welcomeText}>
-              <h1 className={styles.welcomeHeading}>
-                Good day, {userName}. 👋
-              </h1>
-              <p className={styles.welcomeSubhead}>
-                Here&apos;s what&apos;s happening with your comics today.
-              </p>
+        {/* Welcome Banner matching reference */}
+        <MotionReveal delay={0.05}>
+          <section className={styles.welcomeBanner}>
+            <div className={styles.welcomeContent}>
+              <div className={styles.welcomeText}>
+                <h1 className={styles.welcomeHeading}>Good day, {userName}. 👋</h1>
+                <p className={styles.welcomeSubhead}>
+                  Here&apos;s what&apos;s happening across your collaborative productions today.
+                </p>
+              </div>
+
+              <div className={styles.welcomeActions}>
+                <Link href="/studio/tasks">
+                  <Button variant="primary">
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                      <LuListTodo size={16} aria-hidden="true" />
+                      <span>Manage Tasks</span>
+                    </span>
+                  </Button>
+                </Link>
+                <Link href="/studio/series/new">
+                  <Button variant="secondary" className={styles.secondaryActionBtn}>
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                      <LuPlus size={16} aria-hidden="true" />
+                      <span>New Series</span>
+                    </span>
+                  </Button>
+                </Link>
+                <Link href="/studio/studios/new">
+                  <Button variant="secondary" className={styles.secondaryActionBtn}>
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                      <LuBuilding2 size={16} aria-hidden="true" />
+                      <span>New Studio</span>
+                    </span>
+                  </Button>
+                </Link>
+              </div>
             </div>
 
-            <div className={styles.welcomeActions}>
-              <Link href="/studio/series/new">
-                <Button variant="primary">
-                  <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
-                    <LuPlus size={16} aria-hidden="true" />
-                    <span>New Series</span>
+            <div className={styles.welcomeGraphic} aria-hidden="true">
+              <svg viewBox="0 0 200 120" fill="none" className={styles.welcomeSvg}>
+                <path d="M40 0L200 0V120H0L40 0Z" fill="#171717" />
+                <path d="M70 0L200 0V120H30L70 0Z" fill="#E44735" opacity="0.9" />
+                <path d="M120 0L200 0V120H80L120 0Z" fill="#F2C14E" opacity="0.95" />
+              </svg>
+            </div>
+          </section>
+        </MotionReveal>
+
+        {/* Needs My Attention Alert Banner if overdue tasks or pending reviews exist */}
+        {attentionTotal > 0 && (
+          <MotionReveal delay={0.1}>
+            <section className={styles.attentionBanner}>
+              <div className={styles.attentionLeft}>
+                <LuTriangleAlert size={20} color="var(--color-danger)" aria-hidden="true" />
+                <div>
+                  <span className={styles.attentionTitle}>Needs Your Immediate Attention: </span>
+                  <span className={styles.attentionText}>
+                    {overdueCount > 0 && `${overdueCount} overdue task${overdueCount > 1 ? "s" : ""} require action. `}
+                    {pendingReviewsCount > 0 && `${pendingReviewsCount} review request${pendingReviewsCount > 1 ? "s" : ""} awaiting your verdict.`}
                   </span>
-                </Button>
-              </Link>
-              <Link href="/studio/studios/new">
-                <Button variant="secondary" className={styles.secondaryActionBtn}>
-                  <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
-                    <LuBuilding2 size={16} aria-hidden="true" />
-                    <span>New Studio</span>
-                  </span>
-                </Button>
-              </Link>
-            </div>
-          </div>
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: "var(--space-2)" }}>
+                {overdueCount > 0 && (
+                  <Link href="/studio/tasks">
+                    <Button variant="danger" size="sm">
+                      View Overdue ({overdueCount})
+                    </Button>
+                  </Link>
+                )}
+                {pendingReviewsCount > 0 && (
+                  <Link href="/studio/reviews">
+                    <Button variant="primary" size="sm">
+                      Review Queue ({pendingReviewsCount})
+                    </Button>
+                  </Link>
+                )}
+              </div>
+            </section>
+          </MotionReveal>
+        )}
 
-          {/* Comic Panel Graphic Backdrop Accent */}
-          <div className={styles.welcomeGraphic} aria-hidden="true">
-            <svg viewBox="0 0 200 120" fill="none" className={styles.welcomeSvg}>
-              <path d="M40 0L200 0V120H0L40 0Z" fill="#171717" />
-              <path d="M70 0L200 0V120H30L70 0Z" fill="#E44735" opacity="0.9" />
-              <path d="M120 0L200 0V120H80L120 0Z" fill="#F2C14E" opacity="0.95" />
-            </svg>
-          </div>
-        </section>
+        {/* 4 Summary Stats Cards with Real Production Metrics */}
+        <MotionReveal delay={0.15} staggerChildren={0.06}>
+          <section className={styles.statsGrid}>
+            <MotionItem whileHover={{ y: -3 }} className={styles.statCard}>
+              <div className={styles.statHeader}>
+                <span className={styles.statLabel}>Active Series</span>
+                <LuBookOpen size={16} className={styles.statIcon} aria-hidden="true" />
+              </div>
+              <span className={styles.statValue}>{seriesList.length}</span>
+              <span className={styles.statSubtext}>
+                {seriesList.length === 1 ? "1 series in workspace" : `${seriesList.length} titles in workspace`}
+              </span>
+            </MotionItem>
 
-        {/* 3 Metric Summary Cards matching reference */}
-        <section className={styles.statsGrid}>
-          <div className={styles.statCard}>
-            <div className={styles.statHeader}>
-              <span className={styles.statLabel}>Active Series</span>
-              <LuBookOpen size={16} className={styles.statIcon} aria-hidden="true" />
-            </div>
-            <span className={styles.statValue}>{seriesList.length}</span>
-            <span className={styles.statSubtext}>
-              {seriesList.length === 1 ? "1 series in workspace" : `${seriesList.length} titles in workspace`}
-            </span>
-          </div>
+            <MotionItem whileHover={{ y: -3 }} className={styles.statCard}>
+              <div className={styles.statHeader}>
+                <span className={styles.statLabel}>My Active Tasks</span>
+                <LuListTodo size={16} className={styles.statIcon} aria-hidden="true" />
+              </div>
+              <span className={styles.statValue}>{activeTasks.length}</span>
+              <span className={styles.statSubtext}>
+                {dueSoonTasks.length > 0
+                  ? `${dueSoonTasks.length} due within 7 days`
+                  : "No upcoming deadlines"}
+              </span>
+            </MotionItem>
 
-          <div className={styles.statCard}>
-            <div className={styles.statHeader}>
-              <span className={styles.statLabel}>Studio Teams</span>
-              <LuBuilding2 size={16} className={styles.statIcon} aria-hidden="true" />
-            </div>
-            <span className={styles.statValue}>{studiosCount}</span>
-            <span className={styles.statSubtext}>
-              {studiosCount === 1 ? "1 studio team" : `${studiosCount} team collaborations`}
-            </span>
-          </div>
+            <MotionItem whileHover={{ y: -3 }} className={styles.statCard}>
+              <div className={styles.statHeader}>
+                <span className={styles.statLabel}>Assigned Reviews</span>
+                <LuMessageSquare size={16} className={styles.statIcon} aria-hidden="true" />
+              </div>
+              <span
+                className={styles.statValue}
+                style={{ color: pendingReviewsCount > 0 ? "var(--color-primary)" : "inherit" }}
+              >
+                {pendingReviewsCount}
+              </span>
+              <span className={styles.statSubtext}>
+                {pendingReviewsCount === 1 ? "1 request awaiting verdict" : `${pendingReviewsCount} requests in queue`}
+              </span>
+            </MotionItem>
 
-          <div className={styles.statCard}>
-            <div className={styles.statHeader}>
-              <span className={styles.statLabel}>Pending Reviews</span>
-              <LuMessageSquare size={16} className={styles.statIcon} aria-hidden="true" />
-            </div>
-            <span className={styles.statValue} style={{ color: pendingReviewsCount > 0 ? "var(--color-primary)" : "inherit" }}>
-              {pendingReviewsCount}
-            </span>
-            <span className={styles.statSubtext}>
-              {pendingReviewsCount === 1 ? "1 revision awaiting review" : `${pendingReviewsCount} revisions in review`}
-            </span>
-          </div>
-        </section>
+            <MotionItem whileHover={{ y: -3 }} className={styles.statCard}>
+              <div className={styles.statHeader}>
+                <span className={styles.statLabel}>Studio Teams</span>
+                <LuBuilding2 size={16} className={styles.statIcon} aria-hidden="true" />
+              </div>
+              <span className={styles.statValue}>{studiosCount || 0}</span>
+              <span className={styles.statSubtext}>
+                {studiosCount === 1 ? "1 studio team" : `${studiosCount || 0} team collaborations`}
+              </span>
+            </MotionItem>
+          </section>
+        </MotionReveal>
 
-        {/* 2-Column Section: Continue Working & Recent Activity */}
-        <section className={styles.twoColumnGrid}>
-          {/* Column 1: Continue Working */}
+        {/* Continue Working & My Tasks Overview */}
+        <MotionReveal delay={0.2}>
+          <section className={styles.twoColumnGrid}>
+          {/* Column 1: Continue Working on Latest Series */}
           <div className={styles.columnCard}>
             <div className={styles.cardHeader}>
               <h2 className={styles.cardTitle}>Continue Working</h2>
@@ -229,15 +280,16 @@ export default async function CreatorDashboardPage() {
 
                   <h3 className={styles.projectTitle}>{recentProject.title}</h3>
 
-                  <p className={styles.episodeText}>
+                  <div className={styles.episodeText}>
                     {latestEpisode ? (
-                      <>
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
                         Episode {latestEpisode.episode_number}: <strong>{latestEpisode.title}</strong>
-                      </>
+                        <StatusBadge status={latestEpisode.status || "draft"} />
+                      </span>
                     ) : (
                       "No episodes created yet"
                     )}
-                  </p>
+                  </div>
 
                   <div className={styles.continueActions}>
                     {latestEpisode ? (
@@ -264,142 +316,235 @@ export default async function CreatorDashboardPage() {
               </div>
             ) : (
               <div className={styles.emptyContinue}>
-                <p className={styles.emptyText}>
-                  You haven&apos;t started a comic series yet.
-                </p>
+                <p className={styles.emptyText}>You haven&apos;t started a comic series yet.</p>
                 <Link href="/studio/series/new">
                   <Button variant="primary" size="sm">
-                    <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
-                      <LuPlus size={14} aria-hidden="true" />
-                      <span>Create Series</span>
-                    </span>
+                    Create Series
                   </Button>
                 </Link>
               </div>
             )}
           </div>
 
-          {/* Column 2: Recent Activity */}
+          {/* Column 2: My Assigned Tasks Preview */}
           <div className={styles.columnCard}>
             <div className={styles.cardHeader}>
-              <h2 className={styles.cardTitle}>Recent Activity</h2>
-              <Link href="/studio/series" className={styles.headerLink}>
-                <span>View all</span>
+              <h2 className={styles.cardTitle}>My Tasks ({activeTasks.length})</h2>
+              <Link href="/studio/tasks" className={styles.headerLink}>
+                <span>Task Board</span>
                 <LuArrowRight size={14} aria-hidden="true" />
               </Link>
             </div>
 
-            {seriesList.length > 0 ? (
-              <div className={styles.activityList}>
-                {seriesList.slice(0, 4).map((s) => (
-                  <div key={s.id} className={styles.activityItem}>
-                    <div className={styles.activityDot}>
-                      <LuCircleCheck size={16} color="var(--color-primary)" />
+            {activeTasks.length > 0 ? (
+              <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)" }}>
+                {activeTasks.slice(0, 4).map((task) => {
+                  const isOverdue =
+                    task.due_date && new Date(task.due_date).getTime() < Date.now();
+                  return (
+                    <div key={task.id} className={styles.taskItem}>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div className={styles.taskTitle}>{task.title}</div>
+                        <div className={styles.taskSub}>
+                          <span>{task.series?.title || "General Task"}</span>
+                          {task.due_date && (
+                            <span className={isOverdue ? styles.dueBadgeOverdue : undefined}>
+                              • Due {new Date(task.due_date).toLocaleDateString()}
+                              {isOverdue && " (Overdue)"}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
+                        <span
+                          className={`${styles.priorityBadge} ${
+                            task.priority === "urgent"
+                              ? styles.priorityUrgent
+                              : task.priority === "high"
+                              ? styles.priorityHigh
+                              : task.priority === "medium"
+                              ? styles.priorityMedium
+                              : styles.priorityLow
+                          }`}
+                        >
+                          {task.priority}
+                        </span>
+                        <StatusBadge status={task.status as any} />
+                      </div>
                     </div>
-                    <div className={styles.activityInfo}>
-                      <p className={styles.activityText}>
-                        Updated series <strong>{s.title}</strong>
-                      </p>
-                      <span className={styles.activityTime}>
-                        {s.format === "scroll" ? "Vertical Scroll" : "Page-by-Page"} &bull; {s.genre}
-                      </span>
-                    </div>
-                    <Link href={`/studio/series/${s.id}`} className={styles.activityAction}>
-                      Workspace
-                    </Link>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             ) : (
-              <div className={styles.emptyActivity}>
-                <LuClock size={28} color="var(--color-text-muted)" aria-hidden="true" />
-                <p>No recent activity recorded yet.</p>
+              <div style={{ padding: "var(--space-6)", textAlign: "center", color: "var(--color-text-muted)" }}>
+                <p style={{ fontSize: "var(--font-size-sm)" }}>No pending tasks assigned to you.</p>
+                <div style={{ marginTop: "var(--space-3)" }}>
+                  <Link href="/studio/tasks">
+                    <Button variant="secondary" size="sm">
+                      Create Production Task
+                    </Button>
+                  </Link>
+                </div>
               </div>
             )}
           </div>
         </section>
 
-        {/* Your Series Section matching reference */}
-        <section className={styles.section}>
-          <div className={styles.sectionHeader}>
-            <div>
-              <h2 className={styles.sectionTitle}>Your Series</h2>
-              <p className={styles.sectionSubtitle}>
-                Manage your comics, chapters, and team assignments.
-              </p>
+        {/* Two-Column Section: My Reviews Queue & Recent Activity Timeline */}
+        <section className={styles.twoColumnGrid}>
+          {/* Left Column: My Review Requests Queue */}
+          <div className={styles.columnCard}>
+            <div className={styles.cardHeader}>
+              <h2 className={styles.cardTitle}>My Reviews Queue ({myReviews.length})</h2>
+              <Link href="/studio/reviews" className={styles.headerLink}>
+                <span>View all</span>
+                <LuArrowRight size={14} aria-hidden="true" />
+              </Link>
             </div>
-            <Link href="/studio/series/new">
-              <Button variant="primary" size="sm">
-                <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
-                  <LuPlus size={14} aria-hidden="true" />
-                  <span>New Series</span>
-                </span>
-              </Button>
-            </Link>
+
+            {myReviews.length > 0 ? (
+              <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)" }}>
+                {myReviews.slice(0, 4).map((req) => (
+                  <div key={req.id} className={styles.taskItem}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div className={styles.taskTitle}>
+                        {req.series?.title}: {req.episode?.title}
+                      </div>
+                      <div className={styles.taskSub}>
+                        <span>Round #{req.round}</span>
+                        <span>• Requester: {req.requester?.display_name || "Creator"}</span>
+                      </div>
+                    </div>
+                    <Link href={`/studio/reviews?requestId=${req.id}`}>
+                      <Button variant="secondary" size="sm">
+                        Review
+                      </Button>
+                    </Link>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div style={{ padding: "var(--space-6)", textAlign: "center", color: "var(--color-text-muted)" }}>
+                <p style={{ fontSize: "var(--font-size-sm)" }}>No review requests currently waiting for you.</p>
+              </div>
+            )}
           </div>
 
-          {seriesList.length > 0 ? (
-            <div className={styles.seriesGrid}>
-              {seriesList.map((s) => (
-                <div key={s.id} className={styles.seriesCard}>
-                  <div className={styles.seriesCoverWrapper}>
-                    {s.cover_url ? (
-                      <img src={s.cover_url} alt={s.title} className={styles.seriesCardCover} />
-                    ) : (
-                      <div className={styles.seriesCoverPlaceholder}>
-                        <LuBookOpen size={32} color="#F7F0E3" />
-                      </div>
-                    )}
-                    <span className={styles.seriesFormatBadge}>
-                      {s.format === "scroll" ? "Scroll" : "Pages"}
-                    </span>
-                  </div>
-
-                  <div className={styles.seriesCardBody}>
-                    <div className={styles.seriesCardMeta}>
-                      <span className={styles.seriesGenre}>{s.genre}</span>
-                      <StatusBadge
-                        status={s.visibility === "public" ? "published" : "draft"}
-                        label={s.visibility.toUpperCase()}
-                      />
-                    </div>
-
-                    <h3 className={styles.seriesCardTitle}>{s.title}</h3>
-
-                    <p className={styles.seriesCardDesc}>
-                      {s.synopsis || "No series synopsis provided yet."}
-                    </p>
-
-                    <div className={styles.seriesCardFooter}>
-                      <span className={styles.seriesEpisodeCount}>
-                        {s.episode_count ?? 0} {s.episode_count === 1 ? "episode" : "episodes"}
-                      </span>
-                      <Link href={`/studio/series/${s.id}`}>
-                        <Button variant="secondary" size="sm">
-                          <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
-                            <span>Workspace</span>
-                            <LuArrowRight size={14} aria-hidden="true" />
-                          </span>
-                        </Button>
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              ))}
+          {/* Right Column: Recent Production Activity Feed */}
+          <div className={styles.columnCard}>
+            <div className={styles.cardHeader}>
+              <h2 className={styles.cardTitle}>Recent Production Activity</h2>
             </div>
-          ) : (
-            <EmptyState
-              icon={<LuLayers size={44} color="var(--color-primary)" />}
-              title="No series created yet"
-              description="Start your first comic series to assemble episodes, invite team collaborators, and publish revisions."
-              action={
-                <Link href="/studio/series/new">
-                  <Button variant="primary">Create Your First Series</Button>
-                </Link>
-              }
-            />
-          )}
+
+            {recentActivity.length > 0 ? (
+              <div className={styles.activityList}>
+                {recentActivity.slice(0, 5).map((event) => (
+                  <div key={event.id} className={styles.activityItem}>
+                    <div className={styles.activityDot}>
+                      <LuCircleCheck size={16} color="var(--color-primary)" />
+                    </div>
+                    <div className={styles.activityInfo}>
+                      <p className={styles.activityText}>{formatActivityDescription(event)}</p>
+                      <span className={styles.activityTime}>
+                        {new Date(event.created_at).toLocaleDateString()} at{" "}
+                        {new Date(event.created_at).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p style={{ color: "var(--color-text-muted)", fontSize: "var(--font-size-sm)", padding: "var(--space-4)" }}>
+                No recent activity recorded yet.
+              </p>
+            )}
+          </div>
         </section>
+      </MotionReveal>
+
+        {/* My Comic Titles Section */}
+        <MotionReveal delay={0.25}>
+          <section className={styles.section}>
+            <div className={styles.sectionHeader}>
+              <h2 className={styles.sectionTitle}>Your Comic Titles ({seriesList.length})</h2>
+              <Link href="/studio/series">
+                <Button variant="secondary" size="sm">
+                  <span>View All Titles</span>
+                  <LuArrowRight size={14} aria-hidden="true" />
+                </Button>
+              </Link>
+            </div>
+
+            {seriesList.length > 0 ? (
+              <div className={styles.seriesGrid}>
+                {seriesList.slice(0, 3).map((series) => (
+                  <MotionItem
+                    key={series.id}
+                    whileHover={{ y: -4 }}
+                    className={styles.seriesCard}
+                  >
+                    <div className={styles.seriesCoverWrapper}>
+                      {series.cover_url ? (
+                        <img
+                          src={series.cover_url}
+                          alt={series.title}
+                          className={styles.seriesCardCover}
+                        />
+                      ) : (
+                        <div className={styles.seriesCoverPlaceholder}>
+                          <LuLayers size={36} color="var(--color-text-muted)" />
+                        </div>
+                      )}
+                      <span className={styles.seriesFormatBadge}>
+                        {series.format === "scroll" ? "Scroll" : "Page"}
+                      </span>
+                    </div>
+
+                    <div className={styles.seriesCardBody}>
+                      <div className={styles.seriesCardMeta}>
+                        <span className={styles.seriesGenre}>{series.genre}</span>
+                        <StatusBadge
+                          status={series.visibility === "public" ? "published" : "draft"}
+                          label={series.visibility.toUpperCase()}
+                        />
+                      </div>
+
+                      <h3 className={styles.seriesCardTitle}>{series.title}</h3>
+                      <p className={styles.seriesCardDesc}>{series.synopsis}</p>
+
+                      <div className={styles.seriesCardFooter}>
+                        <span className={styles.seriesEpisodeCount}>
+                          {series.episode_count ?? 0} Chapters
+                        </span>
+                        <Link href={`/studio/series/${series.id}`}>
+                          <Button variant="secondary" size="sm">
+                            Workspace
+                          </Button>
+                        </Link>
+                      </div>
+                    </div>
+                  </MotionItem>
+                ))}
+              </div>
+            ) : (
+              <EmptyState
+                icon={<LuBookOpen size={48} color="var(--color-text-muted)" />}
+                title="No comics published yet"
+                description="Start producing your first comic series today."
+                action={
+                  <Link href="/studio/series/new">
+                    <Button variant="primary" size="sm">
+                      Create Series
+                    </Button>
+                  </Link>
+                }
+              />
+            )}
+          </section>
+        </MotionReveal>
       </main>
     </div>
   );

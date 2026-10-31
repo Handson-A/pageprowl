@@ -34,15 +34,6 @@ export default async function StudiosListPage() {
               Collaborate in multi-creator studios with shared series and team permissions.
             </p>
           </div>
-
-          <Link href="/studio/studios/new">
-            <Button variant="primary">
-              <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
-                <LuPlus size={16} aria-hidden="true" />
-                <span>New Studio</span>
-              </span>
-            </Button>
-          </Link>
         </header>
 
         <section className={styles.section}>

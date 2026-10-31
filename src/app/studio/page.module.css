@@ -1,17 +1,20 @@
 .layout {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   background-color: var(--color-bg);
 }
 
 .main {
   flex: 1;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
   padding: var(--space-8);
   display: flex;
   flex-direction: column;
   gap: var(--space-8);
   max-width: var(--container-max-width);
-  overflow-x: hidden;
 }
 
 /* Welcome Banner from Reference */
@@ -75,8 +78,11 @@
   top: 0;
   bottom: 0;
   width: 220px;
+  max-width: 25%;
   pointer-events: none;
-  opacity: 0.85;
+  opacity: 0.25;
+  mask-image: linear-gradient(to left, rgba(0, 0, 0, 0.9) 30%, rgba(0, 0, 0, 0) 100%);
+  -webkit-mask-image: linear-gradient(to left, rgba(0, 0, 0, 0.9) 30%, rgba(0, 0, 0, 0) 100%);
 }
 
 .welcomeSvg {
@@ -85,11 +91,23 @@
   object-fit: cover;
 }
 
-/* 3 Summary Stats Cards from Reference */
+/* 4 Summary Stats Cards from Reference */
 .statsGrid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: var(--space-6);
+}
+
+@media (max-width: 1200px) {
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .statCard {
@@ -362,8 +380,8 @@
 }
 
 .seriesCard:hover {
-  transform: translateY(-3px);
   border-color: rgba(228, 71, 53, 0.4);
+  box-shadow: var(--pv-shadow-hover);
 }
 
 .seriesCoverWrapper {
@@ -456,22 +474,128 @@
   color: var(--color-text-muted);
 }
 
-@media (max-width: 960px) {
-  .statsGrid {
-    grid-template-columns: 1fr;
-  }
+/* Phase 5 Collaboration & Production Tokens */
+.attentionBanner {
+  background: linear-gradient(135deg, rgba(228, 71, 53, 0.08) 0%, rgba(242, 193, 78, 0.08) 100%);
+  border: 1px solid rgba(228, 71, 53, 0.3);
+  border-radius: var(--pv-radius-md);
+  padding: var(--space-4) var(--space-6);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  box-shadow: var(--pv-shadow-card);
+  flex-wrap: wrap;
+}
 
+.attentionLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.attentionTitle {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-danger);
+}
+
+.attentionText {
+  font-size: var(--font-size-xs);
+  color: var(--color-text);
+}
+
+.taskItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--pv-radius-sm);
+  transition: border-color var(--pv-motion-fast);
+  gap: var(--space-3);
+}
+
+.taskItem:hover {
+  border-color: var(--color-primary);
+}
+
+.taskTitle {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text);
+}
+
+.taskSub {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  margin-top: 2px;
+}
+
+.priorityBadge {
+  font-size: 10px;
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  letter-spacing: 0.04em;
+}
+
+.priorityUrgent {
+  background-color: #FEE2E2;
+  color: #DC2626;
+  border: 1px solid rgba(220, 38, 38, 0.3);
+}
+
+.priorityHigh {
+  background-color: #FEF3C7;
+  color: #D97706;
+  border: 1px solid rgba(217, 119, 6, 0.3);
+}
+
+.priorityMedium {
+  background-color: #DBEAFE;
+  color: #2563EB;
+  border: 1px solid rgba(37, 99, 235, 0.3);
+}
+
+.priorityLow {
+  background-color: var(--color-surface-muted);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+}
+
+.dueBadgeOverdue {
+  color: var(--color-danger);
+  font-weight: var(--font-weight-semibold);
+}
+
+.dueBadgeUpcoming {
+  color: var(--color-warning);
+  font-weight: var(--font-weight-semibold);
+}
+
+@media (max-width: 1024px) {
   .twoColumnGrid {
     grid-template-columns: 1fr;
+    gap: var(--space-6);
   }
 }
 
 @media (max-width: 768px) {
   .layout {
     flex-direction: column;
+    height: auto;
+    overflow: visible;
   }
 
   .main {
+    height: auto;
+    overflow-y: visible;
     padding: var(--space-4);
     gap: var(--space-6);
   }

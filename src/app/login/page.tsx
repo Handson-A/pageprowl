@@ -37,6 +37,11 @@ function LoginForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (typeof window !== "undefined" && !navigator.onLine) {
+      setError("You appear to be offline. Please connect to the internet to sign in.");
+      return;
+    }
+
     setError(null);
     setInfoMessage(null);
     setIsLoading(true);

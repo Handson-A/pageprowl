@@ -17,11 +17,14 @@ function slugify(text: string): string {
 }
 
 const ALLOWED_TRANSITIONS: Record<RevisionStatus, RevisionStatus[]> = {
-  draft: ["in_review"],
-  in_review: ["ready_to_publish", "draft"],
+  draft: ["in_production", "in_review"],
+  in_production: ["in_review", "draft"],
+  in_review: ["approved", "revisions_required", "ready_to_publish", "draft"],
+  revisions_required: ["in_production", "draft", "in_review"],
+  approved: ["published", "in_production", "draft"],
   ready_to_publish: ["published", "in_review", "draft"],
   published: ["unpublished"],
-  unpublished: ["draft", "in_review"],
+  unpublished: ["draft", "in_production", "in_review"],
   archived: ["draft"],
 };
 

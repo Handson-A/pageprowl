@@ -2,6 +2,7 @@
 
 import React, { useState, useRef } from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import styles from "@/app/studio/page.module.css";
 import wsStyles from "./SeriesWorkspace.module.css";
 import { Button } from "@/components/ui/Button";
@@ -95,6 +96,14 @@ export function SeriesWorkspaceClient({
     e.preventDefault();
     if (!canEdit) return;
 
+    if (typeof window !== "undefined" && !navigator.onLine) {
+      setMetaMessage({
+        type: "error",
+        text: "You are currently offline. Please reconnect to save series details.",
+      });
+      return;
+    }
+
     setIsSavingMeta(true);
     setMetaMessage(null);
 
@@ -119,6 +128,15 @@ export function SeriesWorkspaceClient({
     const file = e.target.files?.[0];
     if (!file || !canEdit) return;
 
+    if (typeof window !== "undefined" && !navigator.onLine) {
+      setCoverMessage({
+        type: "error",
+        text: "You are currently offline. Please reconnect before uploading cover artwork.",
+      });
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
+
     const validTypes = ["image/jpeg", "image/png", "image/webp"];
     if (!validTypes.includes(file.type)) {
       setCoverMessage({ type: "error", text: "Cover image must be a JPG, PNG, or WebP file." });
@@ -132,6 +150,13 @@ export function SeriesWorkspaceClient({
 
     setIsUploadingCover(true);
     setCoverMessage(null);
+
+    const slowTimer = setTimeout(() => {
+      setCoverMessage({
+        type: "success",
+        text: "Uploading cover artwork... taking slightly longer due to network latency.",
+      });
+    }, 7000);
 
     try {
       // 1. Get signed signature
@@ -197,6 +222,7 @@ export function SeriesWorkspaceClient({
     } catch (err: any) {
       setCoverMessage({ type: "error", text: err.message || "Failed to update cover artwork." });
     } finally {
+      clearTimeout(slowTimer);
       setIsUploadingCover(false);
     }
   };
@@ -309,7 +335,14 @@ export function SeriesWorkspaceClient({
             onClick={() => setActiveTab("episodes")}
             className={`${wsStyles.tabBtn} ${activeTab === "episodes" ? wsStyles.tabActive : ""}`}
           >
-            Episodes ({episodes.length})
+            <span>Episodes ({episodes.length})</span>
+            {activeTab === "episodes" && (
+              <motion.span
+                layoutId="seriesWorkspaceTabIndicator"
+                className={wsStyles.tabIndicator}
+                transition={{ type: "spring", stiffness: 450, damping: 35 }}
+              />
+            )}
           </button>
 
           {canEdit && (
@@ -317,7 +350,14 @@ export function SeriesWorkspaceClient({
               onClick={() => setActiveTab("metadata")}
               className={`${wsStyles.tabBtn} ${activeTab === "metadata" ? wsStyles.tabActive : ""}`}
             >
-              Series Details &amp; Metadata
+              <span>Series Details &amp; Metadata</span>
+              {activeTab === "metadata" && (
+                <motion.span
+                  layoutId="seriesWorkspaceTabIndicator"
+                  className={wsStyles.tabIndicator}
+                  transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                />
+              )}
             </button>
           )}
 
@@ -326,7 +366,14 @@ export function SeriesWorkspaceClient({
               onClick={() => setActiveTab("cover")}
               className={`${wsStyles.tabBtn} ${activeTab === "cover" ? wsStyles.tabActive : ""}`}
             >
-              Cover Artwork
+              <span>Cover Artwork</span>
+              {activeTab === "cover" && (
+                <motion.span
+                  layoutId="seriesWorkspaceTabIndicator"
+                  className={wsStyles.tabIndicator}
+                  transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                />
+              )}
             </button>
           )}
 
@@ -335,7 +382,14 @@ export function SeriesWorkspaceClient({
               onClick={() => setActiveTab("danger")}
               className={`${wsStyles.tabBtn} ${activeTab === "danger" ? wsStyles.tabDangerActive : ""}`}
             >
-              Danger Zone
+              <span>Danger Zone</span>
+              {activeTab === "danger" && (
+                <motion.span
+                  layoutId="seriesWorkspaceTabIndicator"
+                  className={wsStyles.tabDangerIndicator}
+                  transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                />
+              )}
             </button>
           )}
         </nav>

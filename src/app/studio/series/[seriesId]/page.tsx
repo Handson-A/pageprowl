@@ -21,7 +21,7 @@ export default async function SeriesWorkspacePage({
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/login");
+    redirect(`/login?redirect=${encodeURIComponent(`/studio/series/${params.seriesId}`)}`);
   }
 
   // Enforce server-side authorization: caller must have at least viewer role

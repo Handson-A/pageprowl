@@ -9,6 +9,8 @@ import {
   LuBookOpen,
   LuBuilding2,
   LuMessageSquare,
+  LuListTodo,
+  LuBell,
   LuUser,
   LuCompass,
   LuLogOut,
@@ -31,9 +33,13 @@ export function CreatorSidebar({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const isLinkActive = (path: string) => {
-    if (path === "/studio" && pathname === "/studio") return true;
-    if (path !== "/studio" && pathname.startsWith(path)) return true;
-    return false;
+    if (path === "/") {
+      return pathname === "/";
+    }
+    if (path === "/studio") {
+      return pathname === "/studio";
+    }
+    return pathname.startsWith(path);
   };
 
   const navLinks = [
@@ -48,14 +54,16 @@ export function CreatorSidebar({
     {
       section: "COLLABORATION",
       items: [
-        { href: "/studio/reviews", label: "Reviews & Tasks", icon: LuMessageSquare },
+        { href: "/studio/tasks", label: "Production Tasks", icon: LuListTodo },
+        { href: "/studio/reviews", label: "Reviews & Revisions", icon: LuMessageSquare },
+        { href: "/studio/notifications", label: "Notifications", icon: LuBell },
       ],
     },
     {
       section: "ACCOUNT",
       items: [
         { href: "/studio/profile", label: "Profile Settings", icon: LuUser },
-        { href: "/", label: "Public Reader", icon: LuCompass },
+        { href: "/", label: "Public Site", icon: LuCompass },
       ],
     },
   ];
@@ -100,7 +108,8 @@ export function CreatorSidebar({
                 return (
                   <motion.div
                     key={item.href}
-                    whileHover={{ x: 2 }}
+                    whileHover={{ x: 3 }}
+                    whileTap={{ scale: 0.98 }}
                     transition={{ type: "spring", stiffness: 400, damping: 25 }}
                   >
                     <Link
@@ -109,7 +118,18 @@ export function CreatorSidebar({
                       className={`${styles.navItem} ${active ? styles.active : ""}`}
                       aria-current={active ? "page" : undefined}
                     >
-                      <Icon size={18} aria-hidden="true" />
+                      {active && (
+                        <motion.span
+                          layoutId="activeSidebarIndicator"
+                          className={styles.activeIndicator}
+                          transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                        />
+                      )}
+                      <Icon
+                        size={18}
+                        className={active ? styles.activeIcon : undefined}
+                        aria-hidden="true"
+                      />
                       <span>{item.label}</span>
                     </Link>
                   </motion.div>
