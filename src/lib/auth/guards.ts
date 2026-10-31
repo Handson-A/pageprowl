@@ -9,6 +9,7 @@ import {
 } from "./permissions";
 
 export * from "./permissions";
+export * from "./redirect";
 
 /**
  * Require an authenticated session on the server.

@@ -1,12 +1,16 @@
 "use client";
 
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect, Suspense, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import styles from "@/app/studio/page.module.css";
 import { CreatorSidebar } from "@/components/layout/CreatorSidebar";
 import { Button } from "@/components/ui/Button";
 import { FormField } from "@/components/ui/FormField";
 import { createClient } from "@/lib/supabase/client";
+import { createSeriesAction } from "../actions";
+import { SUPPORTED_GENRES } from "@/lib/constants/genres";
+import { LuArrowLeft, LuUpload, LuImage, LuCheck } from "react-icons/lu";
 
 interface StudioOption {
   id: string;
@@ -22,15 +26,21 @@ function NewSeriesForm() {
   const [slug, setSlug] = useState("");
   const [synopsis, setSynopsis] = useState("");
   const [format, setFormat] = useState<"scroll" | "page">("scroll");
-  const [genre, setGenre] = useState("Action");
+  const [genre, setGenre] = useState<string>(SUPPORTED_GENRES[0]);
   const [visibility, setVisibility] = useState<"private" | "public">("private");
   const [ownerType, setOwnerType] = useState<"individual" | "studio">(
     initialStudioId ? "studio" : "individual"
   );
   const [selectedStudioId, setSelectedStudioId] = useState(initialStudioId);
   const [userStudios, setUserStudios] = useState<StudioOption[]>([]);
+  const [coverUrl, setCoverUrl] = useState<string>("");
+  const [coverAssetId, setCoverAssetId] = useState<string>("");
+  const [isUploadingCover, setIsUploadingCover] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     async function loadStudios() {
@@ -39,15 +49,20 @@ function NewSeriesForm() {
         data: { user },
       } = await supabase.auth.getUser();
 
-      if (!user) return;
+      if (!user) {
+        router.push("/login?redirect=" + encodeURIComponent("/studio/series/new"));
+        return;
+      }
 
       const { data: memberships } = await supabase
         .from("studio_members")
         .select(`
           studio_id,
+          role,
           studios:studio_id (id, name)
         `)
-        .eq("user_id", user.id);
+        .eq("user_id", user.id)
+        .in("role", ["owner", "admin"]);
 
       if (memberships) {
         const studios = memberships
@@ -63,7 +78,7 @@ function NewSeriesForm() {
     }
 
     loadStudios();
-  }, [initialStudioId]);
+  }, [initialStudioId, router]);
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
@@ -76,51 +91,107 @@ function NewSeriesForm() {
     );
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleCoverFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate type and size (<5MB)
+    const validTypes = ["image/jpeg", "image/png", "image/webp"];
+    if (!validTypes.includes(file.type)) {
+      setUploadError("Cover must be a JPG, PNG, or WebP image.");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setUploadError("Cover image must be under 5MB.");
+      return;
+    }
+
+    setIsUploadingCover(true);
+    setUploadError(null);
+
+    try {
+      // 1. Request signature from server
+      const sigRes = await fetch("/api/media/signature", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "cover" }),
+      });
+
+      if (!sigRes.ok) {
+        const errJson = await sigRes.json().catch(() => ({}));
+        throw new Error(errJson.error || "Failed to authorize upload.");
+      }
+
+      const sigData = await sigRes.json();
+
+      // 2. Upload to Cloudinary
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("api_key", sigData.apiKey);
+      formData.append("timestamp", sigData.timestamp.toString());
+      formData.append("signature", sigData.signature);
+      formData.append("folder", sigData.folder);
+      formData.append("tags", "panelverse,cover");
+
+      const uploadRes = await fetch(
+        `https://api.cloudinary.com/v1_1/${sigData.cloudName}/image/upload`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      if (!uploadRes.ok) {
+        const errData = await uploadRes.json().catch(() => ({}));
+        throw new Error(errData.error?.message || "Failed to upload cover to Cloudinary.");
+      }
+
+      const uploadData = await uploadRes.json();
+
+      // 3. Register media asset
+      const assetRes = await fetch("/api/media/asset", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          cloudinaryPublicId: uploadData.public_id,
+          format: uploadData.format,
+          width: uploadData.width,
+          height: uploadData.height,
+          byteSize: uploadData.bytes,
+          secureUrl: uploadData.secure_url,
+        }),
+      });
+
+      if (assetRes.ok) {
+        const { asset } = await assetRes.json();
+        setCoverAssetId(asset.id);
+      }
+
+      setCoverUrl(uploadData.secure_url);
+    } catch (err: any) {
+      setUploadError(err.message || "Upload failed.");
+    } finally {
+      setIsUploadingCover(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
     setIsLoading(true);
 
     try {
-      const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) {
-        throw new Error("You must be signed in to create a series.");
+      const formData = new FormData(e.currentTarget);
+      if (coverUrl) {
+        formData.set("coverUrl", coverUrl);
       }
-
-      // Enforce check_exactly_one_owner constraint:
-      // Either owner_user_id is set and owner_studio_id is null, OR vice versa
-      const isStudio = ownerType === "studio" && selectedStudioId;
-      const owner_user_id = isStudio ? null : user.id;
-      const owner_studio_id = isStudio ? selectedStudioId : null;
-
-      const { data, error: insertError } = await supabase
-        .from("series")
-        .insert({
-          title,
-          slug,
-          synopsis,
-          format,
-          genre,
-          visibility,
-          owner_user_id,
-          owner_studio_id,
-        })
-        .select()
-        .single();
-
-      if (insertError) {
-        throw insertError;
+      if (coverAssetId) {
+        formData.set("coverAssetId", coverAssetId);
       }
-
-      router.push(`/studio/series/${data.id}`);
-      router.refresh();
+      await createSeriesAction(formData);
     } catch (err: any) {
       setError(err?.message || "Failed to create series.");
-    } finally {
       setIsLoading(false);
     }
   };
@@ -128,7 +199,7 @@ function NewSeriesForm() {
   return (
     <div
       style={{
-        maxWidth: "680px",
+        maxWidth: "720px",
         backgroundColor: "var(--color-surface)",
         padding: "var(--space-8)",
         borderRadius: "var(--radius-lg)",
@@ -150,17 +221,189 @@ function NewSeriesForm() {
         </div>
       )}
 
-      <form
-        onSubmit={handleSubmit}
-        style={{ display: "flex", flexDirection: "column", gap: "20px" }}
-      >
-        {/* Ownership Selector enforcing Section 5.2 Ownership Invariant */}
-        <FormField
-          label="Ownership Model"
-          hint="Decide if this comic belongs to your personal profile or a collaborative studio."
-        >
-          <div style={{ display: "flex", gap: "16px", marginTop: "4px" }}>
-            <label style={{ display: "flex", alignItems: "center", gap: "6px", cursor: "pointer" }}>
+      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+        <div style={{ display: "flex", gap: "24px", alignItems: "flex-start", flexWrap: "wrap" }}>
+          {/* Cover Art Preview / Upload */}
+          <div style={{ width: "160px" }}>
+            <label
+              style={{
+                display: "block",
+                marginBottom: "6px",
+                fontSize: "var(--font-size-sm)",
+                fontWeight: "var(--font-weight-medium)",
+              }}
+            >
+              Cover Artwork
+            </label>
+            <div
+              style={{
+                width: "160px",
+                height: "220px",
+                borderRadius: "var(--radius-md)",
+                border: "1px dashed var(--color-border)",
+                backgroundColor: "var(--color-surface-hover)",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                overflow: "hidden",
+                position: "relative",
+              }}
+            >
+              {coverUrl ? (
+                <img
+                  src={coverUrl}
+                  alt="Cover preview"
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
+              ) : (
+                <div style={{ textAlign: "center", padding: "12px" }}>
+                  <LuImage size={32} color="var(--color-text-muted)" style={{ marginBottom: "8px" }} />
+                  <span style={{ fontSize: "0.75rem", color: "var(--color-text-muted)" }}>
+                    Optional Cover (JPG/PNG &lt; 5MB)
+                  </span>
+                </div>
+              )}
+            </div>
+
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleCoverFileUpload}
+              accept="image/jpeg,image/png,image/webp"
+              style={{ display: "none" }}
+            />
+
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              style={{ width: "100%", marginTop: "8px" }}
+              onClick={() => fileInputRef.current?.click()}
+              isLoading={isUploadingCover}
+            >
+              <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                <LuUpload size={14} />
+                <span>{coverUrl ? "Change Cover" : "Upload Cover"}</span>
+              </span>
+            </Button>
+            {uploadError && (
+              <span style={{ fontSize: "0.75rem", color: "var(--color-danger)", display: "block", marginTop: "4px" }}>
+                {uploadError}
+              </span>
+            )}
+          </div>
+
+          {/* Core Metadata Fields */}
+          <div style={{ flex: 1, minWidth: "280px", display: "flex", flexDirection: "column", gap: "16px" }}>
+            <FormField label="Series Title" htmlFor="title" required>
+              <input
+                id="title"
+                name="title"
+                type="text"
+                required
+                maxLength={100}
+                placeholder="e.g. Chronicles of Neon"
+                value={title}
+                onChange={handleTitleChange}
+                style={{
+                  padding: "10px 14px",
+                  borderRadius: "6px",
+                  border: "1px solid var(--color-border)",
+                  backgroundColor: "var(--color-surface)",
+                  color: "var(--color-text-main)",
+                }}
+              />
+            </FormField>
+
+            <FormField label="URL Slug" htmlFor="slug" hint="Used in public web URLs">
+              <input
+                id="slug"
+                name="slug"
+                type="text"
+                readOnly
+                value={slug}
+                style={{
+                  padding: "10px 14px",
+                  borderRadius: "6px",
+                  border: "1px solid var(--color-border)",
+                  backgroundColor: "var(--color-surface-hover)",
+                  color: "var(--color-text-muted)",
+                  fontFamily: "monospace",
+                }}
+              />
+            </FormField>
+          </div>
+        </div>
+
+        <FormField label="Synopsis / Description" htmlFor="synopsis" required>
+          <textarea
+            id="synopsis"
+            name="synopsis"
+            required
+            rows={4}
+            minLength={10}
+            maxLength={2000}
+            placeholder="Introduce the world, characters, and central conflict of your story..."
+            value={synopsis}
+            onChange={(e) => setSynopsis(e.target.value)}
+            style={{
+              padding: "10px 14px",
+              borderRadius: "6px",
+              border: "1px solid var(--color-border)",
+              backgroundColor: "var(--color-surface)",
+              color: "var(--color-text-main)",
+              resize: "vertical",
+            }}
+          />
+        </FormField>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+          <FormField label="Comic Format" htmlFor="format" required>
+            <select
+              id="format"
+              name="format"
+              value={format}
+              onChange={(e) => setFormat(e.target.value as any)}
+              style={{
+                padding: "10px 14px",
+                borderRadius: "6px",
+                border: "1px solid var(--color-border)",
+                backgroundColor: "var(--color-surface)",
+                color: "var(--color-text-main)",
+              }}
+            >
+              <option value="scroll">Vertical Scroll (Webtoon / Mobile)</option>
+              <option value="page">Page-by-Page (Traditional Print)</option>
+            </select>
+          </FormField>
+
+          <FormField label="Primary Genre" htmlFor="genre" required>
+            <select
+              id="genre"
+              name="genre"
+              value={genre}
+              onChange={(e) => setGenre(e.target.value)}
+              style={{
+                padding: "10px 14px",
+                borderRadius: "6px",
+                border: "1px solid var(--color-border)",
+                backgroundColor: "var(--color-surface)",
+                color: "var(--color-text-main)",
+              }}
+            >
+              {SUPPORTED_GENRES.map((g) => (
+                <option key={g} value={g}>
+                  {g}
+                </option>
+              ))}
+            </select>
+          </FormField>
+        </div>
+
+        <FormField label="Ownership &amp; Publishing Entity" htmlFor="ownerType" required>
+          <div style={{ display: "flex", gap: "16px", marginBottom: "8px" }}>
+            <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}>
               <input
                 type="radio"
                 name="ownerType"
@@ -168,11 +411,11 @@ function NewSeriesForm() {
                 checked={ownerType === "individual"}
                 onChange={() => setOwnerType("individual")}
               />
-              <span>Personal Project</span>
+              <span>Personal (Sole Creator)</span>
             </label>
 
             {userStudios.length > 0 && (
-              <label style={{ display: "flex", alignItems: "center", gap: "6px", cursor: "pointer" }}>
+              <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}>
                 <input
                   type="radio"
                   name="ownerType"
@@ -180,180 +423,61 @@ function NewSeriesForm() {
                   checked={ownerType === "studio"}
                   onChange={() => setOwnerType("studio")}
                 />
-                <span>Studio Team</span>
+                <span>Studio Workspace</span>
               </label>
             )}
           </div>
-        </FormField>
 
-        {ownerType === "studio" && userStudios.length > 0 && (
-          <FormField
-            label="Select Studio"
-            required
-            hint="The comic will be owned by this studio workspace and accessible by its members."
-          >
+          {ownerType === "studio" && userStudios.length > 0 && (
             <select
+              id="studioId"
+              name="studioId"
               value={selectedStudioId}
               onChange={(e) => setSelectedStudioId(e.target.value)}
-              required
               style={{
                 padding: "10px 14px",
                 borderRadius: "6px",
                 border: "1px solid var(--color-border)",
                 backgroundColor: "var(--color-surface)",
-                width: "100%",
+                color: "var(--color-text-main)",
               }}
             >
-              <option value="" disabled>
-                -- Choose a Studio --
-              </option>
-              {userStudios.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name}
+              {userStudios.map((st) => (
+                <option key={st.id} value={st.id}>
+                  {st.name}
                 </option>
               ))}
             </select>
-          </FormField>
-        )}
-
-        <FormField label="Series Title" htmlFor="title" required>
-          <input
-            id="title"
-            type="text"
-            required
-            value={title}
-            onChange={handleTitleChange}
-            placeholder="e.g. Neon Horizon"
-            style={{
-              padding: "10px 14px",
-              borderRadius: "6px",
-              border: "1px solid var(--color-border)",
-              fontSize: "1rem",
-              backgroundColor: "var(--color-bg)",
-              color: "var(--color-text)",
-            }}
-          />
+          )}
         </FormField>
 
-        <FormField
-          label="URL Slug"
-          htmlFor="slug"
-          required
-          hint="Unique address identifier on panelverse.com/series/[slug]"
-        >
-          <input
-            id="slug"
-            type="text"
-            required
-            value={slug}
-            onChange={(e) => setSlug(e.target.value)}
-            placeholder="neon-horizon"
-            style={{
-              padding: "10px 14px",
-              borderRadius: "6px",
-              border: "1px solid var(--color-border)",
-              backgroundColor: "var(--color-bg)",
-              color: "var(--color-text)",
-            }}
-          />
-        </FormField>
-
-        <FormField
-          label="Comic Reading Format"
-          htmlFor="format"
-          required
-          hint="Determines whether readers experience the comic via vertical scroll or page-by-page."
-        >
-          <select
-            id="format"
-            value={format}
-            onChange={(e) => setFormat(e.target.value as "scroll" | "page")}
-            style={{
-              padding: "10px 14px",
-              borderRadius: "6px",
-              border: "1px solid var(--color-border)",
-              backgroundColor: "var(--color-surface)",
-              color: "var(--color-text)",
-            }}
-          >
-            <option value="scroll">Vertical Scroll (Webtoon style)</option>
-            <option value="page">Page-by-Page (Traditional comic/manga)</option>
-          </select>
-        </FormField>
-
-        <FormField label="Genre" htmlFor="genre" required>
-          <select
-            id="genre"
-            value={genre}
-            onChange={(e) => setGenre(e.target.value)}
-            style={{
-              padding: "10px 14px",
-              borderRadius: "6px",
-              border: "1px solid var(--color-border)",
-              backgroundColor: "var(--color-surface)",
-              color: "var(--color-text)",
-            }}
-          >
-            <option value="Action">Action</option>
-            <option value="Fantasy">Fantasy</option>
-            <option value="Sci-Fi">Sci-Fi</option>
-            <option value="Romance">Romance</option>
-            <option value="Horror">Horror</option>
-            <option value="Comedy">Comedy</option>
-            <option value="Drama">Drama</option>
-            <option value="Slice of Life">Slice of Life</option>
-          </select>
-        </FormField>
-
-        <FormField label="Synopsis / Summary" htmlFor="synopsis" required>
-          <textarea
-            id="synopsis"
-            rows={4}
-            required
-            value={synopsis}
-            onChange={(e) => setSynopsis(e.target.value)}
-            placeholder="Describe the setting, characters, and high-level premise..."
-            style={{
-              padding: "10px 14px",
-              borderRadius: "6px",
-              border: "1px solid var(--color-border)",
-              fontFamily: "inherit",
-              backgroundColor: "var(--color-bg)",
-              color: "var(--color-text)",
-            }}
-          />
-        </FormField>
-
-        <FormField label="Initial Visibility" htmlFor="visibility">
+        <FormField label="Initial Visibility" htmlFor="visibility" required>
           <select
             id="visibility"
+            name="visibility"
             value={visibility}
-            onChange={(e) =>
-              setVisibility(e.target.value as "private" | "public")
-            }
+            onChange={(e) => setVisibility(e.target.value as any)}
             style={{
               padding: "10px 14px",
               borderRadius: "6px",
               border: "1px solid var(--color-border)",
               backgroundColor: "var(--color-surface)",
-              color: "var(--color-text)",
+              color: "var(--color-text-main)",
             }}
           >
-            <option value="private">Private (Workspace team only)</option>
-            <option value="public">Public (Visible in catalog once published)</option>
+            <option value="private">Private (Only authorized team members can view)</option>
+            <option value="public">Public (Visible in public browse catalog once chapters publish)</option>
           </select>
         </FormField>
 
-        <div style={{ display: "flex", gap: "12px", marginTop: "12px" }}>
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: "12px", marginTop: "12px" }}>
+          <Link href="/studio/series">
+            <Button type="button" variant="ghost">
+              Cancel
+            </Button>
+          </Link>
           <Button type="submit" variant="primary" isLoading={isLoading}>
             Create Series
-          </Button>
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={() => router.back()}
-          >
-            Cancel
           </Button>
         </div>
       </form>
@@ -369,14 +493,29 @@ export default function NewSeriesPage() {
       <main className={styles.main}>
         <header className={styles.header}>
           <div>
-            <h1 className={styles.title}>Create New Series</h1>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
+              <Link
+                href="/studio/series"
+                style={{
+                  color: "var(--color-text-muted)",
+                  fontSize: "0.875rem",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "4px",
+                }}
+              >
+                <LuArrowLeft size={14} aria-hidden="true" />
+                <span>All Series</span>
+              </Link>
+            </div>
+            <h1 className={styles.title}>Create Comic Series</h1>
             <p className={styles.subtitle}>
-              Establish the foundation for your new comic title.
+              Establish a new title, define metadata, upload cover artwork, and prepare for episode releases.
             </p>
           </div>
         </header>
 
-        <Suspense fallback={<div>Loading series form...</div>}>
+        <Suspense fallback={<div>Loading form...</div>}>
           <NewSeriesForm />
         </Suspense>
       </main>

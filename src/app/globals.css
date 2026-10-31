@@ -24,6 +24,7 @@
   --pv-radius-xl: 22px;
 
   --pv-shadow-card: 0 4px 16px rgb(23 23 23 / 6%);
+  --pv-shadow-hover: 0 10px 24px -2px rgb(23 23 23 / 12%), 0 4px 12px -2px rgb(23 23 23 / 8%);
   --pv-shadow-overlay: 0 16px 48px rgb(23 23 23 / 18%);
 
   --pv-motion-fast: 120ms;
@@ -67,7 +68,7 @@
   --color-info: #2563eb;
   --color-info-bg: #dbeafe;
 
-  /* Dark Reader Environment Tokens */
+  /* Dark Reader & Ink Header Environment Tokens */
   --reader-bg: #0f0f0f;
   --reader-surface: #1a1a1a;
   --reader-surface-muted: #242424;
@@ -123,6 +124,7 @@
   /* Layout Containers */
   --container-max-width: 1200px;
   --container-reader-width: 800px;
+  --mobile-bottom-nav-height: 64px;
 }
 
 *,
@@ -174,6 +176,28 @@ input, textarea, select {
   outline-offset: 2px;
 }
 
+/* Skeleton loader utilities */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(23, 23, 23, 0.06) 25%,
+    rgba(23, 23, 23, 0.12) 50%,
+    rgba(23, 23, 23, 0.06) 75%
+  );
+  background-size: 200% 100%;
+  animation: pv-shimmer 1.8s infinite ease-in-out;
+  border-radius: var(--radius-md);
+}
+
+@keyframes pv-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -182,5 +206,10 @@ input, textarea, select {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  .skeleton {
+    animation: none !important;
+    background: rgba(23, 23, 23, 0.08) !important;
   }
 }

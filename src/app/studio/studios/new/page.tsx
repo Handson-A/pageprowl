@@ -1,12 +1,22 @@
 import React from "react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { CreatorSidebar } from "@/components/layout/CreatorSidebar";
 import { Button } from "@/components/ui/Button";
 import { FormField } from "@/components/ui/FormField";
 import { createStudioAction } from "@/app/studio/studios/actions";
+import { createClient } from "@/lib/supabase/server";
 import styles from "@/app/studio/page.module.css";
 
-export default function NewStudioPage() {
+export default async function NewStudioPage() {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login?redirect=/studio/studios/new");
+  }
   return (
     <div className={styles.layout}>
       <CreatorSidebar />

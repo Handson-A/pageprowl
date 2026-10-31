@@ -1,6 +1,7 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import type { Database } from "@/types/database";
+import { getSafeRedirectUrl } from "@/lib/auth/redirect";
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({
@@ -9,11 +10,17 @@ export async function middleware(request: NextRequest) {
     },
   });
 
+  const pathname = request.nextUrl.pathname;
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  // If Supabase environment is not yet configured, skip session refresh safely
+  // If Supabase environment is unconfigured, prevent unauthenticated access to protected routes
   if (!supabaseUrl || !supabaseAnonKey) {
+    if (pathname.startsWith("/studio")) {
+      const loginUrl = new URL("/login", request.url);
+      loginUrl.searchParams.set("redirect", getSafeRedirectUrl(pathname + request.nextUrl.search));
+      return NextResponse.redirect(loginUrl);
+    }
     return response;
   }
 
@@ -47,8 +54,45 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  // Refresh auth session
-  await supabase.auth.getUser();
+  // Authenticate and refresh auth session
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  // 1. Route Protection Guard: All /studio routes require authentication
+  if (pathname.startsWith("/studio")) {
+    if (!user) {
+      const originalDestination = pathname + request.nextUrl.search;
+      const safeTarget = getSafeRedirectUrl(originalDestination, "/studio");
+      const loginUrl = new URL("/login", request.url);
+      loginUrl.searchParams.set("redirect", safeTarget);
+
+      const redirectResponse = NextResponse.redirect(loginUrl);
+      // Propagate any refreshed or cleared cookies
+      response.cookies.getAll().forEach((cookie) => {
+        redirectResponse.cookies.set(cookie.name, cookie.value, cookie);
+      });
+      return redirectResponse;
+    }
+  }
+
+  // 2. Auth Routes (/login, /signup): If already authenticated, redirect to destination
+  if (pathname === "/login" || pathname === "/signup") {
+    const isSignoutAction = request.nextUrl.searchParams.get("action") === "signout";
+    if (user && !isSignoutAction) {
+      const rawTarget =
+        request.nextUrl.searchParams.get("redirect") ||
+        request.nextUrl.searchParams.get("next");
+      const safeTarget = getSafeRedirectUrl(rawTarget, "/studio");
+      const destinationUrl = new URL(safeTarget, request.url);
+
+      const redirectResponse = NextResponse.redirect(destinationUrl);
+      response.cookies.getAll().forEach((cookie) => {
+        redirectResponse.cookies.set(cookie.name, cookie.value, cookie);
+      });
+      return redirectResponse;
+    }
+  }
 
   return response;
 }

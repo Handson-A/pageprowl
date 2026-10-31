@@ -25,7 +25,7 @@ export default async function EpisodeWorkspacePage({
   }
 
   // Enforce server-side authorization: caller must be editor or owner
-  await requireSeriesRole(params.seriesId, "editor");
+  const { effectiveRole } = await requireSeriesRole(params.seriesId, "editor");
 
   const { data: series } = await supabase
     .from("series")
@@ -41,6 +41,7 @@ export default async function EpisodeWorkspacePage({
     .from("episodes")
     .select("*")
     .eq("id", params.episodeId)
+    .eq("series_id", series.id)
     .single();
 
   if (!episode) {
@@ -63,12 +64,13 @@ export default async function EpisodeWorkspacePage({
           status: "draft" as const,
         };
 
-  // Fetch revision pages
+  // Fetch revision pages with media_asset_id
   const { data: pages } = await supabase
     .from("revision_pages")
     .select(`
       id,
       page_number,
+      media_asset_id,
       media_assets:media_asset_id (secure_url)
     `)
     .eq("revision_id", currentRevision.id)
@@ -77,10 +79,11 @@ export default async function EpisodeWorkspacePage({
   const initialPages = (pages || []).map((p: any) => ({
     id: p.id,
     pageNumber: p.page_number,
-    imageUrl: p.media_assets?.secure_url || "https://picsum.photos/800/1200",
+    mediaAssetId: p.media_asset_id,
+    imageUrl: p.media_assets?.secure_url || "/images/artwork-fallback.png",
   }));
 
-  // Fetch comments
+  // Fetch review comments
   const { data: comments } = await supabase
     .from("review_comments")
     .select(`
@@ -114,11 +117,13 @@ export default async function EpisodeWorkspacePage({
         episodeId={episode.id}
         episodeNumber={episode.episode_number}
         episodeTitle={episode.title}
+        episodeSlug={episode.slug}
         initialRevisionId={currentRevision.id}
         initialStatus={currentRevision.status}
         initialPages={initialPages}
         initialComments={initialComments}
         isPublished={isPublished}
+        userRole={effectiveRole}
       />
     </div>
   );

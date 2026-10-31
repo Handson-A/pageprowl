@@ -3,6 +3,7 @@ import Link from "next/link";
 import styles from "./PublicHeader.module.css";
 import { Button } from "@/components/ui/Button";
 import { PanelverseLogo } from "@/components/brand/PanelverseLogo";
+import { LuSearch } from "react-icons/lu";
 
 export function PublicHeader() {
   return (
@@ -10,7 +11,7 @@ export function PublicHeader() {
       <div className={styles.inner}>
         <div className={styles.brandGroup}>
           <Link href="/" className={styles.brand} aria-label="Panelverse Home">
-            <PanelverseLogo variant="full" size="sm" />
+            <PanelverseLogo variant="full" theme="dark" size="sm" />
           </Link>
 
           <nav className={styles.nav} aria-label="Main Navigation">
@@ -26,18 +27,30 @@ export function PublicHeader() {
             <Link href="/browse?genre=Fantasy" className={styles.navLink}>
               Fantasy
             </Link>
+            <Link href="/studio" className={styles.navLink}>
+              Creators
+            </Link>
           </nav>
         </div>
 
         <div className={styles.actions}>
-          <Link href="/studio">
-            <Button variant="secondary" size="sm">
-              Creator Studio
+          <Link
+            href="/browse"
+            className={styles.searchButton}
+            aria-label="Search comics"
+          >
+            <LuSearch size={18} aria-hidden="true" />
+          </Link>
+
+          <Link href="/login" className={styles.loginLink}>
+            <Button variant="ghost" size="sm" className={styles.ghostLight}>
+              Sign In
             </Button>
           </Link>
-          <Link href="/login">
+
+          <Link href="/studio">
             <Button variant="primary" size="sm">
-              Sign In
+              Creator Studio
             </Button>
           </Link>
         </div>

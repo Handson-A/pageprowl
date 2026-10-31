@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { CreatorSidebar } from "@/components/layout/CreatorSidebar";
 import { Button } from "@/components/ui/Button";
 import { StatusBadge } from "@/components/ui/StatusBadge";
@@ -14,10 +15,13 @@ export default async function StudioReviewsPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
+  if (!user) {
+    redirect("/login?redirect=/studio/reviews");
+  }
+
   let comments: any[] = [];
 
-  if (user) {
-    const { data } = await supabase
+  const { data } = await supabase
       .from("review_comments")
       .select(`
         id,
@@ -41,7 +45,6 @@ export default async function StudioReviewsPage() {
     if (data) {
       comments = data;
     }
-  }
 
   return (
     <div className={styles.layout}>

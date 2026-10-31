@@ -192,6 +192,7 @@ export interface Database {
           format: ComicFormat;
           genre: string;
           cover_url: string | null;
+          cover_asset_id: string | null;
           owner_user_id: string | null;
           owner_studio_id: string | null;
           visibility: SeriesVisibility;
@@ -206,6 +207,7 @@ export interface Database {
           format: ComicFormat;
           genre: string;
           cover_url?: string | null;
+          cover_asset_id?: string | null;
           owner_user_id?: string | null;
           owner_studio_id?: string | null;
           visibility?: SeriesVisibility;
@@ -219,6 +221,7 @@ export interface Database {
           format?: ComicFormat;
           genre?: string;
           cover_url?: string | null;
+          cover_asset_id?: string | null;
           owner_user_id?: string | null;
           owner_studio_id?: string | null;
           visibility?: SeriesVisibility;

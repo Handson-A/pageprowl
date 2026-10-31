@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { CreatorSidebar } from "@/components/layout/CreatorSidebar";
 import { Button } from "@/components/ui/Button";
 import { StatusBadge } from "@/components/ui/StatusBadge";
@@ -15,7 +16,11 @@ export default async function StudiosListPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const studios = user ? await getUserStudios(user.id) : [];
+  if (!user) {
+    redirect("/login?redirect=/studio/studios");
+  }
+
+  const studios = await getUserStudios(user.id);
 
   return (
     <div className={styles.layout}>

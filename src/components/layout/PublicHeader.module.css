@@ -1,6 +1,6 @@
 .header {
-  border-bottom: 1px solid var(--color-border);
-  background-color: var(--color-surface);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background-color: #171717;
   position: sticky;
   top: 0;
   z-index: 50;
@@ -10,7 +10,7 @@
 .inner {
   max-width: var(--container-max-width);
   margin: 0 auto;
-  padding: var(--space-4) var(--space-6);
+  padding: var(--space-3) var(--space-6);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -25,20 +25,7 @@
 .brand {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
-  font-family: var(--font-family-heading);
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-bold);
-  color: var(--color-text);
-  letter-spacing: -0.02em;
-}
-
-.brandDot {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  border-radius: var(--radius-full);
-  background-color: var(--color-primary);
+  text-decoration: none;
 }
 
 .nav {
@@ -50,12 +37,13 @@
 .navLink {
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
-  color: var(--color-text-muted);
+  color: #A3A3A3;
+  text-decoration: none;
   transition: color var(--pv-motion-fast) var(--pv-ease-standard);
 }
 
 .navLink:hover {
-  color: var(--color-primary);
+  color: #F7F0E3;
 }
 
 .actions {
@@ -64,12 +52,42 @@
   gap: var(--space-3);
 }
 
-@media (max-width: 640px) {
+.searchButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  color: #A3A3A3;
+  transition: color var(--pv-motion-fast) var(--pv-ease-standard),
+              background-color var(--pv-motion-fast) var(--pv-ease-standard);
+}
+
+.searchButton:hover {
+  color: #F7F0E3;
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.ghostLight {
+  color: #D4D0C7 !important;
+}
+
+.ghostLight:hover {
+  color: #FFFFFF !important;
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+@media (max-width: 768px) {
   .inner {
     padding: var(--space-3) var(--space-4);
   }
 
   .nav {
+    display: none;
+  }
+
+  .loginLink {
     display: none;
   }
 }

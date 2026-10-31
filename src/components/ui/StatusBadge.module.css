@@ -1,14 +1,22 @@
 .badge {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-1);
-  padding: 2px 8px;
+  gap: 6px;
+  padding: 3px 10px;
   border-radius: var(--radius-full);
   font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
-  line-height: 1.4;
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.2;
   border: 1px solid transparent;
   width: fit-content;
+  white-space: nowrap;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
 }
 
 .draft {
@@ -16,27 +24,44 @@
   color: var(--color-text-muted);
   border-color: var(--color-border);
 }
+.draft .dot {
+  background-color: var(--color-text-muted);
+}
 
+.inProgress,
 .inReview {
-  background-color: var(--color-warning-bg);
-  color: var(--color-warning);
-  border-color: rgba(217, 119, 6, 0.3);
+  background-color: #FEF3C7;
+  color: #92400E;
+  border-color: rgba(242, 193, 78, 0.4);
+}
+.inProgress .dot,
+.inReview .dot {
+  background-color: #D97706;
 }
 
 .readyToPublish {
-  background-color: var(--color-info-bg);
-  color: var(--color-info);
+  background-color: #DBEAFE;
+  color: #1E40AF;
   border-color: rgba(37, 99, 235, 0.3);
+}
+.readyToPublish .dot {
+  background-color: #2563EB;
 }
 
 .published {
-  background-color: var(--color-success-bg);
-  color: var(--color-success);
-  border-color: rgba(22, 163, 74, 0.3);
+  background-color: #DCFCE7;
+  color: #166534;
+  border-color: rgba(34, 197, 94, 0.3);
+}
+.published .dot {
+  background-color: #16A34A;
 }
 
 .restricted {
-  background-color: var(--color-danger-bg);
-  color: var(--color-danger);
+  background-color: #FEE2E2;
+  color: #991B1B;
   border-color: rgba(220, 38, 38, 0.3);
+}
+.restricted .dot {
+  background-color: #DC2626;
 }

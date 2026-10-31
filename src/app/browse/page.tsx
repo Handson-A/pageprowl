@@ -3,6 +3,7 @@ import Link from "next/link";
 import styles from "./page.module.css";
 import { PublicHeader } from "@/components/layout/PublicHeader";
 import { PublicFooter } from "@/components/layout/PublicFooter";
+import { BottomNav } from "@/components/layout/BottomNav";
 import { SeriesCard } from "@/components/ui/SeriesCard";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/Button";
@@ -140,6 +141,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
       </main>
 
       <PublicFooter />
+      <BottomNav />
     </div>
   );
 }

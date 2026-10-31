@@ -4,10 +4,11 @@ import { notFound } from "next/navigation";
 import styles from "./page.module.css";
 import { PublicHeader } from "@/components/layout/PublicHeader";
 import { PublicFooter } from "@/components/layout/PublicFooter";
+import { BottomNav } from "@/components/layout/BottomNav";
 import { Button } from "@/components/ui/Button";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 import { getPublicSeriesBySlug, getPublishedEpisodes } from "@/lib/data/series";
-import { LuImage, LuClock, LuBookOpen, LuArrowRight } from "react-icons/lu";
+import { LuBookOpen, LuArrowRight, LuLayers } from "react-icons/lu";
 
 interface SeriesPageProps {
   params: {
@@ -40,8 +41,9 @@ export default async function SeriesOverviewPage({ params }: SeriesPageProps) {
                 className={styles.coverImage}
               />
             ) : (
-              <div className={styles.coverFallback} aria-label="Cover Artwork Placeholder">
-                <LuImage size={44} color="var(--color-text-muted)" />
+              <div className={styles.coverFallback} aria-label="Cover artwork placeholder">
+                <LuLayers size={48} color="#F7F0E3" />
+                <span className={styles.fallbackTitle}>{series.title}</span>
               </div>
             )}
           </div>
@@ -49,14 +51,19 @@ export default async function SeriesOverviewPage({ params }: SeriesPageProps) {
           <div className={styles.seriesMeta}>
             <div className={styles.badges}>
               <span className={styles.badge}>{series.genre}</span>
-              <span className={styles.badge}>
+              <span className={styles.formatBadge}>
                 {series.format === "scroll" ? "Vertical Scroll" : "Page-by-Page"}
               </span>
+              <StatusBadge status="published" label="PUBLISHED" />
             </div>
 
             <h1 className={styles.title}>{series.title}</h1>
-            <p className={styles.creator}>Created by {series.creator_name}</p>
-            <p className={styles.synopsis}>{series.synopsis}</p>
+            <p className={styles.creator}>
+              Story by <strong>{series.creator_name}</strong>
+              {series.studio_name ? ` &bull; Studio: ${series.studio_name}` : ""}
+            </p>
+
+            <p className={styles.synopsis}>{series.synopsis || "No series synopsis available."}</p>
 
             <div className={styles.actions}>
               {firstEpisode ? (
@@ -78,7 +85,10 @@ export default async function SeriesOverviewPage({ params }: SeriesPageProps) {
         </div>
 
         <section className={styles.episodesSection}>
-          <h2 className={styles.episodesTitle}>Published Episodes ({episodes.length})</h2>
+          <div className={styles.episodesHeader}>
+            <h2 className={styles.episodesTitle}>Published Episodes ({episodes.length})</h2>
+            <span className={styles.readingOrderNotice}>In Official Reading Order</span>
+          </div>
 
           {episodes.length > 0 ? (
             <div className={styles.episodeList}>
@@ -92,9 +102,14 @@ export default async function SeriesOverviewPage({ params }: SeriesPageProps) {
                     <span className={styles.episodeNumber}>
                       #{ep.episode_number}
                     </span>
-                    <span className={styles.episodeItemTitle}>{ep.title}</span>
+                    <div className={styles.episodeTextGroup}>
+                      <span className={styles.episodeItemTitle}>{ep.title}</span>
+                      <span className={styles.episodeFormat}>
+                        {series.format === "scroll" ? "Scroll Mode" : "Page Mode"}
+                      </span>
+                    </div>
                   </div>
-                  <span className={styles.readButton} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                  <span className={styles.readButton}>
                     <span>Read</span>
                     <LuArrowRight size={14} aria-hidden="true" />
                   </span>
@@ -102,16 +117,15 @@ export default async function SeriesOverviewPage({ params }: SeriesPageProps) {
               ))}
             </div>
           ) : (
-            <EmptyState
-              icon={<LuClock size={40} color="var(--color-text-muted)" />}
-              title="No published episodes yet"
-              description="The creator is currently preparing the first chapter. Check back soon!"
-            />
+            <p className={styles.noEpisodes}>
+              No episodes have been published yet for this series. Check back soon!
+            </p>
           )}
         </section>
       </main>
 
       <PublicFooter />
+      <BottomNav />
     </div>
   );
 }

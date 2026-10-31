@@ -11,18 +11,20 @@
   flex-direction: column;
   gap: var(--space-6);
   max-width: var(--container-max-width);
+  overflow-x: hidden;
 }
 
 .header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   flex-wrap: wrap;
   gap: var(--space-4);
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--pv-radius-md);
   padding: var(--space-6);
+  box-shadow: var(--pv-shadow-card);
 }
 
 .headerLeft {
@@ -36,80 +38,222 @@
   color: var(--color-text-muted);
 }
 
-.title {
-  font-size: var(--font-size-2xl);
-  font-weight: var(--font-weight-bold);
+.breadcrumb a {
+  color: var(--color-text-muted);
+  text-decoration: none;
+  transition: color var(--pv-motion-fast) var(--pv-ease-standard);
+}
+
+.breadcrumb a:hover {
   color: var(--color-text);
+}
+
+.title {
+  font-family: var(--font-family-heading);
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  font-weight: 800;
+  color: var(--color-text);
+  line-height: var(--line-height-tight);
 }
 
 .tabBar {
   display: flex;
   gap: var(--space-2);
-  border-bottom: 1px solid var(--color-border);
-  padding-bottom: var(--space-2);
+  border-bottom: 2px solid var(--color-border);
+  padding-bottom: 0;
+  overflow-x: auto;
 }
 
 .tab {
-  padding: var(--space-2) var(--space-4);
-  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
   background: none;
   border: none;
   color: var(--color-text-muted);
   cursor: pointer;
-  transition: all 0.15s ease;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  white-space: nowrap;
+  transition: color var(--pv-motion-fast) var(--pv-ease-standard),
+              border-color var(--pv-motion-fast) var(--pv-ease-standard);
 }
 
 .tab:hover {
   color: var(--color-text);
-  background-color: var(--color-surface-muted);
 }
 
 .tabActive {
-  background-color: var(--color-surface);
-  color: var(--color-primary);
+  color: var(--color-primary) !important;
   font-weight: var(--font-weight-semibold);
-  border: 1px solid var(--color-border);
+  border-bottom-color: var(--color-primary) !important;
 }
 
 .card {
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--pv-radius-md);
   padding: var(--space-6);
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
+  box-shadow: var(--pv-shadow-card);
 }
 
+/* Two-Column Studio Production Layout from Reference Screen 4 */
+.productionLayout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: var(--space-6);
+  align-items: start;
+}
+
+.pageSidebar {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--pv-radius-md);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.sidebarHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.sidebarTitle {
+  font-family: var(--font-family-heading);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+}
+
+.pageListVertical {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-height: 600px;
+  overflow-y: auto;
+  padding-right: var(--space-1);
+}
+
+.pageRowItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+}
+
+.pageNumberBadge {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-primary);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: var(--font-weight-bold);
+  flex-shrink: 0;
+}
+
+.pageThumbMini {
+  width: 48px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  background-color: #000;
+  flex-shrink: 0;
+}
+
+.pageRowControls {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-left: auto;
+}
+
+/* Upload Dropzone from Reference Screen 4 */
 .uploadZone {
-  border: 2px dashed var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-8);
+  border: 2px dashed rgba(228, 71, 53, 0.4);
+  border-radius: var(--pv-radius-lg);
+  padding: var(--space-10) var(--space-6);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: var(--space-3);
   text-align: center;
-  background-color: var(--color-surface-muted);
+  background-color: rgba(247, 240, 227, 0.5);
+  cursor: pointer;
+  transition: border-color var(--pv-motion-fast) var(--pv-ease-standard),
+              background-color var(--pv-motion-fast) var(--pv-ease-standard);
 }
 
+.uploadZone:hover {
+  border-color: var(--color-primary);
+  background-color: rgba(228, 71, 53, 0.05);
+}
+
+.uploadIconCircle {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-full);
+  background-color: rgba(228, 71, 53, 0.1);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.uploadTitle {
+  font-family: var(--font-family-heading);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+}
+
+.uploadTitle span {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
+.uploadSubtitle {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+/* Grid for desktop full view */
 .pageGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: var(--space-4);
 }
 
 .pageItem {
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  border-radius: var(--pv-radius-md);
   overflow: hidden;
   display: flex;
   flex-direction: column;
   position: relative;
+  box-shadow: var(--pv-shadow-card);
+  transition: transform var(--pv-motion-fast) var(--pv-ease-standard);
+}
+
+.pageItem:hover {
+  transform: translateY(-2px);
+  border-color: rgba(228, 71, 53, 0.4);
 }
 
 .pageThumbnail {
@@ -120,32 +264,48 @@
 }
 
 .pageFooter {
-  padding: var(--space-2);
+  padding: var(--space-2) var(--space-3);
   display: flex;
   justify-content: space-between;
   align-items: center;
   font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
   background-color: var(--color-surface-muted);
 }
 
 .orderControls {
   display: flex;
-  gap: var(--space-1);
+  gap: 3px;
 }
 
 .orderBtn {
-  background: none;
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
-  padding: 2px 6px;
+  padding: 3px 6px;
   cursor: pointer;
-  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text);
+  transition: background-color var(--pv-motion-fast) var(--pv-ease-standard);
+}
+
+.orderBtn:hover:not(:disabled) {
+  background-color: var(--color-primary);
+  color: #FFFFFF;
+  border-color: var(--color-primary);
+}
+
+.orderBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
 }
 
 .publishBox {
   background-color: var(--color-surface-muted);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  border-radius: var(--pv-radius-md);
   padding: var(--space-6);
   display: flex;
   flex-direction: column;
@@ -160,8 +320,32 @@
 
 .commentItem {
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: var(--space-3) var(--space-4);
+  border-radius: var(--pv-radius-md);
+  padding: var(--space-4);
   background-color: var(--color-surface);
   font-size: var(--font-size-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+@media (max-width: 960px) {
+  .productionLayout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .layout {
+    flex-direction: column;
+  }
+
+  .main {
+    padding: var(--space-4);
+    gap: var(--space-4);
+  }
+
+  .header {
+    padding: var(--space-4);
+  }
 }

@@ -1,12 +1,15 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import styles from "@/app/studio/page.module.css";
 import { CreatorSidebar } from "@/components/layout/CreatorSidebar";
 import { Button } from "@/components/ui/Button";
 import { FormField } from "@/components/ui/FormField";
 import { createClient } from "@/lib/supabase/client";
+import { createEpisodeAction } from "../actions";
+import { LuArrowLeft } from "react-icons/lu";
 
 interface NewEpisodePageProps {
   params: {
@@ -22,64 +25,61 @@ export default function NewEpisodePage({ params }: NewEpisodePageProps) {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value;
-    setTitle(val);
-    setSlug(
-      val
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-|-$/g, "")
-    );
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setIsLoading(true);
-
-    try {
+  useEffect(() => {
+    async function suggestNextNumber() {
       const supabase = createClient();
       const {
         data: { user },
       } = await supabase.auth.getUser();
 
       if (!user) {
-        throw new Error("You must be signed in to create an episode.");
+        router.push(
+          `/login?redirect=${encodeURIComponent(
+            `/studio/series/${params.seriesId}/episodes/new`
+          )}`
+        );
+        return;
       }
 
-      // Insert episode
-      const { data: episode, error: epError } = await supabase
+      const { data } = await supabase
         .from("episodes")
-        .insert({
-          series_id: params.seriesId,
-          episode_number: episodeNumber,
-          title,
-          slug,
-        })
-        .select()
-        .single();
+        .select("episode_number")
+        .eq("series_id", params.seriesId)
+        .order("episode_number", { ascending: false })
+        .limit(1);
 
-      if (epError) throw epError;
+      if (data && data.length > 0) {
+        const nextNum = data[0].episode_number + 1;
+        setEpisodeNumber(nextNum);
+        setSlug(`chapter-${nextNum}`);
+      } else {
+        setEpisodeNumber(1);
+        setSlug("chapter-1");
+      }
+    }
+    suggestNextNumber();
+  }, [params.seriesId, router]);
 
-      // Automatically create Revision 1 (Draft)
-      const { error: revError } = await supabase
-        .from("episode_revisions")
-        .insert({
-          episode_id: episode.id,
-          revision_number: 1,
-          status: "draft",
-          created_by: user.id,
-          notes: "Initial draft",
-        });
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setTitle(val);
+    const generated = val
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "");
+    setSlug(generated || `chapter-${episodeNumber}`);
+  };
 
-      if (revError) throw revError;
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError(null);
+    setIsLoading(true);
 
-      router.push(`/studio/series/${params.seriesId}/episodes/${episode.id}`);
-      router.refresh();
+    try {
+      const formData = new FormData(e.currentTarget);
+      await createEpisodeAction(params.seriesId, formData);
     } catch (err: any) {
       setError(err?.message || "Failed to create episode.");
-    } finally {
       setIsLoading(false);
     }
   };
@@ -91,9 +91,24 @@ export default function NewEpisodePage({ params }: NewEpisodePageProps) {
       <main className={styles.main}>
         <header className={styles.header}>
           <div>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
+              <Link
+                href={`/studio/series/${params.seriesId}`}
+                style={{
+                  color: "var(--color-text-muted)",
+                  fontSize: "0.875rem",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "4px",
+                }}
+              >
+                <LuArrowLeft size={14} aria-hidden="true" />
+                <span>Back to Series Workspace</span>
+              </Link>
+            </div>
             <h1 className={styles.title}>New Episode</h1>
             <p className={styles.subtitle}>
-              Create an episode container to begin uploading artwork pages.
+              Create a new chapter or episode container to upload comic pages and prepare revisions.
             </p>
           </div>
         </header>
@@ -126,18 +141,25 @@ export default function NewEpisodePage({ params }: NewEpisodePageProps) {
             onSubmit={handleSubmit}
             style={{ display: "flex", flexDirection: "column", gap: "20px" }}
           >
-            <FormField label="Episode Number" htmlFor="episodeNumber" required>
+            <FormField label="Episode Number" htmlFor="episodeNumber" required hint="Scoped to this series">
               <input
                 id="episodeNumber"
+                name="episodeNumber"
                 type="number"
                 min={1}
                 required
                 value={episodeNumber}
-                onChange={(e) => setEpisodeNumber(parseInt(e.target.value) || 1)}
+                onChange={(e) => {
+                  const val = parseInt(e.target.value) || 1;
+                  setEpisodeNumber(val);
+                  if (!title) setSlug(`chapter-${val}`);
+                }}
                 style={{
                   padding: "10px 14px",
                   borderRadius: "6px",
                   border: "1px solid var(--color-border)",
+                  backgroundColor: "var(--color-surface)",
+                  color: "var(--color-text-main)",
                 }}
               />
             </FormField>
@@ -145,50 +167,56 @@ export default function NewEpisodePage({ params }: NewEpisodePageProps) {
             <FormField label="Episode Title" htmlFor="title" required>
               <input
                 id="title"
+                name="title"
                 type="text"
                 required
+                maxLength={100}
+                placeholder="e.g. The Awakening Part 1"
                 value={title}
                 onChange={handleTitleChange}
-                placeholder="Chapter 1: The Spark"
                 style={{
                   padding: "10px 14px",
                   borderRadius: "6px",
                   border: "1px solid var(--color-border)",
+                  backgroundColor: "var(--color-surface)",
+                  color: "var(--color-text-main)",
                 }}
               />
             </FormField>
 
-            <FormField
-              label="URL Slug"
-              htmlFor="slug"
-              required
-              hint="Identifies the episode in reader URLs"
-            >
+            <FormField label="URL Slug" htmlFor="slug" hint="Used in reader web address">
               <input
                 id="slug"
+                name="slug"
                 type="text"
-                required
+                readOnly
                 value={slug}
-                onChange={(e) => setSlug(e.target.value)}
-                placeholder="chapter-1"
                 style={{
                   padding: "10px 14px",
                   borderRadius: "6px",
                   border: "1px solid var(--color-border)",
+                  backgroundColor: "var(--color-surface-hover)",
+                  color: "var(--color-text-muted)",
+                  fontFamily: "monospace",
                 }}
               />
             </FormField>
 
-            <div style={{ display: "flex", gap: "12px", marginTop: "12px" }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: "12px",
+                marginTop: "12px",
+              }}
+            >
+              <Link href={`/studio/series/${params.seriesId}`}>
+                <Button type="button" variant="ghost">
+                  Cancel
+                </Button>
+              </Link>
               <Button type="submit" variant="primary" isLoading={isLoading}>
-                Create Episode &rarr;
-              </Button>
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => router.back()}
-              >
-                Cancel
+                Create Episode &amp; Open Workspace
               </Button>
             </div>
           </form>

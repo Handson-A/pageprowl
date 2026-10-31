@@ -1,17 +1,22 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import styles from "../login/page.module.css";
 import { PublicHeader } from "@/components/layout/PublicHeader";
 import { PublicFooter } from "@/components/layout/PublicFooter";
 import { Button } from "@/components/ui/Button";
 import { FormField } from "@/components/ui/FormField";
 import { createClient } from "@/lib/supabase/client";
+import { getSafeRedirectUrl } from "@/lib/auth/redirect";
 
-export default function SignUpPage() {
+function SignUpForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const rawRedirect = searchParams.get("redirect") || searchParams.get("next");
+  const destination = getSafeRedirectUrl(rawRedirect, "/studio");
+
   const [username, setUsername] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
@@ -42,7 +47,7 @@ export default function SignUpPage() {
       if (signUpError) {
         setError(signUpError.message);
       } else if (data.session) {
-        router.push("/studio");
+        router.push(destination);
         router.refresh();
       } else {
         setSuccess(
@@ -56,121 +61,140 @@ export default function SignUpPage() {
     }
   };
 
+  const loginHref =
+    destination !== "/studio"
+      ? `/login?redirect=${encodeURIComponent(destination)}`
+      : "/login";
+
+  return (
+    <div className={styles.card}>
+      <div className={styles.header}>
+        <h1 className={styles.title}>Join Panelverse</h1>
+        <p className={styles.subtitle}>
+          Create an account to publish comics and collaborate with studios
+        </p>
+      </div>
+
+      {error && <div className={styles.errorBanner}>{error}</div>}
+      {success && (
+        <div
+          style={{
+            backgroundColor: "var(--color-success-bg)",
+            border: "1px solid var(--color-success)",
+            color: "var(--color-success)",
+            padding: "12px",
+            borderRadius: "6px",
+            fontSize: "0.875rem",
+          }}
+        >
+          {success}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className={styles.form}>
+        <FormField label="Username" htmlFor="username" required hint="Unique creator handle">
+          <input
+            id="username"
+            type="text"
+            required
+            value={username}
+            onChange={(e) =>
+              setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ""))
+            }
+            placeholder="pen_name"
+            style={{
+              padding: "8px 12px",
+              borderRadius: "6px",
+              border: "1px solid var(--color-border)",
+            }}
+          />
+        </FormField>
+
+        <FormField label="Display Name" htmlFor="displayName" required>
+          <input
+            id="displayName"
+            type="text"
+            required
+            value={displayName}
+            onChange={(e) => setDisplayName(e.target.value)}
+            placeholder="Jane Doe"
+            style={{
+              padding: "8px 12px",
+              borderRadius: "6px",
+              border: "1px solid var(--color-border)",
+            }}
+          />
+        </FormField>
+
+        <FormField label="Email Address" htmlFor="email" required>
+          <input
+            id="email"
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="creator@panelverse.com"
+            style={{
+              padding: "8px 12px",
+              borderRadius: "6px",
+              border: "1px solid var(--color-border)",
+            }}
+          />
+        </FormField>
+
+        <FormField label="Password" htmlFor="password" required hint="At least 6 characters">
+          <input
+            id="password"
+            type="password"
+            required
+            minLength={6}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="••••••••"
+            style={{
+              padding: "8px 12px",
+              borderRadius: "6px",
+              border: "1px solid var(--color-border)",
+            }}
+          />
+        </FormField>
+
+        <Button
+          type="submit"
+          variant="primary"
+          fullWidth
+          isLoading={isLoading}
+          style={{ marginTop: "8px" }}
+        >
+          Create Account
+        </Button>
+      </form>
+
+      <div className={styles.footer}>
+        Already have an account?{" "}
+        <Link href={loginHref} className={styles.link}>
+          Sign In
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+export default function SignUpPage() {
   return (
     <div className={styles.container}>
       <PublicHeader />
-
       <main className={styles.main}>
-        <div className={styles.card}>
-          <div className={styles.header}>
-            <h1 className={styles.title}>Join Panelverse</h1>
-            <p className={styles.subtitle}>
-              Create an account to publish comics and collaborate with studios
-            </p>
-          </div>
-
-          {error && <div className={styles.errorBanner}>{error}</div>}
-          {success && (
-            <div
-              style={{
-                backgroundColor: "var(--color-success-bg)",
-                border: "1px solid var(--color-success)",
-                color: "var(--color-success)",
-                padding: "12px",
-                borderRadius: "6px",
-                fontSize: "0.875rem",
-              }}
-            >
-              {success}
+        <Suspense
+          fallback={
+            <div className={styles.card}>
+              <p style={{ color: "var(--color-text-muted)" }}>Loading Sign Up...</p>
             </div>
-          )}
-
-          <form onSubmit={handleSubmit} className={styles.form}>
-            <FormField label="Username" htmlFor="username" required hint="Unique creator handle">
-              <input
-                id="username"
-                type="text"
-                required
-                value={username}
-                onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ""))}
-                placeholder="pen_name"
-                style={{
-                  padding: "8px 12px",
-                  borderRadius: "6px",
-                  border: "1px solid var(--color-border)",
-                }}
-              />
-            </FormField>
-
-            <FormField label="Display Name" htmlFor="displayName" required>
-              <input
-                id="displayName"
-                type="text"
-                required
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-                placeholder="Jane Doe"
-                style={{
-                  padding: "8px 12px",
-                  borderRadius: "6px",
-                  border: "1px solid var(--color-border)",
-                }}
-              />
-            </FormField>
-
-            <FormField label="Email Address" htmlFor="email" required>
-              <input
-                id="email"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="creator@panelverse.com"
-                style={{
-                  padding: "8px 12px",
-                  borderRadius: "6px",
-                  border: "1px solid var(--color-border)",
-                }}
-              />
-            </FormField>
-
-            <FormField label="Password" htmlFor="password" required hint="At least 6 characters">
-              <input
-                id="password"
-                type="password"
-                required
-                minLength={6}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                style={{
-                  padding: "8px 12px",
-                  borderRadius: "6px",
-                  border: "1px solid var(--color-border)",
-                }}
-              />
-            </FormField>
-
-            <Button
-              type="submit"
-              variant="primary"
-              fullWidth
-              isLoading={isLoading}
-              style={{ marginTop: "8px" }}
-            >
-              Create Account
-            </Button>
-          </form>
-
-          <div className={styles.footer}>
-            Already have an account?{" "}
-            <Link href="/login" className={styles.link}>
-              Sign In
-            </Link>
-          </div>
-        </div>
+          }
+        >
+          <SignUpForm />
+        </Suspense>
       </main>
-
       <PublicFooter />
     </div>
   );

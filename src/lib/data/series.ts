@@ -1,11 +1,14 @@
 import { createClient } from "@/lib/supabase/server";
-import type { Database, ComicFormat } from "@/types/database";
+import type { Database, ComicFormat, SeriesVisibility } from "@/types/database";
 
 export type SeriesRow = Database["public"]["Tables"]["series"]["Row"];
 export type EpisodeRow = Database["public"]["Tables"]["episodes"]["Row"];
 
+export { SUPPORTED_GENRES, isValidGenre, type SupportedGenre } from "@/lib/constants/genres";
+
 export interface SeriesWithCreator extends SeriesRow {
   creator_name?: string;
+  studio_name?: string;
   episode_count?: number;
 }
 
@@ -50,6 +53,7 @@ export async function getPublicSeriesList(params: {
   return (data as any[]).map((item: any) => ({
     ...item,
     creator_name: item.profiles?.display_name || item.studios?.name || "Independent Creator",
+    studio_name: item.studios?.name,
   }));
 }
 
@@ -77,6 +81,7 @@ export async function getFeaturedSeries(): Promise<SeriesWithCreator[]> {
   return (data as any[]).map((item: any) => ({
     ...item,
     creator_name: item.profiles?.display_name || item.studios?.name || "Independent Creator",
+    studio_name: item.studios?.name,
   }));
 }
 
@@ -105,6 +110,7 @@ export async function getPublicSeriesBySlug(slug: string): Promise<SeriesWithCre
   return {
     ...rawData,
     creator_name: rawData.profiles?.display_name || rawData.studios?.name || "Independent Creator",
+    studio_name: rawData.studios?.name,
   };
 }
 
@@ -202,20 +208,61 @@ export async function getPublicEpisodeContent(seriesSlug: string, episodeSlug: s
 }
 
 /**
- * Fetch series accessible by a creator in the workspace.
+ * Fetch all series accessible by a creator in the workspace:
+ * 1. Series directly owned by user
+ * 2. Series owned by studios where user is owner or admin
+ * 3. Series where user is an authorized member
  */
-export async function getCreatorSeries(userId: string): Promise<SeriesRow[]> {
+export async function getCreatorSeries(userId: string): Promise<SeriesWithCreator[]> {
   const supabase = createClient();
 
-  const { data, error } = await supabase
+  // Find studios where user is owner or admin
+  const { data: userStudios } = await supabase
+    .from("studio_members")
+    .select("studio_id")
+    .eq("user_id", userId)
+    .in("role", ["owner", "admin"]);
+
+  const studioIds = (userStudios || []).map((s) => s.studio_id);
+
+  // Find series where user has an explicit series membership
+  const { data: memberSeries } = await supabase
+    .from("series_members")
+    .select("series_id")
+    .eq("user_id", userId);
+
+  const memberSeriesIds = (memberSeries || []).map((m) => m.series_id);
+
+  let query = supabase
     .from("series")
-    .select("*")
-    .or(`owner_user_id.eq.${userId}`)
+    .select(`
+      *,
+      studios:owner_studio_id (name),
+      profiles:owner_user_id (display_name),
+      episodes (count)
+    `)
     .order("updated_at", { ascending: false });
+
+  const conditions: string[] = [`owner_user_id.eq.${userId}`];
+  if (studioIds.length > 0) {
+    conditions.push(`owner_studio_id.in.(${studioIds.join(",")})`);
+  }
+  if (memberSeriesIds.length > 0) {
+    conditions.push(`id.in.(${memberSeriesIds.join(",")})`);
+  }
+
+  query = query.or(conditions.join(","));
+
+  const { data, error } = await query;
 
   if (error || !data) {
     return [];
   }
 
-  return data as SeriesRow[];
+  return (data as any[]).map((item: any) => ({
+    ...item,
+    creator_name: item.profiles?.display_name || item.studios?.name || "Independent Creator",
+    studio_name: item.studios?.name,
+    episode_count: item.episodes?.[0]?.count ?? 0,
+  }));
 }

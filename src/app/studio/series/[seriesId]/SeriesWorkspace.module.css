@@ -1,0 +1,312 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  width: 100%;
+}
+
+.breadcrumbBar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.breadcrumbLink {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  text-decoration: none;
+  transition: color var(--pv-motion-fast) var(--pv-ease-standard);
+}
+
+.breadcrumbLink:hover {
+  color: var(--color-text);
+}
+
+/* Cinematic Hero Header from Reference Screen 3 */
+.heroBanner {
+  position: relative;
+  border-radius: var(--pv-radius-lg);
+  overflow: hidden;
+  background-color: #171717;
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: var(--pv-shadow-overlay);
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.heroImage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.45;
+}
+
+.heroOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(23, 23, 23, 0.2) 0%,
+    rgba(23, 23, 23, 0.8) 60%,
+    rgba(23, 23, 23, 0.98) 100%
+  );
+}
+
+.heroContent {
+  position: relative;
+  z-index: 2;
+  padding: var(--space-8);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--space-6);
+  flex-wrap: wrap;
+}
+
+.heroMeta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-width: 680px;
+}
+
+.tagRow {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.formatBadge {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #F7F0E3;
+  font-size: 11px;
+  font-weight: var(--font-weight-medium);
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+}
+
+.heroTitle {
+  font-family: var(--font-family-heading);
+  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+  font-weight: 800;
+  color: #FFFFFF;
+  line-height: var(--line-height-tight);
+}
+
+.heroSynopsis {
+  font-size: var(--font-size-sm);
+  color: #D1CDC7;
+  line-height: var(--line-height-normal);
+}
+
+.heroDetails {
+  font-size: var(--font-size-xs);
+  color: #9CA3AF;
+}
+
+.heroActions {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* Tabs Navigation */
+.tabNav {
+  display: flex;
+  gap: var(--space-2);
+  border-bottom: 2px solid var(--color-border);
+  padding-bottom: 0;
+}
+
+.tabBtn {
+  padding: var(--space-3) var(--space-4);
+  border: none;
+  background: none;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: color var(--pv-motion-fast) var(--pv-ease-standard),
+              border-color var(--pv-motion-fast) var(--pv-ease-standard);
+}
+
+.tabBtn:hover {
+  color: var(--color-text);
+}
+
+.tabActive {
+  color: var(--color-primary) !important;
+  font-weight: var(--font-weight-semibold);
+  border-bottom-color: var(--color-primary) !important;
+}
+
+.tabDangerActive {
+  color: var(--color-danger) !important;
+  border-bottom-color: var(--color-danger) !important;
+}
+
+/* Section Header */
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sectionTitle {
+  font-family: var(--font-family-heading);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+}
+
+/* Episode Cards List from Reference */
+.episodeList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.episodeCard {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--pv-radius-md);
+  padding: var(--space-4);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  box-shadow: var(--pv-shadow-card);
+  transition: transform var(--pv-motion-fast) var(--pv-ease-standard),
+              border-color var(--pv-motion-fast) var(--pv-ease-standard);
+}
+
+.episodeCard:hover {
+  transform: translateY(-2px);
+  border-color: rgba(228, 71, 53, 0.4);
+}
+
+.episodeLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex: 1;
+}
+
+.episodeThumb {
+  width: 90px;
+  height: 56px;
+  border-radius: var(--radius-sm);
+  background-color: #171717;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.thumbImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thumbPlaceholder {
+  color: #F7F0E3;
+  font-family: var(--font-family-heading);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+}
+
+.episodeInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.episodeTitleRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.episodeTitle {
+  font-family: var(--font-family-heading);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+}
+
+.episodeMetaText {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.episodeActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Metadata Form Cards */
+.formCard {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--pv-radius-md);
+  padding: var(--space-6);
+  box-shadow: var(--pv-shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 680px;
+}
+
+.dangerCard {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-danger);
+  border-radius: var(--pv-radius-md);
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 680px;
+}
+
+@media (max-width: 768px) {
+  .heroContent {
+    padding: var(--space-6) var(--space-4);
+  }
+
+  .heroActions {
+    width: 100%;
+  }
+
+  .heroActions > a,
+  .heroActions button {
+    width: 100%;
+  }
+
+  .episodeCard {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .episodeActions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
