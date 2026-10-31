@@ -5,6 +5,7 @@ import { CreatorSidebar } from "@/components/layout/CreatorSidebar";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { createClient } from "@/lib/supabase/server";
+import { LuPlus, LuArrowRight, LuLayers } from "react-icons/lu";
 
 export default async function CreatorDashboardPage() {
   const supabase = createClient();
@@ -14,7 +15,7 @@ export default async function CreatorDashboardPage() {
 
   // If user is authenticated, query their real data; otherwise show studio onboarding state
   let seriesList: any[] = [];
-  let pendingReviewsCount = 0;
+  let studiosCount = 0;
 
   if (user) {
     const { data: userSeries } = await supabase
@@ -25,6 +26,15 @@ export default async function CreatorDashboardPage() {
 
     if (userSeries) {
       seriesList = userSeries;
+    }
+
+    const { count: sCount } = await supabase
+      .from("studio_members")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", user.id);
+
+    if (sCount !== null) {
+      studiosCount = sCount;
     }
   }
 
@@ -41,12 +51,24 @@ export default async function CreatorDashboardPage() {
             </p>
           </div>
 
-          <Link href="/studio/series/new">
-            <Button variant="primary">
-              <span>+</span>
-              <span>New Series</span>
-            </Button>
-          </Link>
+          <div style={{ display: "flex", gap: "var(--space-2)" }}>
+            <Link href="/studio/studios/new">
+              <Button variant="secondary">
+                <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                  <LuPlus size={16} aria-hidden="true" />
+                  <span>New Studio</span>
+                </span>
+              </Button>
+            </Link>
+            <Link href="/studio/series/new">
+              <Button variant="primary">
+                <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                  <LuPlus size={16} aria-hidden="true" />
+                  <span>New Series</span>
+                </span>
+              </Button>
+            </Link>
+          </div>
         </header>
 
         <section className={styles.statsGrid}>
@@ -56,14 +78,14 @@ export default async function CreatorDashboardPage() {
           </div>
 
           <div className={styles.statCard}>
-            <span className={styles.statLabel}>Pending Reviews</span>
-            <span className={styles.statValue}>{pendingReviewsCount}</span>
+            <span className={styles.statLabel}>Studio Teams</span>
+            <span className={styles.statValue}>{studiosCount}</span>
           </div>
 
           <div className={styles.statCard}>
             <span className={styles.statLabel}>Platform Status</span>
             <span className={styles.statValue} style={{ fontSize: "1.25rem", color: "var(--color-success)" }}>
-              Phase 0/1 Online
+              Phase 3 Foundation
             </span>
           </div>
         </section>
@@ -73,7 +95,10 @@ export default async function CreatorDashboardPage() {
             <h2 className={styles.sectionTitle}>Your Series</h2>
             <Link href="/studio/series">
               <Button variant="ghost" size="sm">
-                View All &rarr;
+                <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                  <span>View All</span>
+                  <LuArrowRight size={14} aria-hidden="true" />
+                </span>
               </Button>
             </Link>
           </div>
@@ -103,7 +128,10 @@ export default async function CreatorDashboardPage() {
                     <td>
                       <Link href={`/studio/series/${s.id}`}>
                         <Button variant="secondary" size="sm">
-                          Workspace &rarr;
+                          <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                            <span>Workspace</span>
+                            <LuArrowRight size={14} aria-hidden="true" />
+                          </span>
                         </Button>
                       </Link>
                     </td>
@@ -113,7 +141,7 @@ export default async function CreatorDashboardPage() {
             </table>
           ) : (
             <EmptyState
-              icon="🎨"
+              icon={<LuLayers size={44} color="var(--color-text-muted)" />}
               title="No series created yet"
               description="Start your first comic series to assemble episodes, invite team collaborators, and publish revisions."
               action={

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title">
+<title id="title">Panelverse Panel P</title>
+<rect width="128" height="128" rx="18" fill="#171717"/>
+<g stroke="#171717" stroke-width="5" stroke-linejoin="miter">
+<path d="M27 22H66V55H27Z" fill="#F7F0E3"/>
+<path d="M70 22H82C101 22 111 35 111 52C111 69 101 79 82 79H70Z" fill="#E44735"/>
+<path d="M27 60H66V105L27 113Z" fill="#F2C14E"/>
+<path d="M70 84H84V105L70 108Z" fill="#E44735"/>
+</g></svg>

@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import styles from "./SeriesCard.module.css";
+import { LuImage } from "react-icons/lu";
 import type { SeriesWithCreator } from "@/lib/data/series";
 
 export interface SeriesCardProps {
@@ -19,8 +20,8 @@ export function SeriesCard({ series }: SeriesCardProps) {
             loading="lazy"
           />
         ) : (
-          <div className={styles.coverFallback} aria-hidden="true">
-            🎨
+          <div className={styles.coverFallback} aria-label="Cover Artwork Placeholder">
+            <LuImage size={36} color="var(--color-text-muted)" />
           </div>
         )}
       </div>

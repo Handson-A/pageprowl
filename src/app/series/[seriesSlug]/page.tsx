@@ -7,6 +7,7 @@ import { PublicFooter } from "@/components/layout/PublicFooter";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { getPublicSeriesBySlug, getPublishedEpisodes } from "@/lib/data/series";
+import { LuImage, LuClock, LuBookOpen, LuArrowRight } from "react-icons/lu";
 
 interface SeriesPageProps {
   params: {
@@ -39,7 +40,9 @@ export default async function SeriesOverviewPage({ params }: SeriesPageProps) {
                 className={styles.coverImage}
               />
             ) : (
-              <div className={styles.coverFallback}>🎨</div>
+              <div className={styles.coverFallback} aria-label="Cover Artwork Placeholder">
+                <LuImage size={44} color="var(--color-text-muted)" />
+              </div>
             )}
           </div>
 
@@ -59,7 +62,10 @@ export default async function SeriesOverviewPage({ params }: SeriesPageProps) {
               {firstEpisode ? (
                 <Link href={`/series/${series.slug}/episodes/${firstEpisode.slug}`}>
                   <Button variant="primary" size="lg">
-                    Start Reading (Ep. {firstEpisode.episode_number})
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
+                      <LuBookOpen size={18} aria-hidden="true" />
+                      <span>Start Reading (Ep. {firstEpisode.episode_number})</span>
+                    </span>
                   </Button>
                 </Link>
               ) : (
@@ -88,13 +94,16 @@ export default async function SeriesOverviewPage({ params }: SeriesPageProps) {
                     </span>
                     <span className={styles.episodeItemTitle}>{ep.title}</span>
                   </div>
-                  <span className={styles.readButton}>Read &rarr;</span>
+                  <span className={styles.readButton} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                    <span>Read</span>
+                    <LuArrowRight size={14} aria-hidden="true" />
+                  </span>
                 </Link>
               ))}
             </div>
           ) : (
             <EmptyState
-              icon="⏳"
+              icon={<LuClock size={40} color="var(--color-text-muted)" />}
               title="No published episodes yet"
               description="The creator is currently preparing the first chapter. Check back soon!"
             />

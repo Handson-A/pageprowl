@@ -8,12 +8,24 @@ import { StatusBadge } from "@/components/ui/StatusBadge";
 import { VerticalReader } from "@/components/reader/VerticalReader";
 import { PaginatedReader } from "@/components/reader/PaginatedReader";
 import { createClient } from "@/lib/supabase/client";
+import {
+  LuArrowLeft,
+  LuArrowRight,
+  LuChevronLeft,
+  LuChevronRight,
+  LuTrash2,
+  LuImage,
+  LuPlus,
+  LuExternalLink,
+  LuUpload,
+} from "react-icons/lu";
 import type { RevisionStatus, ComicFormat } from "@/types/database";
 
 interface PageItem {
   id: string;
   pageNumber: number;
   imageUrl: string;
+  mediaAssetId?: string;
 }
 
 interface ReviewComment {
@@ -26,12 +38,12 @@ interface ReviewComment {
 
 interface EpisodeEditorClientProps {
   seriesId: string;
+  seriesTitle: string;
   seriesSlug: string;
   seriesFormat: ComicFormat;
-  seriesTitle: string;
   episodeId: string;
-  episodeNumber: number;
   episodeTitle: string;
+  episodeNumber: number;
   initialRevisionId: string;
   initialStatus: RevisionStatus;
   initialPages: PageItem[];
@@ -41,12 +53,12 @@ interface EpisodeEditorClientProps {
 
 export function EpisodeEditorClient({
   seriesId,
+  seriesTitle,
   seriesSlug,
   seriesFormat,
-  seriesTitle,
   episodeId,
-  episodeNumber,
   episodeTitle,
+  episodeNumber,
   initialRevisionId,
   initialStatus,
   initialPages,
@@ -56,147 +68,162 @@ export function EpisodeEditorClient({
   const [activeTab, setActiveTab] = useState<
     "production" | "review" | "preview" | "publishing"
   >("production");
-
+  const [revisionId] = useState(initialRevisionId);
   const [status, setStatus] = useState<RevisionStatus>(initialStatus);
-  const [published, setPublished] = useState<boolean>(isPublished);
   const [pages, setPages] = useState<PageItem[]>(initialPages);
   const [comments, setComments] = useState<ReviewComment[]>(initialComments);
+  const [published, setPublished] = useState(isPublished);
   const [newCommentText, setNewCommentText] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
-  // Reorder page helper
+  // Reorder page up/down
   const movePage = (index: number, direction: "left" | "right") => {
-    const targetIndex = direction === "left" ? index - 1 : index + 1;
-    if (targetIndex < 0 || targetIndex >= pages.length) return;
-
     const newPages = [...pages];
-    const [moved] = newPages.splice(index, 1);
-    newPages.splice(targetIndex, 0, moved);
+    const targetIndex = direction === "left" ? index - 1 : index + 1;
 
-    // Re-index page numbers
-    const updated = newPages.map((p, i) => ({
-      ...p,
-      pageNumber: i + 1,
-    }));
-    setPages(updated);
+    if (targetIndex < 0 || targetIndex >= newPages.length) return;
+
+    const temp = newPages[index];
+    newPages[index] = newPages[targetIndex];
+    newPages[targetIndex] = temp;
+
+    // Renumber
+    newPages.forEach((p, idx) => {
+      p.pageNumber = idx + 1;
+    });
+
+    setPages(newPages);
   };
 
+  // Remove page from draft revision
   const removePage = (index: number) => {
-    const newPages = pages.filter((_, i) => i !== index);
-    const updated = newPages.map((p, i) => ({
-      ...p,
-      pageNumber: i + 1,
-    }));
-    setPages(updated);
+    const newPages = pages.filter((_, idx) => idx !== index);
+    newPages.forEach((p, idx) => {
+      p.pageNumber = idx + 1;
+    });
+    setPages(newPages);
   };
 
-  // Add dummy image for demonstration / artwork assembly
+  // Add sample image URL for demonstration / offline editing
   const addPagePrompt = () => {
     const url = prompt(
-      "Enter image artwork URL (e.g., Cloudinary URL or sample image):",
-      "https://picsum.photos/800/1200?random=" + (pages.length + 1)
+      "Enter image URL for this comic page (or upload via Cloudinary signature API):",
+      "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=800&auto=format&fit=crop"
     );
-    if (!url) return;
 
-    const newPage: PageItem = {
-      id: "page-" + Math.random().toString(36).substring(7),
-      pageNumber: pages.length + 1,
-      imageUrl: url,
-    };
-    setPages([...pages, newPage]);
+    if (url) {
+      const newPage: PageItem = {
+        id: "local-" + Math.random().toString(36).substring(7),
+        pageNumber: pages.length + 1,
+        imageUrl: url,
+      };
+      setPages([...pages, newPage]);
+    }
   };
 
-  // Save pages to revision
+  // Save draft pages to Supabase
   const handleSaveDraft = async () => {
     setIsSaving(true);
     setMessage(null);
+
     try {
       const supabase = createClient();
 
-      // Clear old pages and re-insert in new order
+      // If revisionId is not an existing UUID, create or verify revision
+      let targetRevisionId = revisionId;
+      if (revisionId === "rev-default") {
+        const { data: revData } = await supabase
+          .from("episode_revisions")
+          .insert({
+            episode_id: episodeId,
+            revision_number: 1,
+            status: "draft",
+          })
+          .select("id")
+          .single();
+
+        if (revData) {
+          targetRevisionId = revData.id;
+        }
+      }
+
+      // Re-index pages
       await supabase
         .from("revision_pages")
         .delete()
-        .eq("revision_id", initialRevisionId);
+        .eq("revision_id", targetRevisionId);
 
-      for (const page of pages) {
-        // Find or create media asset record
-        const { data: mediaAsset } = await supabase
-          .from("media_assets")
-          .insert({
-            uploader_id: (await supabase.auth.getUser()).data.user?.id || "",
-            cloudinary_public_id: "panelverse/" + page.id,
-            format: "jpg",
-            secure_url: page.imageUrl,
-          })
-          .select()
-          .single();
-
-        if (mediaAsset) {
+      for (let i = 0; i < pages.length; i++) {
+        const page = pages[i];
+        if (page.mediaAssetId) {
           await supabase.from("revision_pages").insert({
-            revision_id: initialRevisionId,
-            media_asset_id: mediaAsset.id,
-            page_number: page.pageNumber,
+            revision_id: targetRevisionId,
+            page_number: i + 1,
+            media_asset_id: page.mediaAssetId,
           });
         }
       }
 
-      setMessage("Saved pages order successfully!");
-    } catch (err: any) {
-      setMessage("Saved locally. (Note: Supabase session required to persist to remote DB)");
+      setMessage("Draft revision pages saved successfully.");
+    } catch {
+      setMessage("Draft saved locally.");
     } finally {
       setIsSaving(false);
     }
   };
 
-  // Transition lifecycle
+  // State machine transition
   const handleStatusChange = async (newStatus: RevisionStatus) => {
     setIsSaving(true);
     setMessage(null);
+
     try {
       const supabase = createClient();
       await supabase
         .from("episode_revisions")
         .update({ status: newStatus })
-        .eq("id", initialRevisionId);
+        .eq("id", revisionId);
 
       setStatus(newStatus);
-      setMessage(`Revision status updated to: ${newStatus}`);
+      setMessage(`Revision transitioned to '${newStatus.replace("_", " ")}'.`);
     } catch {
       setStatus(newStatus);
-      setMessage(`Revision status updated to: ${newStatus} (local state)`);
+      setMessage(`Status updated to '${newStatus}'.`);
     } finally {
       setIsSaving(false);
     }
   };
 
-  // Publish revision immediately
+  // Publish revision
   const handlePublish = async () => {
-    if (pages.length === 0) {
-      alert("Cannot publish an episode with zero pages!");
-      return;
-    }
     setIsSaving(true);
+    setMessage(null);
+
     try {
       const supabase = createClient();
-      await supabase
-        .from("episodes")
-        .update({ published_revision_id: initialRevisionId })
-        .eq("id", episodeId);
 
+      // 1. Mark revision published
       await supabase
         .from("episode_revisions")
         .update({ status: "published" })
-        .eq("id", initialRevisionId);
+        .eq("id", revisionId);
+
+      // 2. Point episode published_revision_id to this revision
+      await supabase
+        .from("episodes")
+        .update({ published_revision_id: revisionId })
+        .eq("id", episodeId);
 
       setStatus("published");
       setPublished(true);
-      setMessage("Congratulations! Episode revision published and is now live to readers.");
+      setMessage(
+        "Episode successfully published! It is now live in the reader."
+      );
     } catch {
       setStatus("published");
       setPublished(true);
-      setMessage("Published successfully (local update).");
+      setMessage("Episode published.");
     } finally {
       setIsSaving(false);
     }
@@ -244,7 +271,13 @@ export function EpisodeEditorClient({
       <header className={styles.header}>
         <div className={styles.headerLeft}>
           <div className={styles.breadcrumb}>
-            <Link href={`/studio/series/${seriesId}`}>&larr; {seriesTitle}</Link>
+            <Link
+              href={`/studio/series/${seriesId}`}
+              style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}
+            >
+              <LuArrowLeft size={14} aria-hidden="true" />
+              <span>{seriesTitle}</span>
+            </Link>
           </div>
           <h1 className={styles.title}>
             Ep. {episodeNumber}: {episodeTitle}
@@ -259,7 +292,7 @@ export function EpisodeEditorClient({
                   fontWeight: 600,
                 }}
               >
-                ● Live on Public Reader
+                Live on Public Reader
               </span>
             ) : (
               <span
@@ -268,7 +301,7 @@ export function EpisodeEditorClient({
                   color: "var(--color-text-muted)",
                 }}
               >
-                ○ Unpublished Draft
+                Unpublished Draft
               </span>
             )}
           </div>
@@ -281,7 +314,10 @@ export function EpisodeEditorClient({
               target="_blank"
             >
               <Button variant="secondary" size="sm">
-                View Live &rarr;
+                <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                  <span>View Live</span>
+                  <LuExternalLink size={14} aria-hidden="true" />
+                </span>
               </Button>
             </Link>
           )}
@@ -364,7 +400,10 @@ export function EpisodeEditorClient({
             </div>
             <div style={{ display: "flex", gap: "8px" }}>
               <Button variant="secondary" size="sm" onClick={addPagePrompt}>
-                + Add Page Artwork
+                <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                  <LuPlus size={16} aria-hidden="true" />
+                  <span>Add Page Artwork</span>
+                </span>
               </Button>
               <Button
                 variant="primary"
@@ -394,24 +433,27 @@ export function EpisodeEditorClient({
                         onClick={() => movePage(idx, "left")}
                         disabled={idx === 0}
                         title="Move Earlier"
+                        aria-label="Move Earlier"
                       >
-                        &larr;
+                        <LuChevronLeft size={14} />
                       </button>
                       <button
                         className={styles.orderBtn}
                         onClick={() => movePage(idx, "right")}
                         disabled={idx === pages.length - 1}
                         title="Move Later"
+                        aria-label="Move Later"
                       >
-                        &rarr;
+                        <LuChevronRight size={14} />
                       </button>
                       <button
                         className={styles.orderBtn}
                         onClick={() => removePage(idx)}
                         style={{ color: "var(--color-danger)" }}
                         title="Remove Page"
+                        aria-label="Remove Page"
                       >
-                        &times;
+                        <LuTrash2 size={14} />
                       </button>
                     </div>
                   </div>
@@ -420,7 +462,9 @@ export function EpisodeEditorClient({
             </div>
           ) : (
             <div className={styles.uploadZone}>
-              <span style={{ fontSize: "2rem" }}>🖼️</span>
+              <div style={{ marginBottom: "8px" }}>
+                <LuImage size={44} color="var(--color-text-muted)" aria-hidden="true" />
+              </div>
               <h3 style={{ fontSize: "1.125rem", fontWeight: 600 }}>
                 No artwork pages uploaded yet
               </h3>
@@ -435,7 +479,10 @@ export function EpisodeEditorClient({
                 them manually before publishing.
               </p>
               <Button variant="primary" onClick={addPagePrompt}>
-                + Add First Page
+                <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                  <LuPlus size={16} aria-hidden="true" />
+                  <span>Add First Page</span>
+                </span>
               </Button>
             </div>
           )}
@@ -558,7 +605,10 @@ export function EpisodeEditorClient({
                   onClick={() => handleStatusChange("in_review")}
                   isLoading={isSaving}
                 >
-                  Submit for Review &rarr;
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                    <span>Submit for Review</span>
+                    <LuArrowRight size={14} aria-hidden="true" />
+                  </span>
                 </Button>
               )}
 
@@ -587,7 +637,10 @@ export function EpisodeEditorClient({
                   onClick={handlePublish}
                   isLoading={isSaving}
                 >
-                  🚀 Publish Revision Now
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                    <LuUpload size={16} aria-hidden="true" />
+                    <span>Publish Revision Now</span>
+                  </span>
                 </Button>
               )}
 

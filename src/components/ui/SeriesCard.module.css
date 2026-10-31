@@ -5,14 +5,16 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   overflow: hidden;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  transition: transform var(--pv-motion-standard) var(--pv-ease-standard),
+              box-shadow var(--pv-motion-standard) var(--pv-ease-standard),
+              border-color var(--pv-motion-standard) var(--pv-ease-standard);
   height: 100%;
 }
 
 .card:hover {
   transform: translateY(-2px);
   border-color: var(--color-border-strong);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--pv-shadow-card, var(--shadow-md));
 }
 
 .coverWrapper {

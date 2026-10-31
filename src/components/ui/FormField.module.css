@@ -26,7 +26,8 @@
   color: var(--color-text);
   font-size: var(--font-size-sm);
   line-height: var(--line-height-normal);
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: border-color var(--pv-motion-fast) var(--pv-ease-standard),
+              box-shadow var(--pv-motion-fast) var(--pv-ease-standard);
   width: 100%;
 }
 

@@ -5,6 +5,38 @@
   --palette-comic-red: #e44735;
   --palette-golden-yellow: #f2c14e;
 
+  /* Brand Foundation Supporting Tokens (--pv-*) */
+  --pv-color-ink: #171717;
+  --pv-color-paper: #f7f0e3;
+  --pv-color-red: #e44735;
+  --pv-color-yellow: #f2c14e;
+  --pv-color-surface: #ffffff;
+  --pv-color-surface-muted: #f4ebdd;
+  --pv-color-border: #e2d5c2;
+  --pv-color-text-muted: #625d55;
+  --pv-color-success: #237a4b;
+  --pv-color-warning: #9a6500;
+  --pv-color-danger: #b42318;
+
+  --pv-radius-sm: 6px;
+  --pv-radius-md: 10px;
+  --pv-radius-lg: 16px;
+  --pv-radius-xl: 22px;
+
+  --pv-shadow-card: 0 4px 16px rgb(23 23 23 / 6%);
+  --pv-shadow-overlay: 0 16px 48px rgb(23 23 23 / 18%);
+
+  --pv-motion-fast: 120ms;
+  --pv-motion-standard: 200ms;
+  --pv-motion-emphasis: 280ms;
+  --pv-ease-standard: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+  /* Motion Aliases */
+  --motion-fast: var(--pv-motion-fast);
+  --motion-standard: var(--pv-motion-standard);
+  --motion-emphasis: var(--pv-motion-emphasis);
+  --ease-standard: var(--pv-ease-standard);
+
   /* Semantic Tokens - Light-first Platform Surfaces */
   --color-bg: #f7f0e3;
   --color-surface: #ffffff;

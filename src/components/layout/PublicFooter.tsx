@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import { PanelverseLogo } from "@/components/brand/PanelverseLogo";
 import styles from "./PublicFooter.module.css";
 
 export function PublicFooter() {
@@ -8,8 +9,10 @@ export function PublicFooter() {
       <div className={styles.inner}>
         <div className={styles.top}>
           <div className={styles.brand}>
-            <div className={styles.brandName}>Panelverse</div>
-            <p className={styles.tagline}>
+            <Link href="/" aria-label="Panelverse Home">
+              <PanelverseLogo variant="full" size="sm" />
+            </Link>
+            <p className={styles.tagline} style={{ marginTop: "var(--space-3)" }}>
               A collaborative comic publishing platform connecting readers, independent creators, and creative studios.
             </p>
           </div>

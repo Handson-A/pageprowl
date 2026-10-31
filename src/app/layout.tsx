@@ -1,10 +1,22 @@
 import type { Metadata } from "next";
 import React from "react";
+import { MotionProvider } from "@/components/providers/MotionProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Panelverse",
-  description: "A collaborative comic publishing platform for indie creator teams and readers.",
+  title: {
+    default: "Panelverse — Collaborative Comic Publishing Platform",
+    template: "%s | Panelverse",
+  },
+  description:
+    "Panelverse brings together independent creators, studios, and passionate readers. Enjoy vertical-scroll and page-by-page comics straight from the creators.",
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/brand/favicon.svg", type: "image/svg+xml" },
+    ],
+    apple: "/brand/panelverse-icon.svg",
+  },
 };
 
 export default function RootLayout({
@@ -14,7 +26,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <MotionProvider>{children}</MotionProvider>
+      </body>
     </html>
   );
 }

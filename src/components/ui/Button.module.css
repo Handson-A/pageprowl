@@ -11,8 +11,16 @@
   border-radius: var(--radius-md);
   border: 1px solid transparent;
   cursor: pointer;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease;
+  transition: background-color var(--pv-motion-fast) var(--pv-ease-standard),
+              border-color var(--pv-motion-fast) var(--pv-ease-standard),
+              color var(--pv-motion-fast) var(--pv-ease-standard),
+              opacity var(--pv-motion-fast) var(--pv-ease-standard),
+              transform var(--pv-motion-fast) var(--pv-ease-standard);
   white-space: nowrap;
+}
+
+.button:active:not(:disabled) {
+  transform: scale(0.98);
 }
 
 .button:disabled,

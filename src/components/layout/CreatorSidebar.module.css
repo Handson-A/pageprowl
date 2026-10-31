@@ -61,7 +61,8 @@
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
   color: var(--color-text-muted);
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition: background-color var(--pv-motion-fast) var(--pv-ease-standard),
+              color var(--pv-motion-fast) var(--pv-ease-standard);
 }
 
 .navItem:hover {

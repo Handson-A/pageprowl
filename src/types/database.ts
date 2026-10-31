@@ -7,6 +7,7 @@ export type Json =
   | Json[];
 
 export type PlatformRole = "user" | "moderator" | "admin";
+export type UserRole = PlatformRole;
 export type StudioRole = "owner" | "admin" | "editor" | "member";
 export type SeriesRole = "owner" | "editor" | "contributor" | "viewer";
 export type ComicFormat = "page" | "scroll";
@@ -153,6 +154,33 @@ export interface Database {
         };
         Update: {
           role?: StudioRole;
+        };
+      };
+      studio_invitations: {
+        Row: {
+          id: string;
+          studio_id: string;
+          inviter_id: string;
+          invited_email: string;
+          role: "admin" | "editor" | "member";
+          token: string;
+          status: "pending" | "accepted" | "declined" | "expired";
+          expires_at: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          studio_id: string;
+          inviter_id: string;
+          invited_email: string;
+          role: "admin" | "editor" | "member";
+          token: string;
+          status?: "pending" | "accepted" | "declined" | "expired";
+          expires_at: string;
+          created_at?: string;
+        };
+        Update: {
+          status?: "pending" | "accepted" | "declined" | "expired";
         };
       };
       series: {

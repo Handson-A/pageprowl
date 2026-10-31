@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import styles from "./VerticalReader.module.css";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { LuImage, LuArrowLeft, LuArrowRight } from "react-icons/lu";
 
 export interface ReaderPage {
   id: string;
@@ -24,7 +25,7 @@ export function VerticalReader({
     return (
       <div className={styles.container}>
         <EmptyState
-          icon="🖼️"
+          icon={<LuImage size={44} color="var(--reader-text-muted)" />}
           title="No pages available"
           description="This episode currently has no artwork pages published."
         />
@@ -46,16 +47,23 @@ export function VerticalReader({
         ))}
 
         <div className={styles.footerActions}>
-          <Link href={`/series/${seriesSlug}`} className={styles.navLink}>
-            &larr; Back to Series
+          <Link
+            href={`/series/${seriesSlug}`}
+            className={styles.navLink}
+            style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
+          >
+            <LuArrowLeft size={16} aria-hidden="true" />
+            <span>Back to Series</span>
           </Link>
 
           {nextEpisodeSlug ? (
             <Link
               href={`/series/${seriesSlug}/episodes/${nextEpisodeSlug}`}
               className={styles.navLink}
+              style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
             >
-              Next Episode &rarr;
+              <span>Next Episode</span>
+              <LuArrowRight size={16} aria-hidden="true" />
             </Link>
           ) : (
             <span style={{ color: "var(--reader-text-muted)", fontSize: "0.875rem" }}>

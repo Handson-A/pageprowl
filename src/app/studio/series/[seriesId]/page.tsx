@@ -1,12 +1,14 @@
 import React from "react";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import styles from "@/app/studio/page.module.css";
 import { CreatorSidebar } from "@/components/layout/CreatorSidebar";
 import { Button } from "@/components/ui/Button";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { createClient } from "@/lib/supabase/server";
+import { requireSeriesRole } from "@/lib/auth/guards";
+import { LuArrowLeft, LuArrowRight, LuPlus, LuLayers } from "react-icons/lu";
 
 interface SeriesWorkspaceProps {
   params: {
@@ -18,6 +20,16 @@ export default async function SeriesWorkspacePage({
   params,
 }: SeriesWorkspaceProps) {
   const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  // Enforce server-side authorization: caller must be owner or assigned collaborator
+  await requireSeriesRole(params.seriesId, "viewer");
 
   const { data: series } = await supabase
     .from("series")
@@ -58,9 +70,13 @@ export default async function SeriesWorkspacePage({
                 style={{
                   color: "var(--color-text-muted)",
                   fontSize: "0.875rem",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "4px",
                 }}
               >
-                &larr; Series
+                <LuArrowLeft size={14} aria-hidden="true" />
+                <span>Series</span>
               </Link>
             </div>
             <h1 className={styles.title}>{series.title}</h1>
@@ -72,7 +88,10 @@ export default async function SeriesWorkspacePage({
           <div style={{ display: "flex", gap: "8px" }}>
             <Link href={`/series/${series.slug}`} target="_blank">
               <Button variant="secondary" size="sm">
-                View Public Page &rarr;
+                <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                  <span>View Public Page</span>
+                  <LuArrowRight size={14} aria-hidden="true" />
+                </span>
               </Button>
             </Link>
           </div>
@@ -86,7 +105,10 @@ export default async function SeriesWorkspacePage({
 
             <Link href={`/studio/series/${series.id}/episodes/new`}>
               <Button variant="primary" size="sm">
-                + New Episode
+                <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                  <LuPlus size={16} aria-hidden="true" />
+                  <span>New Episode</span>
+                </span>
               </Button>
             </Link>
           </div>
@@ -98,12 +120,12 @@ export default async function SeriesWorkspacePage({
                   <th>Number</th>
                   <th>Title</th>
                   <th>Status</th>
-                  <th>Published</th>
+                  <th>Published State</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {episodeList.map((ep: any) => {
+                {episodeList.map((ep) => {
                   const latestRev =
                     ep.episode_revisions && ep.episode_revisions.length > 0
                       ? ep.episode_revisions.sort(
@@ -141,7 +163,10 @@ export default async function SeriesWorkspacePage({
                           href={`/studio/series/${series.id}/episodes/${ep.id}`}
                         >
                           <Button variant="secondary" size="sm">
-                            Open Workspace &rarr;
+                            <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                              <span>Open Workspace</span>
+                              <LuArrowRight size={14} aria-hidden="true" />
+                            </span>
                           </Button>
                         </Link>
                       </td>
@@ -152,7 +177,7 @@ export default async function SeriesWorkspacePage({
             </table>
           ) : (
             <EmptyState
-              icon="🎬"
+              icon={<LuLayers size={44} color="var(--color-text-muted)" />}
               title="No episodes yet"
               description="Create Chapter 1 to start uploading pages and preparing revisions."
               action={

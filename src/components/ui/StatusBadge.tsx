@@ -4,6 +4,7 @@ import type { RevisionStatus } from "@/types/database";
 
 export interface StatusBadgeProps {
   status: RevisionStatus | "restricted" | "scheduled";
+  label?: string;
   className?: string;
 }
 
@@ -21,9 +22,9 @@ const statusDisplayMap: Record<
   scheduled: { label: "Scheduled", styleKey: "readyToPublish" },
 };
 
-export function StatusBadge({ status, className }: StatusBadgeProps) {
+export function StatusBadge({ status, label, className }: StatusBadgeProps) {
   const config = statusDisplayMap[status] || { label: status, styleKey: "draft" };
   const badgeClass = `${styles.badge} ${styles[config.styleKey]} ${className || ""}`.trim();
 
-  return <span className={badgeClass}>{config.label}</span>;
+  return <span className={badgeClass}>{label || config.label}</span>;
 }

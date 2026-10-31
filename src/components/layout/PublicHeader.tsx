@@ -2,15 +2,15 @@ import React from "react";
 import Link from "next/link";
 import styles from "./PublicHeader.module.css";
 import { Button } from "@/components/ui/Button";
+import { PanelverseLogo } from "@/components/brand/PanelverseLogo";
 
 export function PublicHeader() {
   return (
     <header className={styles.header}>
       <div className={styles.inner}>
         <div className={styles.brandGroup}>
-          <Link href="/" className={styles.brand}>
-            <span className={styles.brandDot} aria-hidden="true" />
-            <span>Panelverse</span>
+          <Link href="/" className={styles.brand} aria-label="Panelverse Home">
+            <PanelverseLogo variant="full" size="sm" />
           </Link>
 
           <nav className={styles.nav} aria-label="Main Navigation">

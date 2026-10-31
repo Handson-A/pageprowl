@@ -2,8 +2,10 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 import styles from "./PaginatedReader.module.css";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { LuBookOpen, LuChevronLeft, LuChevronRight } from "react-icons/lu";
 import type { ReaderPage } from "./VerticalReader";
 
 export interface PaginatedReaderProps {
@@ -56,7 +58,7 @@ export function PaginatedReader({
     return (
       <div className={styles.container}>
         <EmptyState
-          icon="📖"
+          icon={<LuBookOpen size={44} color="var(--reader-text-muted)" />}
           title="No pages available"
           description="This episode currently has no artwork pages published."
         />
@@ -76,11 +78,18 @@ export function PaginatedReader({
           tabIndex={0}
           aria-label="Next page"
         >
-          <img
-            src={currentPage.imageUrl}
-            alt={`Page ${currentPage.pageNumber}`}
-            className={styles.pageImage}
-          />
+          <AnimatePresence mode="wait">
+            <motion.img
+              key={currentPage.id}
+              src={currentPage.imageUrl}
+              alt={`Page ${currentPage.pageNumber}`}
+              className={styles.pageImage}
+              initial={{ opacity: 0.8 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0.8 }}
+              transition={{ duration: 0.15 }}
+            />
+          </AnimatePresence>
         </div>
 
         <div className={styles.controls}>
@@ -89,8 +98,10 @@ export function PaginatedReader({
             onClick={goToPrevPage}
             disabled={currentPageIndex === 0}
             aria-label="Previous Page"
+            style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}
           >
-            &larr; Previous
+            <LuChevronLeft size={16} aria-hidden="true" />
+            <span>Previous</span>
           </button>
 
           <span className={styles.pageIndicator}>
@@ -101,8 +112,10 @@ export function PaginatedReader({
             <Link
               href={`/series/${seriesSlug}/episodes/${nextEpisodeSlug}`}
               className={styles.btn}
+              style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}
             >
-              Next Episode &rarr;
+              <span>Next Episode</span>
+              <LuChevronRight size={16} aria-hidden="true" />
             </Link>
           ) : (
             <button
@@ -110,8 +123,10 @@ export function PaginatedReader({
               onClick={goToNextPage}
               disabled={isLastPage}
               aria-label="Next Page"
+              style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}
             >
-              Next &rarr;
+              <span>Next</span>
+              <LuChevronRight size={16} aria-hidden="true" />
             </button>
           )}
         </div>

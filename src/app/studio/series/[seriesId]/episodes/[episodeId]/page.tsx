@@ -1,9 +1,9 @@
-import React from "react";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import styles from "./page.module.css";
 import { CreatorSidebar } from "@/components/layout/CreatorSidebar";
 import { EpisodeEditorClient } from "./EpisodeEditorClient";
 import { createClient } from "@/lib/supabase/server";
+import { requireSeriesRole } from "@/lib/auth/guards";
 
 interface EpisodeWorkspaceProps {
   params: {
@@ -16,6 +16,16 @@ export default async function EpisodeWorkspacePage({
   params,
 }: EpisodeWorkspaceProps) {
   const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  // Enforce server-side authorization: caller must be editor or owner
+  await requireSeriesRole(params.seriesId, "editor");
 
   const { data: series } = await supabase
     .from("series")

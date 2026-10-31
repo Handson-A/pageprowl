@@ -6,7 +6,9 @@ import { PublicFooter } from "@/components/layout/PublicFooter";
 import { Button } from "@/components/ui/Button";
 import { SeriesCard } from "@/components/ui/SeriesCard";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { HomeHero } from "@/components/home/HomeHero";
 import { getFeaturedSeries, getPublicSeriesList } from "@/lib/data/series";
+import { LuBookOpen, LuArrowRight } from "react-icons/lu";
 
 export default async function HomePage() {
   const [featuredSeries, recentSeries] = await Promise.all([
@@ -18,43 +20,16 @@ export default async function HomePage() {
     <div className={styles.page}>
       <PublicHeader />
 
-      <section className={styles.hero}>
-        <div className={styles.heroInner}>
-          <div className={styles.badge}>
-            <span>⚡</span>
-            <span>A Publishing Platform for Comic Creators</span>
-          </div>
-
-          <h1 className={styles.heroTitle}>
-            Where great stories are created, collaborated on, and published.
-          </h1>
-
-          <p className={styles.heroLead}>
-            Panelverse brings together independent creators, studios, and passionate
-            readers. Enjoy vertical-scroll and page-by-page comics straight from
-            the creators.
-          </p>
-
-          <div className={styles.heroActions}>
-            <Link href="/browse">
-              <Button variant="primary" size="lg">
-                Explore Comics
-              </Button>
-            </Link>
-            <Link href="/studio">
-              <Button variant="secondary" size="lg">
-                Creator Studio
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
+      <HomeHero />
 
       <section className={styles.section}>
         <div className={styles.sectionHeader}>
           <h2 className={styles.sectionTitle}>Featured Stories</h2>
           <Link href="/browse" className={styles.sectionLink}>
-            View All &rarr;
+            <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+              <span>View All</span>
+              <LuArrowRight size={16} aria-hidden="true" />
+            </span>
           </Link>
         </div>
 
@@ -72,7 +47,7 @@ export default async function HomePage() {
           </div>
         ) : (
           <EmptyState
-            icon="📚"
+            icon={<LuBookOpen size={44} color="var(--color-text-muted)" />}
             title="The catalog is just beginning"
             description="No published series are available yet. Be among the first independent creators to publish on Panelverse!"
             action={

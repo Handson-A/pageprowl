@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import styles from "./ReaderToolbar.module.css";
+import { LuArrowLeft, LuChevronLeft, LuChevronRight } from "react-icons/lu";
 
 export interface ReaderToolbarProps {
   seriesTitle: string;
@@ -27,7 +28,7 @@ export function ReaderToolbar({
     <header className={styles.toolbar}>
       <div className={styles.left}>
         <Link href={`/series/${seriesSlug}`} className={styles.backLink}>
-          <span>&larr;</span>
+          <LuArrowLeft size={16} aria-hidden="true" />
           <span>Series</span>
         </Link>
         <div className={styles.titleGroup}>
@@ -47,16 +48,26 @@ export function ReaderToolbar({
 
         {prevEpisodeSlug && (
           <Link href={`/series/${seriesSlug}/episodes/${prevEpisodeSlug}`}>
-            <button className={styles.navButton} aria-label="Previous Episode">
-              &larr; Prev
+            <button
+              className={styles.navButton}
+              aria-label="Previous Episode"
+              style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}
+            >
+              <LuChevronLeft size={16} aria-hidden="true" />
+              <span>Prev</span>
             </button>
           </Link>
         )}
 
         {nextEpisodeSlug && (
           <Link href={`/series/${seriesSlug}/episodes/${nextEpisodeSlug}`}>
-            <button className={styles.navButton} aria-label="Next Episode">
-              Next &rarr;
+            <button
+              className={styles.navButton}
+              aria-label="Next Episode"
+              style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}
+            >
+              <span>Next</span>
+              <LuChevronRight size={16} aria-hidden="true" />
             </button>
           </Link>
         )}

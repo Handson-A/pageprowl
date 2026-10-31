@@ -7,6 +7,7 @@ import { SeriesCard } from "@/components/ui/SeriesCard";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/Button";
 import { getPublicSeriesList } from "@/lib/data/series";
+import { LuSearch } from "react-icons/lu";
 import type { ComicFormat } from "@/types/database";
 
 const GENRES = ["All", "Action", "Fantasy", "Sci-Fi", "Romance", "Horror", "Comedy", "Drama"];
@@ -58,7 +59,10 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
               <input type="hidden" name="format" value={currentFormat} />
             )}
             <Button type="submit" variant="primary" size="sm">
-              Search
+              <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                <LuSearch size={14} aria-hidden="true" />
+                <span>Search</span>
+              </span>
             </Button>
           </form>
 
@@ -123,7 +127,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
           </div>
         ) : (
           <EmptyState
-            icon="🔍"
+            icon={<LuSearch size={40} color="var(--color-text-muted)" />}
             title="No matching comics found"
             description="Try adjusting your search terms or filters to find published titles."
             action={

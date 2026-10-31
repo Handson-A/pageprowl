@@ -1,6 +1,10 @@
 /**
- * Shared infrastructure and client utilities.
- * Dedicated service factories (e.g., Supabase, Cloudinary) will be added here in subsequent phases.
+ * Shared infrastructure, security guards, data access, and client utilities.
  */
 
-export {};
+export * from "./logger";
+export * from "./auth/guards";
+export * from "./data/series";
+export * from "./data/studios";
+export * from "./data/profiles";
+export * from "./cloudinary/client";
