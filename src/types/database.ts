@@ -37,7 +37,20 @@ export type EpisodeProductionStatus =
   | "in_review"
   | "revisions_required"
   | "approved"
-  | "published";
+  | "scheduled"
+  | "published"
+  | "unpublished";
+export type ReleaseEventType =
+  | "submitted_for_approval"
+  | "approved"
+  | "rejected"
+  | "resubmitted"
+  | "scheduled"
+  | "rescheduled"
+  | "schedule_cancelled"
+  | "published"
+  | "unpublished"
+  | "republished";
 export type ReviewRequestStatus =
   | "pending"
   | "in_review"
@@ -73,7 +86,8 @@ export type NotificationType =
   | "task"
   | "mention"
   | "approval"
-  | "revision";
+  | "revision"
+  | "new_episode";
 
 export interface Database {
   public: {
@@ -403,6 +417,7 @@ export interface Database {
       scheduled_publications: {
         Row: {
           id: string;
+          series_id: string | null;
           episode_id: string;
           revision_id: string;
           scheduled_for: string;
@@ -414,6 +429,7 @@ export interface Database {
         };
         Insert: {
           id?: string;
+          series_id?: string | null;
           episode_id: string;
           revision_id: string;
           scheduled_for: string;
@@ -424,7 +440,9 @@ export interface Database {
           created_at?: string;
         };
         Update: {
+          series_id?: string | null;
           status?: ScheduledPublicationStatus;
+          scheduled_for?: string;
           error_message?: string | null;
           executed_at?: string | null;
         };
@@ -474,16 +492,19 @@ export interface Database {
         Row: {
           user_id: string;
           series_id: string;
+          notify_new_episodes: boolean;
           created_at: string;
         };
         Insert: {
           user_id: string;
           series_id: string;
+          notify_new_episodes?: boolean;
           created_at?: string;
         };
         Update: {
           user_id?: string;
           series_id?: string;
+          notify_new_episodes?: boolean;
         };
       };
       bookmarks: {
@@ -756,6 +777,110 @@ export interface Database {
         Update: {
           comment_id?: string;
           user_id?: string;
+        };
+      };
+      release_events: {
+        Row: {
+          id: string;
+          series_id: string;
+          episode_id: string;
+          revision_id: string | null;
+          event_type: ReleaseEventType;
+          actor_id: string | null;
+          scheduled_for: string | null;
+          metadata: Json;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          series_id: string;
+          episode_id: string;
+          revision_id?: string | null;
+          event_type: ReleaseEventType;
+          actor_id?: string | null;
+          scheduled_for?: string | null;
+          metadata?: Json;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          series_id?: string;
+          episode_id?: string;
+          revision_id?: string | null;
+          event_type?: ReleaseEventType;
+          actor_id?: string | null;
+          scheduled_for?: string | null;
+          metadata?: Json;
+        };
+      };
+      user_libraries: {
+        Row: {
+          user_id: string;
+          series_id: string;
+          created_at: string;
+        };
+        Insert: {
+          user_id: string;
+          series_id: string;
+          created_at?: string;
+        };
+        Update: {
+          user_id?: string;
+          series_id?: string;
+        };
+      };
+      notification_preferences: {
+        Row: {
+          user_id: string;
+          notifications_enabled: boolean;
+          notify_new_episodes: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          user_id: string;
+          notifications_enabled?: boolean;
+          notify_new_episodes?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          notifications_enabled?: boolean;
+          notify_new_episodes?: boolean;
+          updated_at?: string;
+        };
+      };
+      reading_progress: {
+        Row: {
+          id: string;
+          user_id: string;
+          series_id: string;
+          episode_id: string;
+          page_number: number;
+          scroll_offset_percent: number;
+          completed: boolean;
+          started_at: string;
+          last_read_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          series_id: string;
+          episode_id: string;
+          page_number?: number;
+          scroll_offset_percent?: number;
+          completed?: boolean;
+          started_at?: string;
+          last_read_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          page_number?: number;
+          scroll_offset_percent?: number;
+          completed?: boolean;
+          last_read_at?: string;
+          updated_at?: string;
         };
       };
     };

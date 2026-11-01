@@ -13,6 +13,7 @@ import {
   LuBell,
   LuUser,
   LuCompass,
+  LuCalendar,
   LuLogOut,
   LuMenu,
   LuX,
@@ -48,6 +49,7 @@ export function CreatorSidebar({
       items: [
         { href: "/studio", label: "Dashboard", icon: LuLayoutDashboard },
         { href: "/studio/series", label: "My Series", icon: LuBookOpen },
+        { href: "/studio/publishing", label: "Publishing Calendar", icon: LuCalendar },
         { href: "/studio/studios", label: "Studio Teams", icon: LuBuilding2 },
       ],
     },

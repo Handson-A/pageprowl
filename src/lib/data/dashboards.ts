@@ -188,7 +188,9 @@ export async function getStudioDashboardData(studioId: string): Promise<StudioDa
     in_review: [],
     revisions_required: [],
     approved: [],
+    scheduled: [],
     published: [],
+    unpublished: [],
   };
 
   episodes.forEach((ep) => {

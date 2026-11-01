@@ -8,7 +8,7 @@ Two sides: a creator workspace (series, teams, roles, chapters, uploads, publish
 Content hierarchy: Series → Volumes → Chapters → Pages.
 
 ## Current phase
-**Phase 6: Public Website and Comic Reader.** Update this line when the phase changes.
+**Phase 7: Reader Accounts and Publishing.** Update this line when the phase changes.
 Do NOT build MVP features (auth UI, series, chapters, reader, uploads) unless the task explicitly says so.
 Roadmap order: Phase 0 foundation → Phase 1 DB + auth → series/teams/roles → chapters/uploads → readers. Community and monetization are later phases. Do not scaffold for them.
 

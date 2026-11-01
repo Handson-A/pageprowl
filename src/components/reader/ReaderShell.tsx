@@ -5,6 +5,7 @@ import { ReaderToolbar } from "./ReaderToolbar";
 import { VerticalReader, type ReaderPage } from "./VerticalReader";
 import { PaginatedReader } from "./PaginatedReader";
 import { saveReadingProgress } from "@/lib/reading-progress";
+import { syncReadingProgressAction } from "@/app/actions/reader";
 import styles from "./ReaderShell.module.css";
 import { LuX, LuKeyboard } from "react-icons/lu";
 
@@ -43,8 +44,9 @@ export function ReaderShell({
   const [isImmersive, setIsImmersive] = useState<boolean>(false);
   const [showKeyboardHelp, setShowKeyboardHelp] = useState<boolean>(false);
 
-  // Automatically save reading progress to localStorage
+  // Automatically save reading progress to localStorage and synchronize with account
   useEffect(() => {
+    // 1. LocalStorage update (instant for both anonymous and authenticated)
     saveReadingProgress({
       seriesSlug: series.slug,
       seriesTitle: series.title,
@@ -56,10 +58,32 @@ export function ReaderShell({
       format: readingMode,
       coverUrl: series.cover_url,
     });
+
+    // 2. Debounced backend synchronization across authenticated devices
+    const timer = setTimeout(async () => {
+      try {
+        const isCompleted = pages.length > 0 && currentPage >= pages.length;
+        const scrollPercent = pages.length > 0 ? (currentPage / pages.length) * 100 : 0;
+        await syncReadingProgressAction({
+          seriesId: series.id,
+          episodeId: episode.id,
+          pageNumber: currentPage,
+          scrollOffsetPercent: Math.round(scrollPercent),
+          completed: isCompleted,
+          clientTimestamp: Date.now(),
+        });
+      } catch {
+        // Unauthenticated or offline: silently ignore backend sync error
+      }
+    }, 1500);
+
+    return () => clearTimeout(timer);
   }, [
+    series.id,
     series.slug,
     series.title,
     series.cover_url,
+    episode.id,
     episode.slug,
     episode.episode_number,
     episode.title,

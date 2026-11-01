@@ -4,6 +4,7 @@ import { CreatorSidebar } from "@/components/layout/CreatorSidebar";
 import { EpisodeEditorClient } from "./EpisodeEditorClient";
 import { createClient } from "@/lib/supabase/server";
 import { requireSeriesRole } from "@/lib/auth/guards";
+import { getEpisodeReleaseEvents } from "@/lib/data/publishing";
 
 interface EpisodeWorkspaceProps {
   params: {
@@ -108,7 +109,37 @@ export default async function EpisodeWorkspacePage({
     createdAt: new Date(c.created_at).toLocaleTimeString(),
   }));
 
-  const isPublished = episode.published_revision_id === currentRevision.id;
+  const isPublished = episode.published_revision_id === currentRevision.id || episode.status === "published";
+
+  // Fetch active schedule if scheduled
+  const { data: schedData } = await supabase
+    .from("scheduled_publications")
+    .select("id, scheduled_for, status")
+    .eq("episode_id", episode.id)
+    .eq("status", "scheduled")
+    .maybeSingle();
+
+  // Fetch durable release events
+  const initialReleaseEvents = await getEpisodeReleaseEvents(episode.id);
+
+  // Fetch latest review request if any
+  const { data: latestReview } = await supabase
+    .from("review_requests")
+    .select(`
+      id,
+      status,
+      feedback,
+      round,
+      reviewer_id,
+      completed_at,
+      profiles:reviewer_id (display_name)
+    `)
+    .eq("episode_id", episode.id)
+    .order("round", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const episodeStatus = (episode.status || currentRevision.status || "draft") as any;
 
   return (
     <div className={styles.layout}>
@@ -124,8 +155,12 @@ export default async function EpisodeWorkspacePage({
         episodeSlug={episode.slug}
         initialRevisionId={currentRevision.id}
         initialStatus={currentRevision.status}
+        initialEpisodeStatus={episodeStatus}
         initialPages={initialPages}
         initialComments={initialComments}
+        initialScheduledPublication={schedData || null}
+        initialReleaseEvents={initialReleaseEvents}
+        latestReviewRequest={latestReview as any}
         isPublished={isPublished}
         userRole={effectiveRole}
       />

@@ -30,8 +30,10 @@ export const EPISODE_STAGE_TRANSITIONS: Record<
   in_production: ["in_review", "draft"],
   in_review: ["revisions_required", "approved"],
   revisions_required: ["in_production"],
-  approved: ["published", "in_production"],
-  published: ["in_production", "draft"],
+  approved: ["scheduled", "published", "in_production"],
+  scheduled: ["published", "approved"],
+  published: ["unpublished", "in_production", "draft"],
+  unpublished: ["published", "in_production", "draft"],
 };
 
 export interface ReviewRequestWithDetails extends ReviewRequestRow {
@@ -90,7 +92,7 @@ export function hasStageTransitionPermission(
   if (targetStage === "in_production" || targetStage === "in_review") {
     return effectiveRole === "contributor" || effectiveRole === "editor" || effectiveRole === "owner";
   }
-  if (targetStage === "revisions_required" || targetStage === "approved" || targetStage === "published") {
+  if (targetStage === "revisions_required" || targetStage === "approved" || targetStage === "scheduled" || targetStage === "published" || targetStage === "unpublished") {
     return effectiveRole === "editor" || effectiveRole === "owner";
   }
   return false;

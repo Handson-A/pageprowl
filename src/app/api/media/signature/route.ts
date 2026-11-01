@@ -20,6 +20,7 @@ export async function POST(request: Request) {
     const { seriesId, type, episodeId } = body;
 
     let folder = `pageprowl/creators/${user.id}`;
+    let tags = ["pageprowl"];
 
     // If uploading for a series or episode, strictly verify creator permission
     if (seriesId) {
@@ -27,14 +28,20 @@ export async function POST(request: Request) {
 
       if (type === "cover") {
         folder = `pageprowl/series/${seriesId}/cover`;
+        tags = ["pageprowl", "cover"];
       } else if (episodeId) {
         folder = `pageprowl/series/${seriesId}/episodes/${episodeId}`;
+        tags = ["pageprowl", "episode"];
       } else {
         folder = `pageprowl/series/${seriesId}/uploads`;
+        tags = ["pageprowl", "series"];
       }
+    } else if (type === "avatar") {
+      folder = `pageprowl/users/${user.id}/avatar`;
+      tags = ["pageprowl", "avatar"];
     }
 
-    const signatureData = generateUploadSignature(folder);
+    const signatureData = generateUploadSignature(folder, tags);
 
     return NextResponse.json(signatureData);
   } catch (error: any) {

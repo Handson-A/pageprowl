@@ -342,8 +342,8 @@ export function NewStudioClient() {
           <div className={styles.previewSection}>
             <div className={styles.previewHeader}>
               <span className={styles.previewTag}>
-                <LuSparkles size={14} aria-hidden="true" />
-                <span>Live Studio Preview</span>
+                {/* <LuSparkles size={14} aria-hidden="true" />
+                <span>Live Studio Preview</span> */}
               </span>
               <span className={styles.previewLiveBadge}>Active Preview</span>
             </div>

@@ -69,6 +69,43 @@
   background-color: rgba(255, 255, 255, 0.08);
 }
 
+.iconButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  color: #A3A3A3;
+  position: relative;
+  text-decoration: none;
+  transition: color var(--pv-motion-fast) var(--pv-ease-standard),
+              background-color var(--pv-motion-fast) var(--pv-ease-standard);
+}
+
+.iconButton:hover {
+  color: #F7F0E3;
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.notifBadge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background-color: var(--color-primary);
+  color: #FFFFFF;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
 .ghostLight {
   color: #D4D0C7 !important;
 }

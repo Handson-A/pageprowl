@@ -8,7 +8,10 @@ import { PublicFooter } from "@/components/layout/PublicFooter";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { ContinueReadingButton } from "@/components/series/ContinueReadingButton";
+import { SeriesEngagementButtons } from "@/components/series/SeriesEngagementButtons";
 import { getPublicSeriesBySlug, getPublishedEpisodes, genreToSlug } from "@/lib/data/series";
+import { isSeriesInLibrary, isFollowingSeries } from "@/lib/data/reader";
+import { createClient } from "@/lib/supabase/server";
 import { LuBookOpen, LuArrowRight, LuLayers, LuUser, LuCalendar } from "react-icons/lu";
 
 interface SeriesPageProps {
@@ -59,6 +62,22 @@ export default async function SeriesOverviewPage({ params }: SeriesPageProps) {
 
   const episodes = await getPublishedEpisodes(series.id);
   const firstEpisode = episodes.length > 0 ? episodes[0] : null;
+
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  let inLibrary = false;
+  let following = false;
+  let notify = true;
+
+  if (user) {
+    inLibrary = await isSeriesInLibrary(user.id, series.id);
+    const followStatus = await isFollowingSeries(user.id, series.id);
+    following = followStatus.following;
+    notify = followStatus.notifyNewEpisodes;
+  }
 
   return (
     <div className={styles.container}>
@@ -139,6 +158,14 @@ export default async function SeriesOverviewPage({ params }: SeriesPageProps) {
                 seriesSlug={series.slug}
                 firstEpisodeSlug={firstEpisode?.slug}
                 firstEpisodeNumber={firstEpisode?.episode_number}
+              />
+              <SeriesEngagementButtons
+                seriesId={series.id}
+                seriesSlug={series.slug}
+                initialInLibrary={inLibrary}
+                initialFollowing={following}
+                initialNotify={notify}
+                isAuthenticated={!!user}
               />
             </div>
           </div>

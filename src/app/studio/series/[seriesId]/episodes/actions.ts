@@ -5,6 +5,18 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { requireAuth, requireSeriesRole, ForbiddenError } from "@/lib/auth/guards";
 import { logger } from "@/lib/logger";
+import {
+  submitEpisodeForApproval,
+  approveEpisode,
+  rejectEpisode,
+  publishEpisodeImmediately,
+  scheduleEpisodePublication,
+  editScheduledPublication,
+  cancelScheduledPublication,
+  unpublishEpisode,
+  republishEpisode,
+  getEpisodeReleaseEvents,
+} from "@/lib/data/publishing";
 import type { RevisionStatus } from "@/types/database";
 
 function slugify(text: string): string {
@@ -309,64 +321,114 @@ export async function transitionRevisionStatusAction(
 }
 
 /**
- * Server Action: Publish a revision to make it publicly readable.
+ * Server Action: Submit an episode for editorial approval.
+ */
+export async function submitForApprovalAction(
+  seriesId: string,
+  episodeId: string,
+  revisionId: string,
+  notes?: string
+) {
+  const user = await requireAuth();
+  const { effectiveRole } = await requireSeriesRole(seriesId, "contributor");
+
+  const result = await submitEpisodeForApproval({
+    seriesId,
+    episodeId,
+    revisionId,
+    actorId: user.id,
+    userRole: effectiveRole,
+    notes,
+  });
+
+  revalidatePath(`/studio/series/${seriesId}`);
+  revalidatePath(`/studio/series/${seriesId}/episodes/${episodeId}`);
+  return result;
+}
+
+/**
+ * Server Action: Approve an episode for publication.
+ */
+export async function approveEpisodeAction(
+  seriesId: string,
+  episodeId: string,
+  revisionId?: string | null,
+  feedback?: string
+) {
+  const user = await requireAuth();
+  const { effectiveRole } = await requireSeriesRole(seriesId, "editor");
+
+  const result = await approveEpisode({
+    seriesId,
+    episodeId,
+    revisionId,
+    reviewerId: user.id,
+    userRole: effectiveRole,
+    feedback,
+  });
+
+  revalidatePath(`/studio/series/${seriesId}`);
+  revalidatePath(`/studio/series/${seriesId}/episodes/${episodeId}`);
+  return result;
+}
+
+/**
+ * Server Action: Reject an episode submission with required feedback.
+ */
+export async function rejectEpisodeAction(
+  seriesId: string,
+  episodeId: string,
+  revisionId: string | null,
+  feedback: string
+) {
+  const user = await requireAuth();
+  const { effectiveRole } = await requireSeriesRole(seriesId, "editor");
+
+  const result = await rejectEpisode({
+    seriesId,
+    episodeId,
+    revisionId,
+    reviewerId: user.id,
+    userRole: effectiveRole,
+    feedback,
+  });
+
+  revalidatePath(`/studio/series/${seriesId}`);
+  revalidatePath(`/studio/series/${seriesId}/episodes/${episodeId}`);
+  return result;
+}
+
+/**
+ * Server Action: Publish an approved episode immediately.
  */
 export async function publishRevisionAction(
   seriesId: string,
   episodeId: string,
   revisionId: string
 ) {
-  await requireSeriesRole(seriesId, "editor");
+  const user = await requireAuth();
+  const { effectiveRole } = await requireSeriesRole(seriesId, "editor");
+
+  const result = await publishEpisodeImmediately({
+    seriesId,
+    episodeId,
+    revisionId,
+    actorId: user.id,
+    userRole: effectiveRole,
+  });
+
   const supabase = createClient();
-
-  // Verify revision has pages
-  const { count } = await supabase
-    .from("revision_pages")
-    .select("*", { count: "exact", head: true })
-    .eq("revision_id", revisionId);
-
-  if (!count || count < 1) {
-    throw new Error("Cannot publish an episode without any comic pages.");
-  }
-
-  // 1. Mark revision as published
-  const { error: revError } = await supabase
-    .from("episode_revisions")
-    .update({
-      status: "published",
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", revisionId);
-
-  if (revError) {
-    logger.error("Failed to mark revision as published", revError);
-    throw new Error("Failed to mark revision as published.");
-  }
-
-  // 2. Point episode.published_revision_id to this revision
-  const { data: episode, error: epError } = await supabase
-    .from("episodes")
-    .update({
-      published_revision_id: revisionId,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", episodeId)
-    .select("slug")
-    .single();
-
-  if (epError) {
-    logger.error("Failed to set episode published revision", epError);
-    throw new Error("Failed to publish episode.");
-  }
-
-  // Load series slug for cache revalidation
   const { data: series } = await supabase
     .from("series")
     .select("slug")
     .eq("id", seriesId)
     .single();
 
-  logger.info("Published episode revision", { seriesId, episodeId, revisionId });
+  const { data: episode } = await supabase
+    .from("episodes")
+    .select("slug")
+    .eq("id", episodeId)
+    .single();
 
   if (series) {
     revalidatePath(`/series/${series.slug}`);
@@ -382,55 +444,121 @@ export async function publishRevisionAction(
 }
 
 /**
+ * Server Action: Schedule an approved episode for automated publication.
+ */
+export async function scheduleEpisodeAction(
+  seriesId: string,
+  episodeId: string,
+  revisionId: string,
+  scheduledFor: string,
+  timeZone?: string
+) {
+  const user = await requireAuth();
+  const { effectiveRole } = await requireSeriesRole(seriesId, "editor");
+
+  const result = await scheduleEpisodePublication({
+    seriesId,
+    episodeId,
+    revisionId,
+    scheduledFor,
+    actorId: user.id,
+    userRole: effectiveRole,
+    timeZone,
+  });
+
+  revalidatePath(`/studio/series/${seriesId}`);
+  revalidatePath(`/studio/series/${seriesId}/episodes/${episodeId}`);
+  return result;
+}
+
+/**
+ * Server Action: Edit a scheduled release date.
+ */
+export async function editScheduledReleaseAction(
+  scheduledPublicationId: string,
+  seriesId: string,
+  episodeId: string,
+  newScheduledFor: string,
+  timeZone?: string
+) {
+  const user = await requireAuth();
+  const { effectiveRole } = await requireSeriesRole(seriesId, "editor");
+
+  const result = await editScheduledPublication({
+    scheduledPublicationId,
+    seriesId,
+    episodeId,
+    newScheduledFor,
+    actorId: user.id,
+    userRole: effectiveRole,
+    timeZone,
+  });
+
+  revalidatePath(`/studio/series/${seriesId}`);
+  revalidatePath(`/studio/series/${seriesId}/episodes/${episodeId}`);
+  return result;
+}
+
+/**
+ * Server Action: Cancel a scheduled release.
+ */
+export async function cancelScheduledReleaseAction(
+  scheduledPublicationId: string,
+  seriesId: string,
+  episodeId: string
+) {
+  const user = await requireAuth();
+  const { effectiveRole } = await requireSeriesRole(seriesId, "editor");
+
+  const result = await cancelScheduledPublication({
+    scheduledPublicationId,
+    seriesId,
+    episodeId,
+    actorId: user.id,
+    userRole: effectiveRole,
+  });
+
+  revalidatePath(`/studio/series/${seriesId}`);
+  revalidatePath(`/studio/series/${seriesId}/episodes/${episodeId}`);
+  return result;
+}
+
+/**
  * Server Action: Unpublish an episode from the public reader.
  */
-export async function unpublishEpisodeAction(seriesId: string, episodeId: string) {
-  await requireSeriesRole(seriesId, "editor");
+export async function unpublishEpisodeAction(
+  seriesId: string,
+  episodeId: string,
+  reason?: string
+) {
+  const user = await requireAuth();
+  const { effectiveRole } = await requireSeriesRole(seriesId, "editor");
+
+  const result = await unpublishEpisode({
+    seriesId,
+    episodeId,
+    actorId: user.id,
+    userRole: effectiveRole,
+    reason,
+  });
+
   const supabase = createClient();
-
-  const { data: ep } = await supabase
-    .from("episodes")
-    .select("published_revision_id, slug")
-    .eq("id", episodeId)
-    .single();
-
-  if (ep?.published_revision_id) {
-    // Transition the published revision to unpublished
-    await supabase
-      .from("episode_revisions")
-      .update({
-        status: "unpublished",
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", ep.published_revision_id);
-  }
-
-  // Clear episode.published_revision_id
-  const { error } = await supabase
-    .from("episodes")
-    .update({
-      published_revision_id: null,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", episodeId);
-
-  if (error) {
-    logger.error("Failed to unpublish episode", error);
-    throw new Error("Failed to unpublish episode.");
-  }
-
   const { data: series } = await supabase
     .from("series")
     .select("slug")
     .eq("id", seriesId)
     .single();
 
-  logger.info("Unpublished episode", { seriesId, episodeId });
+  const { data: episode } = await supabase
+    .from("episodes")
+    .select("slug")
+    .eq("id", episodeId)
+    .single();
 
   if (series) {
     revalidatePath(`/series/${series.slug}`);
-    if (ep) {
-      revalidatePath(`/series/${series.slug}/episodes/${ep.slug}`);
+    if (episode) {
+      revalidatePath(`/series/${series.slug}/episodes/${episode.slug}`);
     }
   }
 
@@ -438,6 +566,59 @@ export async function unpublishEpisodeAction(seriesId: string, episodeId: string
   revalidatePath(`/studio/series/${seriesId}/episodes/${episodeId}`);
 
   return { success: true, published: false };
+}
+
+/**
+ * Server Action: Republish an eligible unpublished episode.
+ */
+export async function republishEpisodeAction(
+  seriesId: string,
+  episodeId: string,
+  revisionId: string
+) {
+  const user = await requireAuth();
+  const { effectiveRole } = await requireSeriesRole(seriesId, "editor");
+
+  const result = await republishEpisode({
+    seriesId,
+    episodeId,
+    revisionId,
+    actorId: user.id,
+    userRole: effectiveRole,
+  });
+
+  const supabase = createClient();
+  const { data: series } = await supabase
+    .from("series")
+    .select("slug")
+    .eq("id", seriesId)
+    .single();
+
+  const { data: episode } = await supabase
+    .from("episodes")
+    .select("slug")
+    .eq("id", episodeId)
+    .single();
+
+  if (series) {
+    revalidatePath(`/series/${series.slug}`);
+    if (episode) {
+      revalidatePath(`/series/${series.slug}/episodes/${episode.slug}`);
+    }
+  }
+
+  revalidatePath(`/studio/series/${seriesId}`);
+  revalidatePath(`/studio/series/${seriesId}/episodes/${episodeId}`);
+
+  return { success: true, published: true };
+}
+
+/**
+ * Server Action: Fetch release history for an episode.
+ */
+export async function getEpisodeReleaseHistoryAction(episodeId: string) {
+  await requireAuth();
+  return getEpisodeReleaseEvents(episodeId);
 }
 
 /**

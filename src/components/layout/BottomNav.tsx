@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import styles from "./BottomNav.module.css";
-import { LuHouse, LuCompass, LuSearch, LuLayers } from "react-icons/lu";
+import { LuHouse, LuCompass, LuSearch, LuLayers, LuBookmark } from "react-icons/lu";
 
 export function BottomNav() {
   const pathname = usePathname();
@@ -20,6 +20,7 @@ export function BottomNav() {
   const navItems = [
     { href: "/", label: "Home", icon: LuHouse },
     { href: "/discover", label: "Discover", icon: LuCompass },
+    { href: "/library", label: "Library", icon: LuBookmark },
     { href: "/search", label: "Search", icon: LuSearch },
     { href: "/studio", label: "Studio", icon: LuLayers },
   ];
