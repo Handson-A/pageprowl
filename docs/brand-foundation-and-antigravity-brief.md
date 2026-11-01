@@ -1,10 +1,10 @@
-# Panelverse — Pass 1: Brand Foundation & Antigravity Implementation Brief
+# PageProwl — Pass 1: Brand Foundation & Antigravity Implementation Brief (formerly Panelverse)
 
-**Purpose:** Integrate the approved Panel P brand direction into the existing Panelverse application without duplicating work that may already be complete. This pass extends the approved Phase 2 design system; it does not reopen product-scope decisions.
+**Purpose:** Integrate the approved Panel P brand direction into the existing PageProwl (formerly Panelverse) application without duplicating work that may already be complete. This pass extends the approved Phase 2 design system; it does not reopen product-scope decisions.
 
 ## Instructions to Antigravity
 
-Read this document and the existing Panelverse documentation, especially `docs/design-system.md`, `docs/decision-register.md`, and `docs/antigravity-handoff.md`.
+Read this document and the existing PageProwl documentation, especially `docs/design-system.md`, `docs/decision-register.md`, and `docs/antigravity-handoff.md`.
 
 **First inspect the repository and existing implementation.** Determine whether the logo, favicon, design tokens, and motion/accessibility conventions already exist. Reuse and improve working implementations rather than creating duplicates. Preserve uncommitted user changes.
 
@@ -22,15 +22,15 @@ Then implement only the missing or incomplete items described below.
 - **Construction:** A bold geometric P assembled from comic-panel shapes.
 - **Character:** Editorial, confident, creative, modern; not childish or cluttered.
 - **Primary palette:** Ink `#171717`, Paper `#F7F0E3`, Comic Red `#E44735`, Golden Yellow `#F2C14E`.
-- **Primary wordmark:** `PANELVERSE`, with optional descriptor `COMICS / CREATORS / TOGETHER`.
+- **Primary wordmark:** `PAGEPROWL`, with optional descriptor `COMICS / CREATORS / TOGETHER` (formerly `PANELVERSE`).
 - **Compact mark:** Panel P symbol.
 - **Favicon:** Simplified symbol with strong contrast and a clear silhouette at small sizes.
 
 ## 2. Supplied assets
 
-- `assets/panelverse-wordmark.svg` — wordmark for light surfaces.
-- `assets/panelverse-wordmark-dark-bg.svg` — wordmark for dark surfaces.
-- `assets/panelverse-icon.svg` — compact icon.
+- `public/brand/pageprowl-wordmark.svg` (and legacy `panelverse-wordmark.svg`) — wordmark for light surfaces.
+- `public/brand/pageprowl-wordmark-dark-bg.svg` (and legacy `panelverse-wordmark-dark-bg.svg`) — wordmark for dark surfaces.
+- `public/brand/pageprowl-icon.svg` (and legacy `panelverse-icon.svg`) — compact icon.
 - `assets/favicon.svg` — favicon source.
 
 These are initial SVG assets. Inspect them in-browser and refine geometry or spacing if needed before considering them final. They are not a claim of trademark clearance.
@@ -139,7 +139,7 @@ Suggested timings:
 - [ ] Existing work was inspected before editing; completed work was reused.
 - [ ] Wordmark and icon render clearly on light and dark surfaces.
 - [ ] Favicon is recognizable at 16, 32, and 48 px.
-- [ ] Brand assets are local and use the approved Panelverse palette.
+- [ ] Brand assets are local and use the approved PageProwl palette.
 - [ ] Existing Phase 2 colors and typography remain intact.
 - [ ] Supporting tokens reuse existing conventions rather than duplicate them.
 - [ ] Reduced-motion preference is respected.

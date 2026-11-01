@@ -9,9 +9,28 @@
   flex: 1;
 }
 
-.featuredSection {
+.section {
   background-color: var(--color-bg);
-  padding: var(--space-12) var(--space-6) var(--space-16);
+  padding: var(--space-10) var(--space-6);
+}
+
+.genreSection {
+  background-color: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-10) var(--space-6);
+}
+
+.creatorsSection {
+  background-color: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-10) var(--space-6);
+}
+
+.bannerSection {
+  background-color: var(--color-bg);
+  padding: var(--space-6) var(--space-6) var(--space-16);
 }
 
 .sectionInner {
@@ -19,7 +38,7 @@
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: var(--space-8);
+  gap: var(--space-6);
 }
 
 .sectionHeader {
@@ -28,6 +47,19 @@
   align-items: flex-end;
   border-bottom: 2px solid var(--color-border);
   padding-bottom: var(--space-4);
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.titleWithIcon {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.sectionIcon {
+  color: var(--color-primary);
+  margin-top: 4px;
 }
 
 .eyebrow {
@@ -46,6 +78,7 @@
   font-weight: 800;
   color: var(--color-text);
   letter-spacing: -0.02em;
+  margin: 0;
 }
 
 .viewAllLink {
@@ -65,8 +98,125 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: var(--space-6);
+}
+
+/* Genre Pills */
+.genrePills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.genrePill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: var(--space-3) var(--space-5);
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--pv-radius-md);
+  color: var(--color-text);
+  text-decoration: none;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  transition: transform var(--pv-motion-fast) var(--pv-ease-standard),
+              border-color var(--pv-motion-fast) var(--pv-ease-standard),
+              background var(--pv-motion-fast) var(--pv-ease-standard);
+}
+
+.genrePill:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-primary);
+  background: rgba(228, 71, 53, 0.06);
+  color: var(--color-primary);
+}
+
+.genreIcon {
+  color: var(--color-primary);
+}
+
+/* Creator Spotlight Grid */
+.creatorsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-4);
+}
+
+.creatorCard {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  background-color: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--pv-radius-md);
+  text-decoration: none;
+  transition: transform var(--pv-motion-fast) var(--pv-ease-standard),
+              border-color var(--pv-motion-fast) var(--pv-ease-standard);
+}
+
+.creatorCard:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-primary);
+}
+
+.creatorAvatarWrapper {
+  width: 54px;
+  height: 54px;
+  min-width: 54px;
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: var(--palette-ink);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.creatorAvatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.creatorAvatarFallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #171717 0%, #2D211F 100%);
+  color: #F7F0E3;
+  font-weight: var(--font-weight-bold);
+  font-size: 1.25rem;
+}
+
+.creatorInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+}
+
+.creatorName {
+  font-family: var(--font-family-heading);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.creatorHandle {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-subtle);
+}
+
+.creatorCount {
+  font-size: 11px;
+  color: var(--color-primary);
+  font-weight: var(--font-weight-medium);
+  margin-top: 2px;
 }
 
 /* Creator Invitation Banner */
@@ -75,7 +225,6 @@
   color: #F7F0E3;
   border-radius: var(--pv-radius-lg);
   padding: var(--space-10) var(--space-8);
-  margin-top: var(--space-8);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -147,7 +296,10 @@
     padding-bottom: var(--mobile-bottom-nav-height);
   }
 
-  .featuredSection {
+  .section,
+  .genreSection,
+  .creatorsSection,
+  .bannerSection {
     padding: var(--space-8) var(--space-4);
   }
 

@@ -76,12 +76,24 @@
   flex-wrap: wrap;
 }
 
+.badgeLink {
+  text-decoration: none;
+}
+
 .badge {
   font-size: 11px;
   font-weight: var(--font-weight-semibold);
   color: var(--color-primary);
   text-transform: uppercase;
   letter-spacing: 0.06em;
+  background: rgba(228, 71, 53, 0.08);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  transition: background var(--pv-motion-fast);
+}
+
+.badge:hover {
+  background: rgba(228, 71, 53, 0.16);
 }
 
 .formatBadge {
@@ -99,14 +111,64 @@
   font-weight: 800;
   color: var(--color-text);
   line-height: var(--line-height-tight);
+  margin: 0;
 }
 
 .creator {
   font-size: var(--font-size-sm);
   color: var(--color-text-muted);
+  margin: 0;
+}
+
+.creatorLink {
+  color: var(--color-text);
+  text-decoration: none;
+  transition: color var(--pv-motion-fast);
+}
+
+.creatorLink:hover {
+  color: var(--color-primary);
+  text-decoration: underline;
 }
 
 .creator strong {
+  color: var(--color-text);
+}
+
+.creditsList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  padding: var(--space-2) 0;
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.creditItem {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.creditRole {
+  text-transform: capitalize;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-subtle);
+}
+
+.creditNameLink {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: var(--font-weight-medium);
+}
+
+.creditNameLink:hover {
+  text-decoration: underline;
+}
+
+.creditName {
   color: var(--color-text);
 }
 
@@ -206,9 +268,23 @@
   color: var(--color-text);
 }
 
+.episodeSubRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
 .episodeFormat {
   font-size: 11px;
   color: var(--color-text-muted);
+}
+
+.episodeDate {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--color-text-subtle);
 }
 
 .readButton {

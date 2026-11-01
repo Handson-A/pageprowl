@@ -24,7 +24,7 @@ export function getOptimizedImageUrl(
     }
   }
 
-  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "panelverse";
+  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "pageprowl";
   const { width, height, crop = "limit", quality = "auto", format = "auto" } = options;
 
   const transformations: string[] = [`f_${format}`, `q_${quality}`];

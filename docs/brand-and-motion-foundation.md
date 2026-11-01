@@ -1,4 +1,4 @@
-# Panelverse Brand & Motion Foundation — Pass 1
+# PageProwl Brand & Motion Foundation — Pass 1 (formerly Panelverse)
 
 **Status:** Initial implementation-ready proposal based on the approved Panel P direction. This extends the approved Phase 2 design system without reopening product-scope decisions.
 
@@ -6,14 +6,14 @@
 
 - **Direction:** The Panel P — a bold geometric P built from comic-panel shapes.
 - **Primary palette:** Ink `#171717`, Paper `#F7F0E3`, Comic Red `#E44735`, Golden Yellow `#F2C14E`.
-- **Primary wordmark:** `PANELVERSE`, with optional descriptor `COMICS / CREATORS / TOGETHER`.
+- **Primary wordmark:** `PAGEPROWL`, with optional descriptor `COMICS / CREATORS / TOGETHER` (formerly `PANELVERSE`).
 - **Compact mark:** Panel P symbol for tight navigation and app/browser icons.
 - **Favicon:** Simplified symbol on a dark square for small-size contrast.
 
 ### Assets
-- `assets/panelverse-wordmark.svg` — for light surfaces.
-- `assets/panelverse-wordmark-dark-bg.svg` — for dark surfaces.
-- `assets/panelverse-icon.svg` — compact icon.
+- `public/brand/pageprowl-wordmark.svg` (and legacy `panelverse-wordmark.svg`) — for light surfaces.
+- `public/brand/pageprowl-wordmark-dark-bg.svg` (and legacy `panelverse-wordmark-dark-bg.svg`) — for dark surfaces.
+- `public/brand/pageprowl-icon.svg` (and legacy `panelverse-icon.svg`) — compact icon.
 - `assets/favicon.svg` — favicon source.
 
 These are first-pass vector assets. Inspect them in-browser and adjust geometry/spacing before considering them final. They are not a claim of trademark clearance.

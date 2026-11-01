@@ -1,13 +1,13 @@
-# Panelverse — Technical Architecture
+# PageProwl — Technical Architecture (formerly Panelverse)
 
 **Status:** Architecture baseline  
-**Product:** Panelverse  
+**Product:** PageProwl (formerly Panelverse)  
 **Stack:** Next.js 14 App Router, Supabase, Cloudinary, Vercel  
 **Development model:** Solo developer with AI-assisted implementation
 
 ## 1. Architectural Goals
 
-Panelverse must support public comic reading, independent creators, collaborative studios, multiple comic formats, revision-based publishing, and platform moderation.
+PageProwl must support public comic reading, independent creators, collaborative studios, multiple comic formats, revision-based publishing, and platform moderation.
 
 The architecture must prioritize:
 

@@ -1,4 +1,4 @@
-# Panelverse — Implementation Plan
+# PageProwl — Implementation Plan (formerly Panelverse)
 
 **Status:** Proposed build sequence  
 **Stack:** Next.js 14 App Router, Supabase, Cloudinary, Vercel  
@@ -6,7 +6,7 @@
 
 ## 1. Objective
 
-Implement Panelverse in small, verifiable increments.
+Implement PageProwl in small, verifiable increments.
 
 Every phase should produce a working result, with clear acceptance criteria before moving to the next phase. Antigravity should not attempt to implement the entire product in one task.
 

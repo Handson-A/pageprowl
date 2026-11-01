@@ -1,0 +1,228 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-bg);
+}
+
+.content {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-6) var(--space-16);
+  width: 100%;
+  flex: 1;
+}
+
+.heroSection {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--pv-radius-lg);
+  padding: var(--space-8);
+  margin-bottom: var(--space-10);
+  box-shadow: var(--pv-shadow-card);
+}
+
+.heroInner {
+  display: flex;
+  gap: var(--space-8);
+  align-items: flex-start;
+}
+
+.avatarWrapper {
+  width: 120px;
+  height: 120px;
+  min-width: 120px;
+  border-radius: 50%;
+  background-color: var(--palette-ink);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  border: 3px solid var(--color-surface);
+}
+
+.avatarImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatarFallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--palette-ink) 0%, #2D211F 100%);
+  color: var(--color-primary);
+}
+
+.avatarLetter {
+  font-family: var(--font-family-heading);
+  font-size: 2.5rem;
+  font-weight: var(--font-weight-bold);
+  color: #F7F0E3;
+}
+
+.profileMeta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  flex: 1;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.displayName {
+  font-family: var(--font-family-heading);
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-weight: 800;
+  color: var(--color-text);
+  margin: 0;
+  line-height: var(--line-height-tight);
+}
+
+.badgeGroup {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.creatorBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: #9A6500;
+  background-color: rgba(242, 193, 78, 0.2);
+  border: 1px solid rgba(242, 193, 78, 0.4);
+  padding: 3px 10px;
+  border-radius: var(--pv-radius-sm);
+}
+
+.username {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-subtle);
+  margin-top: -4px;
+}
+
+.realNameHint {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.bio {
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  line-height: var(--line-height-relaxed);
+  max-width: 680px;
+  margin: var(--space-2) 0;
+}
+
+.linksRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.socialLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+  background-color: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--pv-radius-md);
+  text-decoration: none;
+  text-transform: capitalize;
+  transition: all var(--pv-motion-fast) var(--pv-ease-standard);
+}
+
+.socialLink:hover {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  background-color: rgba(228, 71, 53, 0.05);
+}
+
+.portfolioSection,
+.contributionsSection {
+  margin-bottom: var(--space-12);
+}
+
+.sectionHeader {
+  margin-bottom: var(--space-6);
+  border-bottom: 2px solid var(--color-border);
+  padding-bottom: var(--space-3);
+}
+
+.sectionEyebrow {
+  font-size: 11px;
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-primary);
+  display: block;
+  margin-bottom: 2px;
+}
+
+.sectionTitle {
+  font-family: var(--font-family-heading);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+  margin: 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-6);
+}
+
+.creditCardWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.creditRoleBadge {
+  font-size: 11px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+  background-color: var(--color-surface-muted);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  align-self: flex-start;
+  text-transform: capitalize;
+}
+
+@media (max-width: 768px) {
+  .heroInner {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .titleRow {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .linksRow {
+    justify-content: center;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

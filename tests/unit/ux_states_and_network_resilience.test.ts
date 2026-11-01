@@ -104,7 +104,7 @@ describe("Global UX States & Network Resilience Audit", () => {
 
         uploaded.push({
           pageNumber: uploaded.length + 1,
-          url: `https://res.cloudinary.com/panelverse/image/upload/${file.name}`,
+          url: `https://res.cloudinary.com/pageprowl/image/upload/${file.name}`,
         });
       });
 

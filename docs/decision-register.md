@@ -1,4 +1,4 @@
-# Panelverse — Decision Register & Scope Guard
+# PageProwl — Decision Register & Scope Guard (formerly Panelverse)
 
 **Phase 2 status: CLOSED.** The visual direction, MVP screen coverage, and decisions 45A–45F are locked. This register records the agreed meaning of those choices for implementation.
 
@@ -58,7 +58,7 @@ Enforce publishing permissions and required fields, and provide a limited author
 
 ## 3. Project and implementation context
 
-- Product: Panelverse, a collaborative comic publishing platform for a team of creators.
+- Product: PageProwl (formerly Panelverse), a collaborative comic publishing platform for a team of creators.
 - Stack: Next.js 14 App Router, TypeScript, Supabase, Cloudinary and Vercel.
 - Solo developer workflow: `main` and `dev` branches; conventional commit prefixes such as `feat:` and `fix:`.
 - Antigravity is the coding agent; the developer owns repository setup and project decisions.

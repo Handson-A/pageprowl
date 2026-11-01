@@ -14,7 +14,7 @@ export default function GlobalError({
 }) {
   useEffect(() => {
     // Log safe error representation without exposing sensitive details to user
-    console.error("Panelverse encountered an application error:", error.message);
+    console.error("PageProwl encountered an application error:", error.message);
   }, [error]);
 
   return (

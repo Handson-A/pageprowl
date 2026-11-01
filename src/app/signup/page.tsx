@@ -74,7 +74,7 @@ function SignUpForm() {
   return (
     <div className={styles.card}>
       <div className={styles.header}>
-        <h1 className={styles.title}>Join Panelverse</h1>
+        <h1 className={styles.title}>Join PageProwl</h1>
         <p className={styles.subtitle}>
           Create an account to publish comics and collaborate with studios
         </p>
@@ -138,7 +138,7 @@ function SignUpForm() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="creator@panelverse.com"
+            placeholder="creator@pageprowl.com"
             style={{
               padding: "8px 12px",
               borderRadius: "6px",

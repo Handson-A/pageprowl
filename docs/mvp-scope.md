@@ -1,10 +1,10 @@
-# Panelverse — MVP Scope
-**Product:** Panelverse  
+# PageProwl — MVP Scope (formerly Panelverse)
+**Product:** PageProwl (formerly Panelverse)  
 **Purpose:** Define the minimum viable release, its boundaries, and the features that must work before launch.
 
 ## 1. Product Objective
 
-Panelverse is a web-based collaborative comic publishing platform connecting readers, independent creators, and creative studios.
+PageProwl is a web-based collaborative comic publishing platform connecting readers, independent creators, and creative studios.
 
 The MVP must demonstrate the complete core product experience:
 

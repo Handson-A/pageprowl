@@ -1,4 +1,4 @@
-# Panelverse Pass 1 Brand Foundation
+# PageProwl Brand Foundation (formerly Panelverse)
 
 Contents:
 - `brand-and-motion-foundation.md` — logo usage, supporting tokens, motion, depth, accessibility, acceptance criteria.

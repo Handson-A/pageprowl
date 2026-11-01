@@ -1,19 +1,52 @@
 import React from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import styles from "./page.module.css";
 import { PublicHeader } from "@/components/layout/PublicHeader";
 import { PublicFooter } from "@/components/layout/PublicFooter";
 import { BottomNav } from "@/components/layout/BottomNav";
-import { Button } from "@/components/ui/Button";
 import { StatusBadge } from "@/components/ui/StatusBadge";
-import { getPublicSeriesBySlug, getPublishedEpisodes } from "@/lib/data/series";
-import { LuBookOpen, LuArrowRight, LuLayers } from "react-icons/lu";
+import { ContinueReadingButton } from "@/components/series/ContinueReadingButton";
+import { getPublicSeriesBySlug, getPublishedEpisodes, genreToSlug } from "@/lib/data/series";
+import { LuBookOpen, LuArrowRight, LuLayers, LuUser, LuCalendar } from "react-icons/lu";
 
 interface SeriesPageProps {
   params: {
     seriesSlug: string;
   };
+}
+
+export async function generateMetadata({
+  params,
+}: SeriesPageProps): Promise<Metadata> {
+  const series = await getPublicSeriesBySlug(params.seriesSlug);
+
+  if (!series) {
+    return {
+      title: "Comic Series | PageProwl",
+    };
+  }
+
+  return {
+    title: `${series.title} by ${series.creator_name} | PageProwl`,
+    description:
+      series.synopsis ||
+      `Read the published comic series "${series.title}" on PageProwl.`,
+  };
+}
+
+function formatDate(dateString: string): string {
+  try {
+    const d = new Date(dateString);
+    return d.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  } catch {
+    return "";
+  }
 }
 
 export default async function SeriesOverviewPage({ params }: SeriesPageProps) {
@@ -50,7 +83,9 @@ export default async function SeriesOverviewPage({ params }: SeriesPageProps) {
 
           <div className={styles.seriesMeta}>
             <div className={styles.badges}>
-              <span className={styles.badge}>{series.genre}</span>
+              <Link href={`/genres/${genreToSlug(series.genre)}`} className={styles.badgeLink}>
+                <span className={styles.badge}>{series.genre}</span>
+              </Link>
               <span className={styles.formatBadge}>
                 {series.format === "scroll" ? "Vertical Scroll" : "Page-by-Page"}
               </span>
@@ -58,35 +93,62 @@ export default async function SeriesOverviewPage({ params }: SeriesPageProps) {
             </div>
 
             <h1 className={styles.title}>{series.title}</h1>
+
             <p className={styles.creator}>
-              Story by <strong>{series.creator_name}</strong>
-              {series.studio_name ? ` &bull; Studio: ${series.studio_name}` : ""}
-            </p>
-
-            <p className={styles.synopsis}>{series.synopsis || "No series synopsis available."}</p>
-
-            <div className={styles.actions}>
-              {firstEpisode ? (
-                <Link href={`/series/${series.slug}/episodes/${firstEpisode.slug}`}>
-                  <Button variant="primary" size="lg">
-                    <span style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
-                      <LuBookOpen size={18} aria-hidden="true" />
-                      <span>Start Reading (Ep. {firstEpisode.episode_number})</span>
-                    </span>
-                  </Button>
+              Story by{" "}
+              {series.creator_username ? (
+                <Link
+                  href={`/creators/${series.creator_username}`}
+                  className={styles.creatorLink}
+                >
+                  <strong>{series.creator_name}</strong>
                 </Link>
               ) : (
-                <Button variant="secondary" size="lg" disabled>
-                  Coming Soon
-                </Button>
+                <strong>{series.creator_name}</strong>
               )}
+              {series.studio_name ? ` • Studio: ${series.studio_name}` : ""}
+            </p>
+
+            {/* Contributor Credits if any */}
+            {series.credits && series.credits.length > 0 && (
+              <div className={styles.creditsList} aria-label="Creative Credits">
+                {series.credits.map((credit) => (
+                  <span key={credit.id} className={styles.creditItem}>
+                    <span className={styles.creditRole}>{credit.role_category}:</span>{" "}
+                    {credit.username ? (
+                      <Link
+                        href={`/creators/${credit.username}`}
+                        className={styles.creditNameLink}
+                      >
+                        {credit.display_name}
+                      </Link>
+                    ) : (
+                      <span className={styles.creditName}>{credit.display_name}</span>
+                    )}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            <p className={styles.synopsis}>
+              {series.synopsis || "No series synopsis available."}
+            </p>
+
+            <div className={styles.actions}>
+              <ContinueReadingButton
+                seriesSlug={series.slug}
+                firstEpisodeSlug={firstEpisode?.slug}
+                firstEpisodeNumber={firstEpisode?.episode_number}
+              />
             </div>
           </div>
         </div>
 
         <section className={styles.episodesSection}>
           <div className={styles.episodesHeader}>
-            <h2 className={styles.episodesTitle}>Published Episodes ({episodes.length})</h2>
+            <h2 className={styles.episodesTitle}>
+              Published Episodes ({episodes.length})
+            </h2>
             <span className={styles.readingOrderNotice}>In Official Reading Order</span>
           </div>
 
@@ -104,9 +166,17 @@ export default async function SeriesOverviewPage({ params }: SeriesPageProps) {
                     </span>
                     <div className={styles.episodeTextGroup}>
                       <span className={styles.episodeItemTitle}>{ep.title}</span>
-                      <span className={styles.episodeFormat}>
-                        {series.format === "scroll" ? "Scroll Mode" : "Page Mode"}
-                      </span>
+                      <div className={styles.episodeSubRow}>
+                        <span className={styles.episodeFormat}>
+                          {series.format === "scroll" ? "Scroll Mode" : "Page Mode"}
+                        </span>
+                        {ep.created_at && (
+                          <span className={styles.episodeDate}>
+                            <LuCalendar size={11} aria-hidden="true" />
+                            <span>{formatDate(ep.created_at)}</span>
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                   <span className={styles.readButton}>

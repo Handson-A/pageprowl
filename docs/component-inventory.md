@@ -1,4 +1,4 @@
-# Panelverse Reusable Component Inventory
+# PageProwl Reusable Component Inventory (formerly Panelverse)
 
 This is a reusable UI inventory, not a mandate to create a component for every row. Reuse existing components when they meet the requirements; avoid premature abstraction.
 

@@ -106,7 +106,7 @@ function LoginForm() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="creator@panelverse.com"
+            placeholder="creator@pageprowl.com"
             style={{
               padding: "8px 12px",
               borderRadius: "6px",

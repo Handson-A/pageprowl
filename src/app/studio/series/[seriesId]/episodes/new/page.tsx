@@ -3,13 +3,23 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import styles from "@/app/studio/page.module.css";
+import styles from "./NewEpisode.module.css";
+import pageStyles from "@/app/studio/page.module.css";
 import { CreatorSidebar } from "@/components/layout/CreatorSidebar";
 import { Button } from "@/components/ui/Button";
 import { FormField } from "@/components/ui/FormField";
 import { createClient } from "@/lib/supabase/client";
 import { createEpisodeAction } from "../actions";
-import { LuArrowLeft } from "react-icons/lu";
+import {
+  LuArrowLeft,
+  LuSparkles,
+  LuLayers,
+  LuCheck,
+  LuCircleHelp,
+  LuFileText,
+  LuCloudUpload,
+  LuEye,
+} from "react-icons/lu";
 
 interface NewEpisodePageProps {
   params: {
@@ -22,11 +32,12 @@ export default function NewEpisodePage({ params }: NewEpisodePageProps) {
   const [episodeNumber, setEpisodeNumber] = useState<number>(1);
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
+  const [seriesTitle, setSeriesTitle] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    async function suggestNextNumber() {
+    async function loadEpisodeData() {
       const supabase = createClient();
       const {
         data: { user },
@@ -39,6 +50,17 @@ export default function NewEpisodePage({ params }: NewEpisodePageProps) {
           )}`
         );
         return;
+      }
+
+      // Fetch series metadata for context
+      const { data: series } = await supabase
+        .from("series")
+        .select("title")
+        .eq("id", params.seriesId)
+        .single();
+
+      if (series?.title) {
+        setSeriesTitle(series.title);
       }
 
       const { data } = await supabase
@@ -57,7 +79,7 @@ export default function NewEpisodePage({ params }: NewEpisodePageProps) {
         setSlug("chapter-1");
       }
     }
-    suggestNextNumber();
+    loadEpisodeData();
   }, [params.seriesId, router]);
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -90,141 +112,204 @@ export default function NewEpisodePage({ params }: NewEpisodePageProps) {
   };
 
   return (
-    <div className={styles.layout}>
+    <div className={pageStyles.layout}>
       <CreatorSidebar />
 
-      <main className={styles.main}>
-        <header className={styles.header}>
-          <div>
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
-              <Link
-                href={`/studio/series/${params.seriesId}`}
-                style={{
-                  color: "var(--color-text-muted)",
-                  fontSize: "0.875rem",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "4px",
-                }}
-              >
-                <LuArrowLeft size={14} aria-hidden="true" />
-                <span>Back to Series Workspace</span>
-              </Link>
-            </div>
-            <h1 className={styles.title}>New Episode</h1>
-            <p className={styles.subtitle}>
-              Create a new chapter or episode container to upload comic pages and prepare revisions.
-            </p>
-          </div>
+      <main className={pageStyles.main}>
+        {/* Header */}
+        <header className={styles.pageHeader}>
+          <Link
+            href={`/studio/series/${params.seriesId}`}
+            className={styles.backLink}
+          >
+            <LuArrowLeft size={16} aria-hidden="true" />
+            <span>Back to Series Workspace</span>
+          </Link>
+          <h1 className={styles.pageTitle}>New Episode</h1>
+          <p className={styles.pageSubtitle}>
+            Create a new chapter container for {seriesTitle ? `"${seriesTitle}"` : "your series"} to
+            upload comic pages, arrange panel order, and prepare revisions for editorial review.
+          </p>
         </header>
 
-        <div
-          style={{
-            maxWidth: "600px",
-            backgroundColor: "var(--color-surface)",
-            padding: "var(--space-8)",
-            borderRadius: "var(--radius-lg)",
-            border: "1px solid var(--color-border)",
-          }}
-        >
-          {error && (
-            <div
-              style={{
-                backgroundColor: "var(--color-danger-bg)",
-                color: "var(--color-danger)",
-                padding: "12px",
-                borderRadius: "6px",
-                marginBottom: "20px",
-                fontSize: "0.875rem",
-              }}
-            >
-              {error}
-            </div>
-          )}
+        {/* Two-Column Grid */}
+        <div className={styles.twoColLayout}>
+          {/* Left Column: Form Card */}
+          <div className={styles.formCard}>
+            {error && (
+              <div className={styles.errorBanner} role="alert">
+                <span>{error}</span>
+              </div>
+            )}
 
-          <form
-            onSubmit={handleSubmit}
-            style={{ display: "flex", flexDirection: "column", gap: "20px" }}
-          >
-            <FormField label="Episode Number" htmlFor="episodeNumber" required hint="Scoped to this series">
-              <input
-                id="episodeNumber"
-                name="episodeNumber"
-                type="number"
-                min={1}
-                required
-                value={episodeNumber}
-                onChange={(e) => {
-                  const val = parseInt(e.target.value) || 1;
-                  setEpisodeNumber(val);
-                  if (!title) setSlug(`chapter-${val}`);
-                }}
+            <form onSubmit={handleSubmit} className={styles.formBody}>
+              <div className={styles.twoInputGrid}>
+                <FormField
+                  label="Chapter #"
+                  htmlFor="episodeNumber"
+                  required
+                  hint="Order index"
+                >
+                  <input
+                    id="episodeNumber"
+                    name="episodeNumber"
+                    type="number"
+                    min={1}
+                    required
+                    value={episodeNumber}
+                    onChange={(e) => {
+                      const val = parseInt(e.target.value) || 1;
+                      setEpisodeNumber(val);
+                      if (!title) setSlug(`chapter-${val}`);
+                    }}
+                    className={styles.inputField}
+                  />
+                </FormField>
+
+                <FormField
+                  label="Episode / Chapter Title"
+                  htmlFor="title"
+                  required
+                >
+                  <input
+                    id="title"
+                    name="title"
+                    type="text"
+                    required
+                    maxLength={100}
+                    placeholder="e.g. The Awakening Part 1"
+                    value={title}
+                    onChange={handleTitleChange}
+                    className={styles.inputField}
+                    autoFocus
+                  />
+                </FormField>
+              </div>
+
+              <FormField
+                label="URL Slug"
+                htmlFor="slug"
+                description="Unique identifier used in reader web addresses."
+              >
+                <input
+                  id="slug"
+                  name="slug"
+                  type="text"
+                  readOnly
+                  value={slug}
+                  className={`${styles.inputField} ${styles.inputFieldReadonly}`}
+                />
+              </FormField>
+
+              <div
                 style={{
-                  padding: "10px 14px",
-                  borderRadius: "6px",
+                  backgroundColor: "var(--color-bg)",
                   border: "1px solid var(--color-border)",
-                  backgroundColor: "var(--color-surface)",
-                  color: "var(--color-text-main)",
+                  borderRadius: "var(--pv-radius-md)",
+                  padding: "var(--space-4)",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "var(--space-2)",
                 }}
-              />
-            </FormField>
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <LuSparkles size={16} color="var(--color-primary)" />
+                  <span style={{ fontSize: "var(--font-size-sm)", fontWeight: "600", color: "var(--color-text)" }}>
+                    Initial Revision Status: Draft
+                  </span>
+                </div>
+                <p style={{ fontSize: "var(--font-size-xs)", color: "var(--color-text-muted)", margin: 0, lineHeight: 1.5 }}>
+                  Creating this episode will generate initial Revision 1 in <strong>Draft</strong> status.
+                  You can upload high-res page slices immediately in the editor.
+                </p>
+              </div>
 
-            <FormField label="Episode Title" htmlFor="title" required>
-              <input
-                id="title"
-                name="title"
-                type="text"
-                required
-                maxLength={100}
-                placeholder="e.g. The Awakening Part 1"
-                value={title}
-                onChange={handleTitleChange}
-                style={{
-                  padding: "10px 14px",
-                  borderRadius: "6px",
-                  border: "1px solid var(--color-border)",
-                  backgroundColor: "var(--color-surface)",
-                  color: "var(--color-text-main)",
-                }}
-              />
-            </FormField>
-
-            <FormField label="URL Slug" htmlFor="slug" hint="Used in reader web address">
-              <input
-                id="slug"
-                name="slug"
-                type="text"
-                readOnly
-                value={slug}
-                style={{
-                  padding: "10px 14px",
-                  borderRadius: "6px",
-                  border: "1px solid var(--color-border)",
-                  backgroundColor: "var(--color-surface-hover)",
-                  color: "var(--color-text-muted)",
-                  fontFamily: "monospace",
-                }}
-              />
-            </FormField>
-
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "flex-end",
-                gap: "12px",
-                marginTop: "12px",
-              }}
-            >
-              <Link href={`/studio/series/${params.seriesId}`}>
-                <Button type="button" variant="ghost">
-                  Cancel
+              <div className={styles.btnRow}>
+                <Link href={`/studio/series/${params.seriesId}`}>
+                  <Button type="button" variant="secondary">
+                    Cancel
+                  </Button>
+                </Link>
+                <Button type="submit" variant="primary" isLoading={isLoading}>
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                    <LuCheck size={16} aria-hidden="true" />
+                    <span>Create Episode &amp; Open Workspace</span>
+                  </span>
                 </Button>
-              </Link>
-              <Button type="submit" variant="primary" isLoading={isLoading}>
-                Create Episode &amp; Open Workspace
-              </Button>
+              </div>
+            </form>
+          </div>
+
+          {/* Right Column: Live Episode Preview & Workflow Tips */}
+          <aside className={styles.sidebarCol} aria-label="Episode Preview and Workflow Tips">
+            {/* Live Episode Preview */}
+            <div className={styles.previewCard}>
+              <div className={styles.previewHeader}>
+                <span className={styles.previewTag}>
+                  <LuSparkles size={14} aria-hidden="true" />
+                  <span>Episode Preview</span>
+                </span>
+                <span className={styles.previewBadge}>Active</span>
+              </div>
+
+              <div className={styles.previewBody}>
+                <div className={styles.previewEpisodeHeader}>
+                  <span className={styles.episodeBadge}>Ch. {episodeNumber}</span>
+                  <h3 className={styles.previewTitle}>
+                    {title.trim() || "Episode Title"}
+                  </h3>
+                </div>
+
+                <div className={styles.previewSlugBox}>
+                  <span>/episodes/{slug || `chapter-${episodeNumber}`}</span>
+                </div>
+
+                <div className={styles.previewWorkflowSteps}>
+                  <div className={styles.workflowStepItem}>
+                    <LuFileText size={14} color="var(--color-primary)" />
+                    <span>Revision 1 initialized as Draft</span>
+                  </div>
+                  <div className={styles.workflowStepItem}>
+                    <LuCloudUpload size={14} color="var(--color-primary)" />
+                    <span>Direct batch page uploads ready</span>
+                  </div>
+                  <div className={styles.workflowStepItem}>
+                    <LuEye size={14} color="var(--color-primary)" />
+                    <span>Private until approved &amp; published</span>
+                  </div>
+                </div>
+              </div>
             </div>
-          </form>
+
+            {/* Quick Tips */}
+            <div className={styles.tipsCard}>
+              <div className={styles.tipsHeader}>
+                <LuCircleHelp size={18} color="var(--color-primary)" />
+                <span>Production Workflow</span>
+              </div>
+
+              <ul className={styles.tipsList}>
+                <li className={styles.tipItem}>
+                  <span className={styles.tipBullet}>•</span>
+                  <div>
+                    <strong>1. Page Uploads:</strong> In the next screen, you can batch drag-and-drop all artwork files with automatic numeric ordering.
+                  </div>
+                </li>
+                <li className={styles.tipItem}>
+                  <span className={styles.tipBullet}>•</span>
+                  <div>
+                    <strong>2. Editorial Review:</strong> Once pages are sequenced, submit the draft for review so your editor or team lead can verify quality.
+                  </div>
+                </li>
+                <li className={styles.tipItem}>
+                  <span className={styles.tipBullet}>•</span>
+                  <div>
+                    <strong>3. Safe Publishing:</strong> Published revisions are permanently immutable to ensure readers experience a consistent release.
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </aside>
         </div>
       </main>
     </div>

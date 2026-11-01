@@ -224,7 +224,7 @@ export function EpisodeEditorClient({
         formData.append("timestamp", sigData.timestamp.toString());
         formData.append("signature", sigData.signature);
         formData.append("folder", sigData.folder);
-        formData.append("tags", "panelverse,episode_page");
+        formData.append("tags", "pageprowl,episode_page");
 
         const uploadRes = await fetch(
           `https://api.cloudinary.com/v1_1/${sigData.cloudName}/image/upload`,

@@ -1,11 +1,11 @@
-# Panelverse Architecture
+# PageProwl Architecture (formerly Panelverse)
 
 ## High-level structure
 
 The following is the intended structure. Create directories when they are needed; Not necessarily adding empty folders merely to match this tree. The exact routes and features may evolve as product requirements are finalized.
 
 ```text
-panelverse/
+pageprowl/ (repository: panelverse)
 ├── public/
 │   ├── images/
 │   ├── icons/

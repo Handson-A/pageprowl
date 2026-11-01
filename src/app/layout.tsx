@@ -6,17 +6,23 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "Panelverse — Collaborative Comic Publishing Platform",
-    template: "%s | Panelverse",
+    default: "PageProwl — Collaborative Comic Publishing Platform",
+    template: "%s | PageProwl",
   },
   description:
-    "Panelverse brings together independent creators, studios, and passionate readers. Enjoy vertical-scroll and page-by-page comics straight from the creators.",
+    "PageProwl brings together independent creators, studios, and passionate readers. Enjoy vertical-scroll and page-by-page comics straight from the creators.",
+  openGraph: {
+    title: "PageProwl — Collaborative Comic Publishing Platform",
+    description:
+      "PageProwl brings together independent creators, studios, and passionate readers. Enjoy vertical-scroll and page-by-page comics straight from the creators.",
+    siteName: "PageProwl",
+  },
   icons: {
     icon: [
       { url: "/icon.svg", type: "image/svg+xml" },
       { url: "/brand/favicon.svg", type: "image/svg+xml" },
     ],
-    apple: "/brand/panelverse-icon.svg",
+    apple: "/brand/pageprowl-icon.svg",
   },
 };
 

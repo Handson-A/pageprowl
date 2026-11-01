@@ -9,17 +9,17 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/Button";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { MotionReveal } from "@/components/ui/MotionReveal";
-import { getPublicSeriesList } from "@/lib/data/series";
-import { LuSearch } from "react-icons/lu";
+import { getPublicSeriesCatalog, SUPPORTED_GENRES } from "@/lib/data/series";
+import { LuSearch, LuChevronLeft, LuChevronRight } from "react-icons/lu";
 import type { ComicFormat } from "@/types/database";
-
-const GENRES = ["All", "Action", "Fantasy", "Sci-Fi", "Romance", "Horror", "Comedy", "Drama"];
 
 interface BrowsePageProps {
   searchParams: {
     q?: string;
     genre?: string;
     format?: ComicFormat;
+    sort?: "latest" | "updated" | "title_asc" | "title_desc";
+    page?: string;
   };
 }
 
@@ -27,19 +27,26 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
   const currentGenre = searchParams.genre || "All";
   const currentSearch = searchParams.q || "";
   const currentFormat = searchParams.format;
+  const currentSort = searchParams.sort || "latest";
+  const currentPage = Math.max(1, parseInt(searchParams.page || "1", 10) || 1);
 
-  const seriesList = await getPublicSeriesList({
+  const { items: seriesList, total, totalPages } = await getPublicSeriesCatalog({
     search: currentSearch,
     genre: currentGenre,
     format: currentFormat,
+    sort: currentSort,
+    page: currentPage,
+    limit: 12,
   });
 
-  const genreOptions = GENRES.map((g) => ({
+  const genreOptions = ["All", ...SUPPORTED_GENRES].map((g) => ({
     value: g,
     label: g,
     href: `/browse?genre=${encodeURIComponent(g)}${
       currentSearch ? `&q=${encodeURIComponent(currentSearch)}` : ""
-    }${currentFormat ? `&format=${currentFormat}` : ""}`,
+    }${currentFormat ? `&format=${currentFormat}` : ""}${
+      currentSort !== "latest" ? `&sort=${currentSort}` : ""
+    }`,
   }));
 
   const activeFormatValue = currentFormat || "all";
@@ -49,21 +56,21 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
       label: "All Formats",
       href: `/browse?genre=${encodeURIComponent(currentGenre)}${
         currentSearch ? `&q=${encodeURIComponent(currentSearch)}` : ""
-      }`,
+      }${currentSort !== "latest" ? `&sort=${currentSort}` : ""}`,
     },
     {
       value: "scroll",
       label: "Vertical Scroll",
       href: `/browse?genre=${encodeURIComponent(currentGenre)}&format=scroll${
         currentSearch ? `&q=${encodeURIComponent(currentSearch)}` : ""
-      }`,
+      }${currentSort !== "latest" ? `&sort=${currentSort}` : ""}`,
     },
     {
       value: "page",
       label: "Page-by-Page",
       href: `/browse?genre=${encodeURIComponent(currentGenre)}&format=page${
         currentSearch ? `&q=${encodeURIComponent(currentSearch)}` : ""
-      }`,
+      }${currentSort !== "latest" ? `&sort=${currentSort}` : ""}`,
     },
   ];
 
@@ -96,6 +103,9 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
             )}
             {currentFormat && (
               <input type="hidden" name="format" value={currentFormat} />
+            )}
+            {currentSort !== "latest" && (
+              <input type="hidden" name="sort" value={currentSort} />
             )}
             <Button type="submit" variant="primary" size="md">
               Search
@@ -134,13 +144,57 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
         </div>
 
         {seriesList.length > 0 ? (
-          <MotionReveal delay={0.1}>
-            <div className={styles.grid}>
-              {seriesList.map((series) => (
-                <SeriesCard key={series.id} series={series} />
-              ))}
-            </div>
-          </MotionReveal>
+          <>
+            <MotionReveal delay={0.1}>
+              <div className={styles.grid}>
+                {seriesList.map((series) => (
+                  <SeriesCard key={series.id} series={series} />
+                ))}
+              </div>
+            </MotionReveal>
+
+            {totalPages > 1 && (
+              <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "16px", padding: "24px 0" }}>
+                <Link
+                  href={`/browse?page=${currentPage - 1}${
+                    currentSearch ? `&q=${encodeURIComponent(currentSearch)}` : ""
+                  }${currentGenre !== "All" ? `&genre=${encodeURIComponent(currentGenre)}` : ""}${
+                    currentFormat ? `&format=${currentFormat}` : ""
+                  }${currentSort !== "latest" ? `&sort=${currentSort}` : ""}`}
+                  aria-disabled={currentPage <= 1}
+                  tabIndex={currentPage <= 1 ? -1 : undefined}
+                >
+                  <Button variant="secondary" size="sm" disabled={currentPage <= 1}>
+                    <LuChevronLeft size={16} aria-hidden="true" />
+                    <span>Previous</span>
+                  </Button>
+                </Link>
+
+                <span style={{ fontSize: "var(--font-size-sm)", color: "var(--color-text-muted)" }}>
+                  Page {currentPage} of {totalPages} ({total} series)
+                </span>
+
+                <Link
+                  href={`/browse?page=${currentPage + 1}${
+                    currentSearch ? `&q=${encodeURIComponent(currentSearch)}` : ""
+                  }${currentGenre !== "All" ? `&genre=${encodeURIComponent(currentGenre)}` : ""}${
+                    currentFormat ? `&format=${currentFormat}` : ""
+                  }${currentSort !== "latest" ? `&sort=${currentSort}` : ""}`}
+                  aria-disabled={currentPage >= totalPages}
+                  tabIndex={currentPage >= totalPages ? -1 : undefined}
+                >
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    disabled={currentPage >= totalPages}
+                  >
+                    <span>Next</span>
+                    <LuChevronRight size={16} aria-hidden="true" />
+                  </Button>
+                </Link>
+              </div>
+            )}
+          </>
         ) : currentSearch.trim() || currentGenre !== "All" || currentFormat ? (
           <EmptyState
             icon={<LuSearch size={40} color="var(--color-primary)" />}
@@ -160,7 +214,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
           <EmptyState
             icon={<LuSearch size={40} color="var(--color-text-muted)" />}
             title="The comic catalog is currently empty"
-            description="Independent creators and creative teams are currently crafting their series. Be among the first to publish on Panelverse!"
+            description="Independent creators and creative teams are currently crafting their series. Be among the first to publish on PageProwl!"
             action={
               <Link href="/studio">
                 <Button variant="primary">Go to Creator Studio</Button>

@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { PanelverseLogo } from "@/components/brand/PanelverseLogo";
+import { PageProwlLogo } from "@/components/brand/PageProwlLogo";
 import styles from "./PublicFooter.module.css";
 
 export function PublicFooter() {
@@ -9,8 +9,8 @@ export function PublicFooter() {
       <div className={styles.inner}>
         <div className={styles.top}>
           <div className={styles.brand}>
-            <Link href="/" aria-label="Panelverse Home">
-              <PanelverseLogo variant="full" size="sm" />
+            <Link href="/" aria-label="PageProwl Home">
+              <PageProwlLogo variant="full" size="sm" />
             </Link>
             <p className={styles.tagline} style={{ marginTop: "var(--space-3)" }}>
               A collaborative comic publishing platform connecting readers, independent creators, and creative studios.
@@ -20,14 +20,14 @@ export function PublicFooter() {
           <div className={styles.links}>
             <div className={styles.column}>
               <span className={styles.columnTitle}>Explore</span>
+              <Link href="/discover" className={styles.link}>
+                Discover
+              </Link>
               <Link href="/browse" className={styles.link}>
                 All Comics
               </Link>
-              <Link href="/browse?genre=Action" className={styles.link}>
-                Action
-              </Link>
-              <Link href="/browse?genre=Sci-Fi" className={styles.link}>
-                Sci-Fi
+              <Link href="/genres" className={styles.link}>
+                Genres
               </Link>
             </div>
 
@@ -44,7 +44,7 @@ export function PublicFooter() {
         </div>
 
         <div className={styles.bottom}>
-          <span>&copy; {new Date().getFullYear()} Panelverse. All rights reserved.</span>
+          <span>&copy; {new Date().getFullYear()} PageProwl. All rights reserved.</span>
           <span>Made for comic creators &amp; readers worldwide.</span>
         </div>
       </div>

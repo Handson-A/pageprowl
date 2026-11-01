@@ -1,11 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 144" role="img" aria-labelledby="title">
-<title id="title">Panelverse — Comics, Creators, Together</title>
+<title id="title">PageProwl — Comics, Creators, Together</title>
 <g transform="translate(8 8)" stroke="#F7F0E3" stroke-width="4" stroke-linejoin="miter">
 <path d="M4 8H40V42H4Z" fill="#F7F0E3"/>
 <path d="M44 8H55C75 8 85 21 85 38C85 55 75 65 55 65H44Z" fill="#E44735"/>
 <path d="M4 47H40V99L4 106Z" fill="#F2C14E"/>
 <path d="M44 70H58V99L44 102Z" fill="#E44735"/>
 </g>
-<text x="112" y="70" font-family="Inter,Arial,sans-serif" font-size="53" font-weight="800" letter-spacing="1.5" fill="#F7F0E3">PANELVERSE</text>
+<text x="112" y="70" font-family="Inter,Arial,sans-serif" font-size="53" font-weight="800" letter-spacing="1.5" fill="#F7F0E3">PAGEPROWL</text>
 <text x="115" y="108" font-family="Inter,Arial,sans-serif" font-size="15" font-weight="600" letter-spacing="5.5" fill="#F7F0E3">COMICS / CREATORS / TOGETHER</text>
 </svg>

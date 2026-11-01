@@ -2,7 +2,7 @@
 
 ## Provider
 
-Panelverse uses Supabase Postgres.
+PageProwl uses Supabase Postgres.
 
 ## Schema management
 

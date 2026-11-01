@@ -1,0 +1,202 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-bg);
+}
+
+.content {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-6) var(--space-16);
+  width: 100%;
+  flex: 1;
+}
+
+.heroBanner {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--pv-radius-lg);
+  padding: var(--space-8);
+  margin-bottom: var(--space-8);
+  box-shadow: var(--pv-shadow-card);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-6);
+  flex-wrap: wrap;
+}
+
+.heroText {
+  max-width: 620px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: #9A6500;
+  background-color: rgba(242, 193, 78, 0.2);
+  border: 1px solid rgba(242, 193, 78, 0.4);
+  padding: 3px 10px;
+  border-radius: var(--pv-radius-sm);
+  margin-bottom: var(--space-2);
+}
+
+.title {
+  font-family: var(--font-family-heading);
+  font-size: clamp(2rem, 3.5vw, 2.5rem);
+  font-weight: 800;
+  color: var(--color-text);
+  line-height: var(--line-height-tight);
+  margin: 0 0 var(--space-2) 0;
+}
+
+.subtitle {
+  font-size: var(--font-size-base);
+  color: var(--color-text-muted);
+  line-height: var(--line-height-relaxed);
+  margin: 0;
+}
+
+.searchShortcut {
+  min-width: 260px;
+}
+
+.searchShortcutBtn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-surface-muted);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--pv-radius-md);
+  color: var(--color-text-subtle);
+  text-decoration: none;
+  font-size: var(--font-size-sm);
+  transition: all var(--pv-motion-fast);
+}
+
+.searchShortcutBtn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-text);
+  background-color: var(--color-surface);
+}
+
+.controlsBar {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--pv-radius-lg);
+  padding: var(--space-6);
+  margin-bottom: var(--space-8);
+  box-shadow: var(--pv-shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.filterSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.filterHeader {
+  display: flex;
+  align-items: center;
+}
+
+.filterLabel {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-subtle);
+}
+
+.secondaryControls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.formatControl,
+.sortControl {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.sortLinks {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sortBtn {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+  text-decoration: none;
+  padding: 4px 10px;
+  border-radius: var(--pv-radius-sm);
+  transition: all var(--pv-motion-fast);
+}
+
+.sortBtn:hover {
+  color: var(--color-text);
+  background-color: var(--color-surface-muted);
+}
+
+.sortBtnActive {
+  color: var(--color-primary);
+  background-color: rgba(228, 71, 53, 0.08);
+  font-weight: var(--font-weight-semibold);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-6);
+  margin-bottom: var(--space-10);
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  padding: var(--space-6) 0;
+}
+
+.pageInfo {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 768px) {
+  .heroBanner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .searchShortcut {
+    width: 100%;
+  }
+
+  .secondaryControls {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

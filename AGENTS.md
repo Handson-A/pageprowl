@@ -1,14 +1,14 @@
-# AGENTS.md — Panelverse
+# AGENTS.md — PageProwl
 
 Read this fully. If a task conflicts with this file, stop and ask for clarity and priority. Do not resolve conflicts silently.
 
 ## What this project is
-Panelverse is a web-based collaborative comic publishing platform for indie creator teams.
+PageProwl (formerly Panelverse) is a web-based collaborative comic publishing platform for indie creator teams.
 Two sides: a creator workspace (series, teams, roles, chapters, uploads, publishing) and a public reader(mobile friendly too) (vertical scroll + page-by-page, from the same chapter data).
 Content hierarchy: Series → Volumes → Chapters → Pages.
 
 ## Current phase
-**Phase 5: Collaboration and Production Management.** Update this line when the phase changes.
+**Phase 6: Public Website and Comic Reader.** Update this line when the phase changes.
 Do NOT build MVP features (auth UI, series, chapters, reader, uploads) unless the task explicitly says so.
 Roadmap order: Phase 0 foundation → Phase 1 DB + auth → series/teams/roles → chapters/uploads → readers. Community and monetization are later phases. Do not scaffold for them.
 

@@ -1,8 +1,8 @@
-# Panelverse — Phase 2 Design & MVP Scope Pack
+# PageProwl — Phase 2 Design & MVP Scope Pack (formerly Panelverse)
 
 **Status: CLOSED — design direction and MVP scope decisions are locked.**
 
-This folder contains the approved Phase 2 design and UX handoff for Panelverse. It is intended to be copied into the repository's `docs/` directory.
+This folder contains the approved Phase 2 design and UX handoff for PageProwl (formerly Panelverse). It is intended to be copied into the repository's `docs/` directory.
 
 ## Files
 
@@ -22,7 +22,7 @@ This folder contains the approved Phase 2 design and UX handoff for Panelverse. 
 
 ## Locked project context
 
-- Product: Panelverse, a collaborative comic publishing platform for creators and readers.
+- Product: PageProwl (formerly Panelverse), a collaborative comic publishing platform for creators and readers.
 - Stack: Next.js 14 App Router, TypeScript, Supabase, Cloudinary and Vercel.
 - Workflow: solo developer, `main` and `dev` branches, conventional commit prefixes such as `feat:` and `fix:`.
 - Coding agent: Antigravity.

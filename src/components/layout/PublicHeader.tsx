@@ -2,7 +2,7 @@ import React from "react";
 import Link from "next/link";
 import styles from "./PublicHeader.module.css";
 import { Button } from "@/components/ui/Button";
-import { PanelverseLogo } from "@/components/brand/PanelverseLogo";
+import { PageProwlLogo } from "@/components/brand/PageProwlLogo";
 import { LuSearch } from "react-icons/lu";
 
 export function PublicHeader() {
@@ -10,22 +10,19 @@ export function PublicHeader() {
     <header className={styles.header}>
       <div className={styles.inner}>
         <div className={styles.brandGroup}>
-          <Link href="/" className={styles.brand} aria-label="Panelverse Home">
-            <PanelverseLogo variant="full" theme="dark" size="sm" />
+          <Link href="/" className={styles.brand} aria-label="PageProwl Home">
+            <PageProwlLogo variant="full" theme="dark" size="sm" />
           </Link>
 
           <nav className={styles.nav} aria-label="Main Navigation">
+            <Link href="/discover" className={styles.navLink}>
+              Discover
+            </Link>
             <Link href="/browse" className={styles.navLink}>
               Browse
             </Link>
-            <Link href="/browse?genre=Action" className={styles.navLink}>
-              Action
-            </Link>
-            <Link href="/browse?genre=Sci-Fi" className={styles.navLink}>
-              Sci-Fi
-            </Link>
-            <Link href="/browse?genre=Fantasy" className={styles.navLink}>
-              Fantasy
+            <Link href="/genres" className={styles.navLink}>
+              Genres
             </Link>
             <Link href="/studio" className={styles.navLink}>
               Creators
@@ -35,7 +32,7 @@ export function PublicHeader() {
 
         <div className={styles.actions}>
           <Link
-            href="/browse"
+            href="/search"
             className={styles.searchButton}
             aria-label="Search comics"
           >

@@ -1,8 +1,8 @@
-# Antigravity Implementation Handoff — Panelverse Phase 2
+# Antigravity Implementation Handoff — PageProwl Phase 2 (formerly Panelverse)
 
 ## Objective
 
-Phase 2 design and scope decisions are closed. Implement the approved Panelverse UI/UX from this specification pack without expanding MVP scope. The design system and screen specifications are the UI source of truth; the canonical MVP decision log remains authoritative for product behavior and feature scope.
+Phase 2 design and scope decisions are closed. Implement the approved PageProwl (formerly Panelverse) UI/UX from this specification pack without expanding MVP scope. The design system and screen specifications are the UI source of truth; the canonical MVP decision log remains authoritative for product behavior and feature scope.
 
 ## Existing stack and workflow
 

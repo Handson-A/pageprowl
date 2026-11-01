@@ -1,5 +1,5 @@
 -- ========================================================================
--- Panelverse Phase 4 Migration: Core Comic Management
+-- PageProwl Phase 4 Migration: Core Comic Management
 -- Enhances series, episodes, and media authorization policies and indexing
 -- ========================================================================
 

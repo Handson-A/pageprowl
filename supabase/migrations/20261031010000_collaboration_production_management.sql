@@ -1,5 +1,5 @@
 -- ========================================================================
--- Panelverse Phase 5 Migration: Collaboration and Production Management
+-- PageProwl Phase 5 Migration: Collaboration and Production Management
 -- Implements Tasks, Production Workflows, Review Requests, Mentions, Activity & Notifications
 -- ========================================================================
 

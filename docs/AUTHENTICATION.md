@@ -2,7 +2,7 @@
 
 ## Provider
 
-Panelverse uses Supabase Auth.
+PageProwl uses Supabase Auth.
 
 ## Current status
 

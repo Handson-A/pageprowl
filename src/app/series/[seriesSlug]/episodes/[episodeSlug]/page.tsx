@@ -1,5 +1,6 @@
 import React from "react";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { ReaderShell } from "@/components/reader/ReaderShell";
 import { getPublicEpisodeContent } from "@/lib/data/series";
 
@@ -7,6 +8,26 @@ interface EpisodeReaderPageProps {
   params: {
     seriesSlug: string;
     episodeSlug: string;
+  };
+}
+
+export async function generateMetadata({
+  params,
+}: EpisodeReaderPageProps): Promise<Metadata> {
+  const content = await getPublicEpisodeContent(
+    params.seriesSlug,
+    params.episodeSlug
+  );
+
+  if (!content) {
+    return {
+      title: "Episode Reader | PageProwl",
+    };
+  }
+
+  return {
+    title: `Ch. ${content.episode.episode_number}: ${content.episode.title} - ${content.series.title} | PageProwl`,
+    description: `Read ${content.series.title} Chapter ${content.episode.episode_number} online on PageProwl.`,
   };
 }
 
@@ -23,7 +44,8 @@ export default async function EpisodeReaderPage({
     notFound();
   }
 
-  const { series, episode, pages, prevEpisodeSlug, nextEpisodeSlug } = content;
+  const { series, episode, pages, prevEpisodeSlug, nextEpisodeSlug, allEpisodes } =
+    content;
 
   return (
     <ReaderShell
@@ -32,6 +54,7 @@ export default async function EpisodeReaderPage({
         title: series.title,
         slug: series.slug,
         format: series.format,
+        cover_url: series.cover_url,
       }}
       episode={{
         id: episode.id,
@@ -42,6 +65,7 @@ export default async function EpisodeReaderPage({
       pages={pages}
       prevEpisodeSlug={prevEpisodeSlug}
       nextEpisodeSlug={nextEpisodeSlug}
+      allEpisodes={allEpisodes}
     />
   );
 }

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { ReaderToolbar } from "./ReaderToolbar";
 import { VerticalReader, type ReaderPage } from "./VerticalReader";
 import { PaginatedReader } from "./PaginatedReader";
+import { saveReadingProgress } from "@/lib/reading-progress";
 import styles from "./ReaderShell.module.css";
 import { LuX, LuKeyboard } from "react-icons/lu";
 
@@ -12,7 +13,8 @@ export interface ReaderShellProps {
     id: string;
     title: string;
     slug: string;
-    format: "scroll" | "paged" | string;
+    format: "scroll" | "page" | string;
+    cover_url?: string | null;
   };
   episode: {
     id: string;
@@ -23,6 +25,7 @@ export interface ReaderShellProps {
   pages: ReaderPage[];
   prevEpisodeSlug?: string | null;
   nextEpisodeSlug?: string | null;
+  allEpisodes?: { slug: string; episode_number: number; title: string }[];
 }
 
 export function ReaderShell({
@@ -31,6 +34,7 @@ export function ReaderShell({
   pages,
   prevEpisodeSlug,
   nextEpisodeSlug,
+  allEpisodes,
 }: ReaderShellProps) {
   const [readingMode, setReadingMode] = useState<"scroll" | "paged">(
     series.format === "scroll" ? "scroll" : "paged"
@@ -38,6 +42,31 @@ export function ReaderShell({
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [isImmersive, setIsImmersive] = useState<boolean>(false);
   const [showKeyboardHelp, setShowKeyboardHelp] = useState<boolean>(false);
+
+  // Automatically save reading progress to localStorage
+  useEffect(() => {
+    saveReadingProgress({
+      seriesSlug: series.slug,
+      seriesTitle: series.title,
+      episodeSlug: episode.slug,
+      episodeNumber: episode.episode_number,
+      episodeTitle: episode.title,
+      pageNumber: currentPage,
+      totalPages: pages.length,
+      format: readingMode,
+      coverUrl: series.cover_url,
+    });
+  }, [
+    series.slug,
+    series.title,
+    series.cover_url,
+    episode.slug,
+    episode.episode_number,
+    episode.title,
+    currentPage,
+    pages.length,
+    readingMode,
+  ]);
 
   // Esc key to exit modal or immersive
   useEffect(() => {
@@ -73,6 +102,7 @@ export function ReaderShell({
           totalPages={pages.length}
           prevEpisodeSlug={prevEpisodeSlug}
           nextEpisodeSlug={nextEpisodeSlug}
+          allEpisodes={allEpisodes}
           isImmersive={isImmersive}
           onToggleImmersive={() => setIsImmersive((prev) => !prev)}
           onToggleKeyboardHelp={() => setShowKeyboardHelp((prev) => !prev)}

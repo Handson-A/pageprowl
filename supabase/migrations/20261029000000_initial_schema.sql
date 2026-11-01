@@ -1,5 +1,5 @@
 -- ========================================================================
--- Panelverse Initial Schema Migration
+-- PageProwl (formerly Panelverse) Initial Schema Migration
 -- Matches docs/technical-architecture.md, docs/mvp-scope.md, and AGENTS.md
 -- ========================================================================
 

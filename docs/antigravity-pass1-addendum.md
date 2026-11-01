@@ -1,4 +1,4 @@
-# Antigravity Addendum — Panelverse Pass 1
+# Antigravity Addendum — PageProwl Pass 1 (formerly Panelverse)
 
 Read `docs/brand-and-motion-foundation.md` and inspect the supplied assets before implementing.
 

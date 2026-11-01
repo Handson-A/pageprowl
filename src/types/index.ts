@@ -1,5 +1,5 @@
 /**
- * Shared global TypeScript definitions for Panelverse.
+ * Shared global TypeScript definitions for PageProwl.
  * Feature-specific types should be placed in src/features/<feature>/types.ts.
  */
 

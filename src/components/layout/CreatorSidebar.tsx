@@ -17,7 +17,7 @@ import {
   LuMenu,
   LuX,
 } from "react-icons/lu";
-import { PanelverseLogo } from "@/components/brand/PanelverseLogo";
+import { PageProwlLogo } from "@/components/brand/PageProwlLogo";
 import styles from "./CreatorSidebar.module.css";
 
 interface CreatorSidebarProps {
@@ -74,8 +74,8 @@ export function CreatorSidebar({
     <>
       {/* Mobile Studio Top Header */}
       <div className={styles.mobileBar}>
-        <Link href="/studio" aria-label="Panelverse Studio">
-          <PanelverseLogo variant="full" theme="dark" size="sm" />
+        <Link href="/studio" aria-label="PageProwl Studio">
+          <PageProwlLogo variant="full" theme="dark" size="sm" />
         </Link>
         <button
           className={styles.mobileToggle}
@@ -92,8 +92,8 @@ export function CreatorSidebar({
         aria-label="Creator Studio Navigation"
       >
         <div className={styles.desktopBrand}>
-          <Link href="/studio" aria-label="Panelverse Studio">
-            <PanelverseLogo variant="full" theme="dark" size="sm" />
+          <Link href="/studio" aria-label="PageProwl Studio">
+            <PageProwlLogo variant="full" theme="dark" size="sm" />
           </Link>
           <span className={styles.studioBadge}>Studio</span>
         </div>

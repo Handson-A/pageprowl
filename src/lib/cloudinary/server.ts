@@ -23,8 +23,8 @@ export interface UploadSignatureResponse {
  * This keeps the API secret securely on the server.
  */
 export function generateUploadSignature(
-  folder: string = "panelverse/episodes",
-  tags: string[] = ["panelverse"]
+  folder: string = "pageprowl/episodes",
+  tags: string[] = ["pageprowl"]
 ): UploadSignatureResponse {
   const apiKey = process.env.CLOUDINARY_API_KEY;
   const apiSecret = process.env.CLOUDINARY_API_SECRET;

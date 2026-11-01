@@ -1,8 +1,8 @@
-# Panelverse
+# PageProwl
 
-Panelverse is a web-based, collaborative comic publishing platform for creators, with a public-facing experience for readers and viewers.
+PageProwl (formerly Panelverse) is a web-based, collaborative comic publishing platform for creators, with a public-facing experience for readers and viewers.
 
-This repository contains the Panelverse application. The project is being developed by a solo project owner with AI-assisted implementation. The project owner is the final authority on product scope and architectural decisions.
+This repository contains the PageProwl application. The project is being developed by a solo project owner with AI-assisted implementation. The project owner is the final authority on product scope and architectural decisions.
 
 ## Technology stack
 

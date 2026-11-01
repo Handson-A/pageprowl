@@ -180,7 +180,7 @@ export function SeriesWorkspaceClient({
       formData.append("timestamp", sigData.timestamp.toString());
       formData.append("signature", sigData.signature);
       formData.append("folder", sigData.folder);
-      formData.append("tags", "panelverse,cover");
+      formData.append("tags", "pageprowl,cover");
 
       const uploadRes = await fetch(
         `https://api.cloudinary.com/v1_1/${sigData.cloudName}/image/upload`,

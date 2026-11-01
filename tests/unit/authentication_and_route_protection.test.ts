@@ -13,8 +13,13 @@ describe("Phase 3: Route Protection & Authentication Guard Audit", () => {
   // Route classifications
   const PUBLIC_ROUTES = [
     "/",
+    "/discover",
     "/browse",
     "/browse?genre=Action",
+    "/search",
+    "/genres",
+    "/genres/action",
+    "/creators/alice",
     "/series/iron-strike",
     "/series/iron-strike/episodes/chapter-1",
     "/api/cron/publishing",
@@ -124,7 +129,7 @@ describe("Phase 3: Route Protection & Authentication Guard Audit", () => {
       (err: any) => err instanceof UnauthorizedError && err.statusCode === 401
     );
 
-    const validUser = simulateRequireAuth({ id: "user-123", email: "creator@panelverse.com" });
+    const validUser = simulateRequireAuth({ id: "user-123", email: "creator@pageprowl.com" });
     assert.equal(validUser.id, "user-123");
   });
 

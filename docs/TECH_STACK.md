@@ -1,4 +1,4 @@
-# Panelverse Technical Stack
+# PageProwl Technical Stack (formerly Panelverse)
 
 ## Status
 

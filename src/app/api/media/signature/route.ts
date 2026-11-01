@@ -19,18 +19,18 @@ export async function POST(request: Request) {
     const body = await request.json().catch(() => ({}));
     const { seriesId, type, episodeId } = body;
 
-    let folder = `panelverse/creators/${user.id}`;
+    let folder = `pageprowl/creators/${user.id}`;
 
     // If uploading for a series or episode, strictly verify creator permission
     if (seriesId) {
       await requireSeriesRole(seriesId, "editor");
 
       if (type === "cover") {
-        folder = `panelverse/series/${seriesId}/cover`;
+        folder = `pageprowl/series/${seriesId}/cover`;
       } else if (episodeId) {
-        folder = `panelverse/series/${seriesId}/episodes/${episodeId}`;
+        folder = `pageprowl/series/${seriesId}/episodes/${episodeId}`;
       } else {
-        folder = `panelverse/series/${seriesId}/uploads`;
+        folder = `pageprowl/series/${seriesId}/uploads`;
       }
     }
 

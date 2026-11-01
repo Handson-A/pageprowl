@@ -1,8 +1,8 @@
-# Panelverse Design System
+# PageProwl Design System (formerly Panelverse)
 
 ## 1. Product and brand direction
 
-Panelverse is a collaborative comic publishing platform for creators and readers.
+PageProwl (formerly Panelverse) is a collaborative comic publishing platform for creators and readers.
 
 - **Design direction:** Hybrid Universe — one recognizable brand system with purpose-built public reader and creator-workspace experiences.
 - **Personality:** Bold Creative Collective with a premium storytelling influence.

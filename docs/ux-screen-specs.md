@@ -1,4 +1,4 @@
-# Panelverse UX Screen Specifications
+# PageProwl UX Screen Specifications (formerly Panelverse)
 
 ## 1. Scope and interpretation
 

@@ -2,7 +2,7 @@
 
 ## Hosting
 
-Panelverse is intended to be hosted on Vercel.
+PageProwl is intended to be hosted on Vercel.
 
 
 ## Environment variables

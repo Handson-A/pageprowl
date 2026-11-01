@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import Link from "next/link";
 import styles from "./ReaderToolbar.module.css";
 import {
@@ -10,6 +12,8 @@ import {
   LuMaximize2,
   LuMinimize2,
   LuKeyboard,
+  LuList,
+  LuChevronDown,
 } from "react-icons/lu";
 
 export interface ReaderToolbarProps {
@@ -23,6 +27,7 @@ export interface ReaderToolbarProps {
   totalPages?: number;
   prevEpisodeSlug?: string | null;
   nextEpisodeSlug?: string | null;
+  allEpisodes?: { slug: string; episode_number: number; title: string }[];
   isImmersive?: boolean;
   onToggleImmersive?: () => void;
   onToggleKeyboardHelp?: () => void;
@@ -39,10 +44,13 @@ export function ReaderToolbar({
   totalPages,
   prevEpisodeSlug,
   nextEpisodeSlug,
+  allEpisodes,
   isImmersive = false,
   onToggleImmersive,
   onToggleKeyboardHelp,
 }: ReaderToolbarProps) {
+  const [showEpisodeMenu, setShowEpisodeMenu] = useState(false);
+
   return (
     <header className={styles.toolbar} role="banner" aria-label="Comic Reader Navigation">
       <div className={styles.left}>
@@ -61,8 +69,67 @@ export function ReaderToolbar({
         <div className={styles.titleGroup}>
           <span className={styles.seriesTitle}>{seriesTitle}</span>
           <div className={styles.episodeRow}>
-            <span className={styles.episodeBadge}>Ch. {episodeNumber}</span>
-            <h1 className={styles.episodeTitle}>{episodeTitle}</h1>
+            {allEpisodes && allEpisodes.length > 1 ? (
+              <div className={styles.episodePickerContainer}>
+                <button
+                  type="button"
+                  className={styles.episodePickerTrigger}
+                  onClick={() => setShowEpisodeMenu((prev) => !prev)}
+                  aria-expanded={showEpisodeMenu}
+                  aria-haspopup="listbox"
+                  title="Choose chapter"
+                >
+                  <span className={styles.episodeBadge}>Ch. {episodeNumber}</span>
+                  <h1 className={styles.episodeTitle}>{episodeTitle}</h1>
+                  <LuChevronDown size={14} className={styles.chevronIcon} aria-hidden="true" />
+                </button>
+
+                {showEpisodeMenu && (
+                  <>
+                    <div
+                      className={styles.menuBackdrop}
+                      onClick={() => setShowEpisodeMenu(false)}
+                      aria-hidden="true"
+                    />
+                    <div className={styles.episodeDropdown} role="listbox">
+                      <div className={styles.dropdownHeader}>
+                        <span>All Chapters ({allEpisodes.length})</span>
+                      </div>
+                      <div className={styles.dropdownList}>
+                        {allEpisodes.map((ep) => {
+                          const isCurrent = ep.episode_number === episodeNumber;
+                          return (
+                            <Link
+                              key={ep.slug}
+                              href={`/series/${seriesSlug}/episodes/${ep.slug}`}
+                              className={`${styles.dropdownItem} ${
+                                isCurrent ? styles.dropdownItemActive : ""
+                              }`}
+                              onClick={() => setShowEpisodeMenu(false)}
+                              role="option"
+                              aria-selected={isCurrent}
+                            >
+                              <span className={styles.dropdownEpNumber}>
+                                #{ep.episode_number}
+                              </span>
+                              <span className={styles.dropdownEpTitle}>{ep.title}</span>
+                              {isCurrent && (
+                                <span className={styles.currentIndicator}>Current</span>
+                              )}
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            ) : (
+              <>
+                <span className={styles.episodeBadge}>Ch. {episodeNumber}</span>
+                <h1 className={styles.episodeTitle}>{episodeTitle}</h1>
+              </>
+            )}
           </div>
         </div>
       </div>
