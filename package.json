@@ -8,7 +8,12 @@
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
-    "test": "node --test tests/unit/*.test.ts"
+    "test": "node --test tests/unit/*.test.ts",
+    "seed": "node scripts/seed/run-seed.ts",
+    "seed:dry-run": "node scripts/seed/run-seed.ts --dry-run",
+    "seed:rollback": "node scripts/seed/rollback-seed.ts",
+    "verify:series": "node scripts/seed/run-seed.ts --verify-series",
+    "artwork": "node scripts/seed/run-artwork.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

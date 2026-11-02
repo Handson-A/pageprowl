@@ -383,8 +383,17 @@ export async function getPublicEpisodeContent(seriesSlug: string, episodeSlug: s
     return null;
   }
 
+  // Fetch published revision details (including text_content)
+  const { data: revision } = await supabase
+    .from("episode_revisions")
+    .select("id, text_content")
+    .eq("id", epData.published_revision_id)
+    .maybeSingle();
+
+  const textContent = (revision as any)?.text_content || null;
+
   // Fetch revision pages
-  const { data: pages, error: pageError } = await supabase
+  const { data: pages } = await supabase
     .from("revision_pages")
     .select(`
       id,
@@ -394,7 +403,14 @@ export async function getPublicEpisodeContent(seriesSlug: string, episodeSlug: s
     .eq("revision_id", epData.published_revision_id)
     .order("page_number", { ascending: true });
 
-  if (pageError || !pages) {
+  const pageList = (pages || []).map((p: any) => ({
+    id: p.id,
+    pageNumber: p.page_number,
+    imageUrl: p.media_assets?.secure_url || "/images/artwork-fallback.png",
+  }));
+
+  // Episode must have either text_content or pages to be readable
+  if (pageList.length === 0 && !textContent) {
     return null;
   }
 
@@ -432,11 +448,8 @@ export async function getPublicEpisodeContent(seriesSlug: string, episodeSlug: s
   return {
     series,
     episode: epData,
-    pages: (pages as any[]).map((p: any) => ({
-      id: p.id,
-      pageNumber: p.page_number,
-      imageUrl: p.media_assets?.secure_url || "/images/artwork-fallback.png",
-    })),
+    textContent,
+    pages: pageList,
     prevEpisodeSlug,
     nextEpisodeSlug,
     allEpisodes: publishedEpisodeList,

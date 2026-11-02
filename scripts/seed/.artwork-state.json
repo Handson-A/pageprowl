@@ -1,0 +1,248 @@
+{
+  "version": "1.0.0",
+  "updatedAt": "2026-11-02T00:35:25.001Z",
+  "assets": {
+    "avatar:elena_vance": {
+      "assetKey": "avatar:elena_vance",
+      "type": "avatar",
+      "cloudinaryPublicId": "pageprowl/seed/avatars/elena_vance",
+      "secureUrl": "https://res.cloudinary.com/ko3rdfhg/image/upload/v1793502399/pageprowl/seed/avatars/elena_vance.jpg",
+      "format": "jpg",
+      "width": 1024,
+      "height": 1024,
+      "byteSize": 685814,
+      "uploadedAt": "2026-11-01T03:06:44.054Z"
+    },
+    "avatar:jin_woo_park": {
+      "assetKey": "avatar:jin_woo_park",
+      "type": "avatar",
+      "cloudinaryPublicId": "pageprowl/seed/avatars/jin_woo_park",
+      "secureUrl": "https://res.cloudinary.com/ko3rdfhg/image/upload/v1793502693/pageprowl/seed/avatars/jin_woo_park.jpg",
+      "format": "jpg",
+      "width": 1024,
+      "height": 1024,
+      "byteSize": 776728,
+      "uploadedAt": "2026-11-01T03:11:37.616Z"
+    },
+    "cover:vanguard-strike-neo-seoul": {
+      "assetKey": "cover:vanguard-strike-neo-seoul",
+      "type": "cover",
+      "cloudinaryPublicId": "pageprowl/seed/series/vanguard-strike-neo-seoul/cover/vanguard-strike-neo-seoul",
+      "secureUrl": "https://res.cloudinary.com/ko3rdfhg/image/upload/v1793502694/pageprowl/seed/series/vanguard-strike-neo-seoul/cover/vanguard-strike-neo-seoul.jpg",
+      "format": "jpg",
+      "width": 1376,
+      "height": 768,
+      "byteSize": 1330236,
+      "uploadedAt": "2026-11-01T03:11:38.919Z"
+    },
+    "page:vanguard-strike-neo-seoul:1:1": {
+      "assetKey": "page:vanguard-strike-neo-seoul:1:1",
+      "type": "page",
+      "cloudinaryPublicId": "pageprowl/seed/series/vanguard-strike-neo-seoul/episodes/chapter-1-breach-at-sub-level-4/ep1_p1",
+      "secureUrl": "https://res.cloudinary.com/ko3rdfhg/image/upload/v1793502829/pageprowl/seed/series/vanguard-strike-neo-seoul/episodes/chapter-1-breach-at-sub-level-4/ep1_p1.jpg",
+      "format": "jpg",
+      "width": 768,
+      "height": 1376,
+      "byteSize": 1142704,
+      "uploadedAt": "2026-11-01T03:13:54.082Z"
+    },
+    "page:vanguard-strike-neo-seoul:1:2": {
+      "assetKey": "page:vanguard-strike-neo-seoul:1:2",
+      "type": "page",
+      "cloudinaryPublicId": "pageprowl/seed/series/vanguard-strike-neo-seoul/episodes/chapter-1-breach-at-sub-level-4/ep1_p2",
+      "secureUrl": "https://res.cloudinary.com/ko3rdfhg/image/upload/v1793502831/pageprowl/seed/series/vanguard-strike-neo-seoul/episodes/chapter-1-breach-at-sub-level-4/ep1_p2.jpg",
+      "format": "jpg",
+      "width": 768,
+      "height": 1376,
+      "byteSize": 1076851,
+      "uploadedAt": "2026-11-01T03:13:55.789Z"
+    },
+    "page:vanguard-strike-neo-seoul:1:3": {
+      "assetKey": "page:vanguard-strike-neo-seoul:1:3",
+      "type": "page",
+      "cloudinaryPublicId": "pageprowl/seed/series/vanguard-strike-neo-seoul/episodes/chapter-1-breach-at-sub-level-4/ep1_p3",
+      "secureUrl": "https://res.cloudinary.com/ko3rdfhg/image/upload/v1793502832/pageprowl/seed/series/vanguard-strike-neo-seoul/episodes/chapter-1-breach-at-sub-level-4/ep1_p3.jpg",
+      "format": "jpg",
+      "width": 768,
+      "height": 1376,
+      "byteSize": 1063720,
+      "uploadedAt": "2026-11-01T03:13:56.801Z"
+    },
+    "page:vanguard-strike-neo-seoul:1:4": {
+      "assetKey": "page:vanguard-strike-neo-seoul:1:4",
+      "type": "page",
+      "cloudinaryPublicId": "pageprowl/seed/series/vanguard-strike-neo-seoul/episodes/chapter-1-breach-at-sub-level-4/ep1_p4",
+      "secureUrl": "https://res.cloudinary.com/ko3rdfhg/image/upload/v1793502834/pageprowl/seed/series/vanguard-strike-neo-seoul/episodes/chapter-1-breach-at-sub-level-4/ep1_p4.jpg",
+      "format": "jpg",
+      "width": 768,
+      "height": 1376,
+      "byteSize": 873072,
+      "uploadedAt": "2026-11-01T03:13:58.273Z"
+    },
+    "page:vanguard-strike-neo-seoul:2:1": {
+      "assetKey": "page:vanguard-strike-neo-seoul:2:1",
+      "type": "page",
+      "cloudinaryPublicId": "pageprowl/seed/series/vanguard-strike-neo-seoul/episodes/chapter-2-kinetic-velocity/ep2_p1",
+      "secureUrl": "https://res.cloudinary.com/ko3rdfhg/image/upload/v1793503330/pageprowl/seed/series/vanguard-strike-neo-seoul/episodes/chapter-2-kinetic-velocity/ep2_p1.jpg",
+      "format": "jpg",
+      "width": 768,
+      "height": 1376,
+      "byteSize": 1188282,
+      "uploadedAt": "2026-11-01T03:22:14.270Z"
+    },
+    "page:vanguard-strike-neo-seoul:2:2": {
+      "assetKey": "page:vanguard-strike-neo-seoul:2:2",
+      "type": "page",
+      "cloudinaryPublicId": "pageprowl/seed/series/vanguard-strike-neo-seoul/episodes/chapter-2-kinetic-velocity/ep2_p2",
+      "secureUrl": "https://res.cloudinary.com/ko3rdfhg/image/upload/v1793503332/pageprowl/seed/series/vanguard-strike-neo-seoul/episodes/chapter-2-kinetic-velocity/ep2_p2.jpg",
+      "format": "jpg",
+      "width": 768,
+      "height": 1376,
+      "byteSize": 1132013,
+      "uploadedAt": "2026-11-01T03:22:16.537Z"
+    },
+    "page:vanguard-strike-neo-seoul:2:3": {
+      "assetKey": "page:vanguard-strike-neo-seoul:2:3",
+      "type": "page",
+      "cloudinaryPublicId": "pageprowl/seed/series/vanguard-strike-neo-seoul/episodes/chapter-2-kinetic-velocity/ep2_p3",
+      "secureUrl": "https://res.cloudinary.com/ko3rdfhg/image/upload/v1793503334/pageprowl/seed/series/vanguard-strike-neo-seoul/episodes/chapter-2-kinetic-velocity/ep2_p3.jpg",
+      "format": "jpg",
+      "width": 768,
+      "height": 1376,
+      "byteSize": 1078894,
+      "uploadedAt": "2026-11-01T03:22:18.902Z"
+    },
+    "page:vanguard-strike-neo-seoul:2:4": {
+      "assetKey": "page:vanguard-strike-neo-seoul:2:4",
+      "type": "page",
+      "cloudinaryPublicId": "pageprowl/seed/series/vanguard-strike-neo-seoul/episodes/chapter-2-kinetic-velocity/ep2_p4",
+      "secureUrl": "https://res.cloudinary.com/ko3rdfhg/image/upload/v1793503336/pageprowl/seed/series/vanguard-strike-neo-seoul/episodes/chapter-2-kinetic-velocity/ep2_p4.jpg",
+      "format": "jpg",
+      "width": 768,
+      "height": 1376,
+      "byteSize": 1008345,
+      "uploadedAt": "2026-11-01T03:22:21.147Z"
+    },
+    "page:vanguard-strike-neo-seoul:3:1": {
+      "assetKey": "page:vanguard-strike-neo-seoul:3:1",
+      "type": "page",
+      "cloudinaryPublicId": "pageprowl/seed/series/vanguard-strike-neo-seoul/episodes/chapter-3-into-the-mag-lev-dark/ep3_p1",
+      "secureUrl": "https://res.cloudinary.com/ko3rdfhg/image/upload/v1793503339/pageprowl/seed/series/vanguard-strike-neo-seoul/episodes/chapter-3-into-the-mag-lev-dark/ep3_p1.jpg",
+      "format": "jpg",
+      "width": 768,
+      "height": 1376,
+      "byteSize": 1135456,
+      "uploadedAt": "2026-11-01T03:22:24.020Z"
+    },
+    "page:vanguard-strike-neo-seoul:3:2": {
+      "assetKey": "page:vanguard-strike-neo-seoul:3:2",
+      "type": "page",
+      "cloudinaryPublicId": "pageprowl/seed/series/vanguard-strike-neo-seoul/episodes/chapter-3-into-the-mag-lev-dark/ep3_p2",
+      "secureUrl": "https://res.cloudinary.com/ko3rdfhg/image/upload/v1793503341/pageprowl/seed/series/vanguard-strike-neo-seoul/episodes/chapter-3-into-the-mag-lev-dark/ep3_p2.jpg",
+      "format": "jpg",
+      "width": 768,
+      "height": 1376,
+      "byteSize": 996437,
+      "uploadedAt": "2026-11-01T03:22:26.113Z"
+    },
+    "cover:the-runebound-chronicle": {
+      "assetKey": "cover:the-runebound-chronicle",
+      "type": "cover",
+      "cloudinaryPublicId": "pageprowl/seed/series/the-runebound-chronicle/cover/the-runebound-chronicle",
+      "secureUrl": "https://res.cloudinary.com/ko3rdfhg/image/upload/v1793579699/pageprowl/seed/series/the-runebound-chronicle/cover/the-runebound-chronicle.jpg",
+      "format": "jpg",
+      "width": 848,
+      "height": 1264,
+      "byteSize": 936322,
+      "uploadedAt": "2026-11-02T00:35:04.681Z"
+    },
+    "cover:sub-orbital-drift": {
+      "assetKey": "cover:sub-orbital-drift",
+      "type": "cover",
+      "cloudinaryPublicId": "pageprowl/seed/series/sub-orbital-drift/cover/sub-orbital-drift",
+      "secureUrl": "https://res.cloudinary.com/ko3rdfhg/image/upload/v1793579701/pageprowl/seed/series/sub-orbital-drift/cover/sub-orbital-drift.jpg",
+      "format": "jpg",
+      "width": 1376,
+      "height": 768,
+      "byteSize": 1116192,
+      "uploadedAt": "2026-11-02T00:35:08.003Z"
+    },
+    "cover:between-two-skylines": {
+      "assetKey": "cover:between-two-skylines",
+      "type": "cover",
+      "cloudinaryPublicId": "pageprowl/seed/series/between-two-skylines/cover/between-two-skylines",
+      "secureUrl": "https://res.cloudinary.com/ko3rdfhg/image/upload/v1793579704/pageprowl/seed/series/between-two-skylines/cover/between-two-skylines.jpg",
+      "format": "jpg",
+      "width": 1376,
+      "height": 768,
+      "byteSize": 1098574,
+      "uploadedAt": "2026-11-02T00:35:10.202Z"
+    },
+    "cover:whispers-of-the-black-bog": {
+      "assetKey": "cover:whispers-of-the-black-bog",
+      "type": "cover",
+      "cloudinaryPublicId": "pageprowl/seed/series/whispers-of-the-black-bog/cover/whispers-of-the-black-bog",
+      "secureUrl": "https://res.cloudinary.com/ko3rdfhg/image/upload/v1793579706/pageprowl/seed/series/whispers-of-the-black-bog/cover/whispers-of-the-black-bog.jpg",
+      "format": "jpg",
+      "width": 848,
+      "height": 1264,
+      "byteSize": 1092190,
+      "uploadedAt": "2026-11-02T00:35:12.448Z"
+    },
+    "cover:demon-kings-barista": {
+      "assetKey": "cover:demon-kings-barista",
+      "type": "cover",
+      "cloudinaryPublicId": "pageprowl/seed/series/demon-kings-barista/cover/demon-kings-barista",
+      "secureUrl": "https://res.cloudinary.com/ko3rdfhg/image/upload/v1793579709/pageprowl/seed/series/demon-kings-barista/cover/demon-kings-barista.jpg",
+      "format": "jpg",
+      "width": 1376,
+      "height": 768,
+      "byteSize": 1021625,
+      "uploadedAt": "2026-11-02T00:35:14.449Z"
+    },
+    "cover:the-clockmakers-ledger": {
+      "assetKey": "cover:the-clockmakers-ledger",
+      "type": "cover",
+      "cloudinaryPublicId": "pageprowl/seed/series/the-clockmakers-ledger/cover/the-clockmakers-ledger",
+      "secureUrl": "https://res.cloudinary.com/ko3rdfhg/image/upload/v1793579711/pageprowl/seed/series/the-clockmakers-ledger/cover/the-clockmakers-ledger.jpg",
+      "format": "jpg",
+      "width": 848,
+      "height": 1264,
+      "byteSize": 1239217,
+      "uploadedAt": "2026-11-02T00:35:16.992Z"
+    },
+    "cover:matcha-and-raindrops": {
+      "assetKey": "cover:matcha-and-raindrops",
+      "type": "cover",
+      "cloudinaryPublicId": "pageprowl/seed/series/matcha-and-raindrops/cover/matcha-and-raindrops",
+      "secureUrl": "https://res.cloudinary.com/ko3rdfhg/image/upload/v1793579714/pageprowl/seed/series/matcha-and-raindrops/cover/matcha-and-raindrops.jpg",
+      "format": "jpg",
+      "width": 1376,
+      "height": 768,
+      "byteSize": 1183755,
+      "uploadedAt": "2026-11-02T00:35:20.062Z"
+    },
+    "cover:fogline-murders": {
+      "assetKey": "cover:fogline-murders",
+      "type": "cover",
+      "cloudinaryPublicId": "pageprowl/seed/series/fogline-murders/cover/fogline-murders",
+      "secureUrl": "https://res.cloudinary.com/ko3rdfhg/image/upload/v1793579716/pageprowl/seed/series/fogline-murders/cover/fogline-murders.jpg",
+      "format": "jpg",
+      "width": 848,
+      "height": 1264,
+      "byteSize": 977442,
+      "uploadedAt": "2026-11-02T00:35:22.529Z"
+    },
+    "cover:spirits-of-the-ironwood": {
+      "assetKey": "cover:spirits-of-the-ironwood",
+      "type": "cover",
+      "cloudinaryPublicId": "pageprowl/seed/series/spirits-of-the-ironwood/cover/spirits-of-the-ironwood",
+      "secureUrl": "https://res.cloudinary.com/ko3rdfhg/image/upload/v1793579719/pageprowl/seed/series/spirits-of-the-ironwood/cover/spirits-of-the-ironwood.jpg",
+      "format": "jpg",
+      "width": 1376,
+      "height": 768,
+      "byteSize": 1127760,
+      "uploadedAt": "2026-11-02T00:35:25.001Z"
+    }
+  }
+}

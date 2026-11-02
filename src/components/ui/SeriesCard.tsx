@@ -43,6 +43,9 @@ export function SeriesCard({
               alt={series.title}
               className={styles.coverImage}
               loading="lazy"
+              onError={(e) => {
+                e.currentTarget.src = "/images/artwork-fallback.svg";
+              }}
             />
           ) : (
             <div className={styles.coverFallback} aria-label="Cover artwork placeholder">

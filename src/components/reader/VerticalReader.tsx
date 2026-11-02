@@ -86,6 +86,9 @@ export function VerticalReader({
               className={styles.comicSlice}
               loading={index < 3 ? "eager" : "lazy"}
               decoding={index < 3 ? "sync" : "async"}
+              onError={(e) => {
+                e.currentTarget.src = "/images/artwork-fallback.svg";
+              }}
             />
           </div>
         ))}

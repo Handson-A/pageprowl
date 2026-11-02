@@ -224,7 +224,7 @@ export function EpisodeEditorClient({
       a.name.localeCompare(b.name, undefined, { numeric: true })
     );
 
-    const validTypes = ["image/jpeg", "image/png", "image/webp"];
+    const validTypes = ["image/jpeg", "image/png", "image/webp", "image/avif"];
     const invalidFiles = fileList.filter((f) => !validTypes.includes(f.type) || f.size > 10 * 1024 * 1024);
 
     if (invalidFiles.length > 0) {
@@ -272,7 +272,9 @@ export function EpisodeEditorClient({
         formData.append("timestamp", sigData.timestamp.toString());
         formData.append("signature", sigData.signature);
         formData.append("folder", sigData.folder);
-        formData.append("tags", "pageprowl,episode_page");
+        if (sigData.tags) {
+          formData.append("tags", sigData.tags);
+        }
 
         const uploadRes = await fetch(
           `https://api.cloudinary.com/v1_1/${sigData.cloudName}/image/upload`,

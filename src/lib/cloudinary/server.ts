@@ -1,14 +1,22 @@
 import { v2 as cloudinary } from "cloudinary";
 
-// Configure Cloudinary server-side
-if (process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET) {
-  cloudinary.config({
-    cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
-    secure: true,
-  });
+function configureCloudinary() {
+  const apiKey = process.env.CLOUDINARY_API_KEY;
+  const apiSecret = process.env.CLOUDINARY_API_SECRET;
+  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+
+  if (apiKey && apiSecret && cloudName) {
+    cloudinary.config({
+      cloud_name: cloudName,
+      api_key: apiKey,
+      api_secret: apiSecret,
+      secure: true,
+    });
+  }
 }
+
+// Initial configuration attempt on module load
+configureCloudinary();
 
 export interface UploadSignatureResponse {
   timestamp: number;
@@ -16,6 +24,7 @@ export interface UploadSignatureResponse {
   apiKey: string;
   cloudName: string;
   folder: string;
+  tags: string;
 }
 
 /**
@@ -26,6 +35,8 @@ export function generateUploadSignature(
   folder: string = "pageprowl/episodes",
   tags: string[] = ["pageprowl"]
 ): UploadSignatureResponse {
+  configureCloudinary();
+
   const apiKey = process.env.CLOUDINARY_API_KEY;
   const apiSecret = process.env.CLOUDINARY_API_SECRET;
   const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
@@ -35,10 +46,11 @@ export function generateUploadSignature(
   }
 
   const timestamp = Math.round(new Date().getTime() / 1000);
+  const tagsString = tags.join(",");
   const paramsToSign: Record<string, string | number> = {
     folder,
     timestamp,
-    tags: tags.join(","),
+    tags: tagsString,
   };
 
   const signature = cloudinary.utils.api_sign_request(paramsToSign, apiSecret);
@@ -49,6 +61,7 @@ export function generateUploadSignature(
     apiKey,
     cloudName,
     folder,
+    tags: tagsString,
   };
 }
 
@@ -56,6 +69,8 @@ export function generateUploadSignature(
  * Safely delete an asset from Cloudinary when no longer referenced.
  */
 export async function deleteAsset(publicId: string): Promise<boolean> {
+  configureCloudinary();
+
   const apiKey = process.env.CLOUDINARY_API_KEY;
   const apiSecret = process.env.CLOUDINARY_API_SECRET;
 

@@ -30,7 +30,11 @@ export default async function ProfileSettingsPage() {
 
   return (
     <div className={styles.layout}>
-      <CreatorSidebar userName={profile?.display_name} userRole={profile?.role} />
+      <CreatorSidebar
+        userName={profile?.display_name}
+        userRole={profile?.role}
+        avatarUrl={profile?.avatar_url}
+      />
 
       <main className={styles.main}>
         <header className={styles.header}>

@@ -19,19 +19,30 @@ import {
   LuX,
 } from "react-icons/lu";
 import { PageProwlLogo } from "@/components/brand/PageProwlLogo";
+import { useStudioProfile } from "@/components/providers/StudioProfileProvider";
 import styles from "./CreatorSidebar.module.css";
 
-interface CreatorSidebarProps {
+export interface CreatorSidebarProps {
   userName?: string;
   userRole?: string;
+  avatarUrl?: string | null;
 }
 
 export function CreatorSidebar({
-  userName = "Creator",
-  userRole = "Studio Member",
-}: CreatorSidebarProps) {
+  userName: propUserName,
+  userRole: propUserRole,
+  avatarUrl: propAvatarUrl,
+}: CreatorSidebarProps = {}) {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { profile, isLoading } = useStudioProfile();
+
+  // Props take precedence when passed directly; otherwise fallback to profile from persistent Studio context
+  const userName = propUserName || profile?.displayName || (isLoading ? "" : "Creator");
+  const userRole = propUserRole || profile?.role || "Creator";
+  const avatarUrl = propAvatarUrl !== undefined ? propAvatarUrl : profile?.avatarUrl;
+
+  const showSkeleton = isLoading && !profile && !propUserName;
 
   const isLinkActive = (path: string) => {
     if (path === "/") {
@@ -143,13 +154,29 @@ export function CreatorSidebar({
 
         {/* User Card at bottom of sidebar matching reference */}
         <div className={styles.footer}>
-          <div className={styles.userProfile}>
-            <div className={styles.avatar}>{userInitial}</div>
-            <div className={styles.userInfo}>
-              <span className={styles.userName}>{userName}</span>
-              <span className={styles.userRole}>{userRole}</span>
+          {showSkeleton ? (
+            <div className={styles.userProfileLoading} aria-label="Loading creator profile">
+              <div className={styles.avatarSkeleton} />
+              <div className={styles.userInfoSkeleton}>
+                <div className={styles.userNameSkeleton} />
+                <div className={styles.userRoleSkeleton} />
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className={styles.userProfile}>
+              <div className={styles.avatar}>
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt={userName} className={styles.avatarImg} />
+                ) : (
+                  userInitial
+                )}
+              </div>
+              <div className={styles.userInfo}>
+                <span className={styles.userName}>{userName}</span>
+                <span className={styles.userRole}>{userRole}</span>
+              </div>
+            </div>
+          )}
 
           <form action="/api/auth/signout" method="POST" style={{ margin: 0 }}>
             <button type="submit" className={styles.signOutBtn} title="Sign Out">

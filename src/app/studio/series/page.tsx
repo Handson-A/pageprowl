@@ -27,10 +27,11 @@ export default async function StudioSeriesListPage() {
 
   const seriesList = await getCreatorSeries(user.id);
   let userName = "Creator";
+  let avatarUrl: string | null = null;
 
   const { data: profile } = await supabase
       .from("profiles")
-      .select("display_name")
+      .select("display_name, avatar_url")
       .eq("id", user.id)
       .single();
 
@@ -39,10 +40,13 @@ export default async function StudioSeriesListPage() {
   } else if (user.email) {
     userName = user.email.split("@")[0];
   }
+  if (profile?.avatar_url) {
+    avatarUrl = profile.avatar_url;
+  }
 
   return (
     <div className={styles.layout}>
-      <CreatorSidebar userName={userName} userRole="Creator" />
+      <CreatorSidebar userName={userName} userRole="Creator" avatarUrl={avatarUrl} />
 
       <main className={styles.main}>
         <header className={styles.header}>

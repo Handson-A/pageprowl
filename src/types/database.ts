@@ -374,6 +374,7 @@ export interface Database {
           revision_number: number;
           status: RevisionStatus;
           notes: string | null;
+          text_content: string | null;
           created_by: string;
           created_at: string;
           updated_at: string;
@@ -384,6 +385,7 @@ export interface Database {
           revision_number: number;
           status?: RevisionStatus;
           notes?: string | null;
+          text_content?: string | null;
           created_by: string;
           created_at?: string;
           updated_at?: string;
@@ -391,6 +393,7 @@ export interface Database {
         Update: {
           status?: RevisionStatus;
           notes?: string | null;
+          text_content?: string | null;
           updated_at?: string;
         };
       };

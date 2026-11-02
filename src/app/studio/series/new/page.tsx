@@ -9,6 +9,7 @@ import { CreatorSidebar } from "@/components/layout/CreatorSidebar";
 import { Button } from "@/components/ui/Button";
 import { FormField } from "@/components/ui/FormField";
 import { createClient } from "@/lib/supabase/client";
+import { getAuthorizedUserStudios, type StudioOption } from "@/lib/data/studiosClient";
 import { createSeriesAction } from "../actions";
 import { SUPPORTED_GENRES } from "@/lib/constants/genres";
 import {
@@ -25,11 +26,6 @@ import {
   LuEye,
   LuLock,
 } from "react-icons/lu";
-
-interface StudioOption {
-  id: string;
-  name: string;
-}
 
 function NewSeriesWizard() {
   const router = useRouter();
@@ -58,42 +54,45 @@ function NewSeriesWizard() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    let isCancelled = false;
+
     async function loadStudios() {
-      const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      try {
+        const supabase = createClient();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
 
-      if (!user) {
-        router.push("/login?redirect=" + encodeURIComponent("/studio/series/new"));
-        return;
-      }
+        if (!user) {
+          router.push("/login?redirect=" + encodeURIComponent("/studio/series/new"));
+          return;
+        }
 
-      const { data: memberships } = await supabase
-        .from("studio_members")
-        .select(`
-          studio_id,
-          role,
-          studios:studio_id (id, name)
-        `)
-        .eq("user_id", user.id)
-        .in("role", ["owner", "admin"]);
+        // Fetch authorized studios using deduplicated, cached client helper
+        const studios = await getAuthorizedUserStudios(user.id);
+        if (isCancelled) return;
 
-      if (memberships) {
-        const studios = memberships
-          .map((m: any) => m.studios)
-          .filter(Boolean) as StudioOption[];
         setUserStudios(studios);
 
         if (initialStudioId && studios.some((s) => s.id === initialStudioId)) {
           setSelectedStudioId(initialStudioId);
           setOwnerType("studio");
+        } else if (studios.length > 0 && !selectedStudioId) {
+          setSelectedStudioId(studios[0].id);
+        }
+      } catch (err) {
+        if (!isCancelled) {
+          console.warn("Could not load authorized studios for series creation:", err);
         }
       }
     }
 
     loadStudios();
-  }, [initialStudioId, router]);
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [initialStudioId, router, selectedStudioId]);
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
@@ -148,6 +147,9 @@ function NewSeriesWizard() {
       uploadData.append("timestamp", sigData.timestamp.toString());
       uploadData.append("signature", sigData.signature);
       uploadData.append("folder", sigData.folder);
+      if (sigData.tags) {
+        uploadData.append("tags", sigData.tags);
+      }
 
       const cloudinaryRes = await fetch(
         `https://api.cloudinary.com/v1_1/${sigData.cloudName}/image/upload`,
@@ -158,7 +160,8 @@ function NewSeriesWizard() {
       );
 
       if (!cloudinaryRes.ok) {
-        throw new Error("Direct image upload failed. Please try again.");
+        const errorData = await cloudinaryRes.json().catch(() => ({}));
+        throw new Error(errorData.error?.message || "Direct image upload failed. Please try again.");
       }
 
       const cloudJson = await cloudinaryRes.json();

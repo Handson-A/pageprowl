@@ -29,6 +29,7 @@ export interface ReaderToolbarProps {
   nextEpisodeSlug?: string | null;
   allEpisodes?: { slug: string; episode_number: number; title: string }[];
   isImmersive?: boolean;
+  isTextStory?: boolean;
   onToggleImmersive?: () => void;
   onToggleKeyboardHelp?: () => void;
 }
@@ -46,6 +47,7 @@ export function ReaderToolbar({
   nextEpisodeSlug,
   allEpisodes,
   isImmersive = false,
+  isTextStory = false,
   onToggleImmersive,
   onToggleKeyboardHelp,
 }: ReaderToolbarProps) {
@@ -135,8 +137,8 @@ export function ReaderToolbar({
       </div>
 
       <div className={styles.center}>
-        {/* Reading Mode Segmented Switcher */}
-        {onModeChange && (
+        {/* Reading Mode Segmented Switcher (comic only) */}
+        {!isTextStory && onModeChange && (
           <div className={styles.modeSwitcher} role="group" aria-label="Reading Mode">
             <button
               type="button"
@@ -162,7 +164,7 @@ export function ReaderToolbar({
         )}
 
         {/* Page progress badge for paginated mode */}
-        {readingMode === "paged" && currentPage !== undefined && totalPages !== undefined && (
+        {!isTextStory && readingMode === "paged" && currentPage !== undefined && totalPages !== undefined && (
           <span className={styles.pageBadge} aria-live="polite">
             {currentPage} / {totalPages}
           </span>

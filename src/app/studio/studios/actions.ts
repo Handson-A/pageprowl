@@ -7,6 +7,7 @@ import {
   requireAuth,
   requireStudioRole,
   ForbiddenError,
+  NotFoundError,
 } from "@/lib/auth/guards";
 import { logger } from "@/lib/logger";
 import type { StudioRole } from "@/types/database";
@@ -226,4 +227,77 @@ export async function removeStudioMemberAction(studioId: string, targetUserId: s
   });
 
   revalidatePath(`/studio/studios/${studioId}`);
+}
+
+/**
+ * Server Action: Accept an invitation to join a studio workspace.
+ * Validates the invitation token, ensures it has not expired,
+ * adds the authenticated user to studio_members, and marks the invitation accepted.
+ */
+export async function acceptStudioInvitationAction(token: string) {
+  const user = await requireAuth();
+  const supabase = createClient();
+
+  if (!token || typeof token !== "string") {
+    throw new Error("A valid invitation token is required.");
+  }
+
+  // 1. Fetch pending invitation
+  const { data: invitation, error: fetchError } = await supabase
+    .from("studio_invitations")
+    .select("id, studio_id, role, invited_email, status, expires_at")
+    .eq("token", token)
+    .single();
+
+  if (fetchError || !invitation) {
+    throw new NotFoundError("Invitation not found or invalid token.");
+  }
+
+  if (invitation.status !== "pending") {
+    throw new Error(`Invitation is no longer valid (status: ${invitation.status}).`);
+  }
+
+  const now = new Date();
+  const expiresAt = new Date(invitation.expires_at);
+  if (now > expiresAt) {
+    await supabase
+      .from("studio_invitations")
+      .update({ status: "expired" })
+      .eq("id", invitation.id);
+    throw new Error("This invitation has expired. Please ask the studio administrator for a new invite.");
+  }
+
+  // 2. Add member to studio_members
+  const { error: memberError } = await supabase.from("studio_members").upsert(
+    {
+      studio_id: invitation.studio_id,
+      user_id: user.id,
+      role: invitation.role,
+      created_at: now.toISOString(),
+    },
+    { onConflict: "studio_id, user_id" }
+  );
+
+  if (memberError) {
+    logger.error("Failed to add accepted member to studio", memberError);
+    throw new Error("Failed to join studio workspace.");
+  }
+
+  // 3. Mark invitation as accepted
+  await supabase
+    .from("studio_invitations")
+    .update({ status: "accepted" })
+    .eq("id", invitation.id);
+
+  logger.info("Accepted studio invitation", {
+    studioId: invitation.studio_id,
+    userId: user.id,
+    role: invitation.role,
+  });
+
+  revalidatePath(`/studio/studios/${invitation.studio_id}`);
+  revalidatePath("/studio");
+  revalidatePath("/studio/studios");
+
+  return { success: true, studioId: invitation.studio_id };
 }

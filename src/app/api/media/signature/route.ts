@@ -29,13 +29,17 @@ export async function POST(request: Request) {
       if (type === "cover") {
         folder = `pageprowl/series/${seriesId}/cover`;
         tags = ["pageprowl", "cover"];
-      } else if (episodeId) {
+      } else if (episodeId || type === "episode_page") {
         folder = `pageprowl/series/${seriesId}/episodes/${episodeId}`;
-        tags = ["pageprowl", "episode"];
+        tags = ["pageprowl", "episode_page"];
       } else {
         folder = `pageprowl/series/${seriesId}/uploads`;
         tags = ["pageprowl", "series"];
       }
+    } else if (type === "cover") {
+      // Draft cover upload for new series creation before seriesId exists
+      folder = `pageprowl/creators/${user.id}/covers`;
+      tags = ["pageprowl", "cover"];
     } else if (type === "avatar") {
       folder = `pageprowl/users/${user.id}/avatar`;
       tags = ["pageprowl", "avatar"];

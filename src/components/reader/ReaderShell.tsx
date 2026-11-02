@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { ReaderToolbar } from "./ReaderToolbar";
 import { VerticalReader, type ReaderPage } from "./VerticalReader";
 import { PaginatedReader } from "./PaginatedReader";
+import { TextReader } from "./TextReader";
 import { saveReadingProgress } from "@/lib/reading-progress";
 import { syncReadingProgressAction } from "@/app/actions/reader";
 import styles from "./ReaderShell.module.css";
@@ -23,7 +24,8 @@ export interface ReaderShellProps {
     slug: string;
     episode_number: number;
   };
-  pages: ReaderPage[];
+  pages?: ReaderPage[];
+  textContent?: string | null;
   prevEpisodeSlug?: string | null;
   nextEpisodeSlug?: string | null;
   allEpisodes?: { slug: string; episode_number: number; title: string }[];
@@ -32,11 +34,13 @@ export interface ReaderShellProps {
 export function ReaderShell({
   series,
   episode,
-  pages,
+  pages = [],
+  textContent,
   prevEpisodeSlug,
   nextEpisodeSlug,
   allEpisodes,
 }: ReaderShellProps) {
+  const isTextStory = Boolean(textContent && textContent.trim().length > 0);
   const [readingMode, setReadingMode] = useState<"scroll" | "paged">(
     series.format === "scroll" ? "scroll" : "paged"
   );
@@ -54,16 +58,16 @@ export function ReaderShell({
       episodeNumber: episode.episode_number,
       episodeTitle: episode.title,
       pageNumber: currentPage,
-      totalPages: pages.length,
-      format: readingMode,
+      totalPages: isTextStory ? 1 : Math.max(pages.length, 1),
+      format: isTextStory ? "text" : readingMode,
       coverUrl: series.cover_url,
     });
 
     // 2. Debounced backend synchronization across authenticated devices
     const timer = setTimeout(async () => {
       try {
-        const isCompleted = pages.length > 0 && currentPage >= pages.length;
-        const scrollPercent = pages.length > 0 ? (currentPage / pages.length) * 100 : 0;
+        const isCompleted = isTextStory ? true : pages.length > 0 && currentPage >= pages.length;
+        const scrollPercent = isTextStory ? 100 : pages.length > 0 ? (currentPage / pages.length) * 100 : 0;
         await syncReadingProgressAction({
           seriesId: series.id,
           episodeId: episode.id,
@@ -90,6 +94,7 @@ export function ReaderShell({
     currentPage,
     pages.length,
     readingMode,
+    isTextStory,
   ]);
 
   // Esc key to exit modal or immersive
@@ -128,6 +133,7 @@ export function ReaderShell({
           nextEpisodeSlug={nextEpisodeSlug}
           allEpisodes={allEpisodes}
           isImmersive={isImmersive}
+          isTextStory={isTextStory}
           onToggleImmersive={() => setIsImmersive((prev) => !prev)}
           onToggleKeyboardHelp={() => setShowKeyboardHelp((prev) => !prev)}
         />
@@ -135,7 +141,20 @@ export function ReaderShell({
 
       {/* Reader Body */}
       <div className={styles.readerCanvas}>
-        {readingMode === "scroll" ? (
+        {isTextStory ? (
+          <TextReader
+            textContent={textContent!}
+            seriesSlug={series.slug}
+            seriesTitle={series.title}
+            episodeTitle={episode.title}
+            episodeNumber={episode.episode_number}
+            prevEpisodeSlug={prevEpisodeSlug}
+            nextEpisodeSlug={nextEpisodeSlug}
+            onTextClick={() => {
+              if (isImmersive) setIsImmersive(false);
+            }}
+          />
+        ) : readingMode === "scroll" ? (
           <VerticalReader
             pages={pages}
             seriesSlug={series.slug}

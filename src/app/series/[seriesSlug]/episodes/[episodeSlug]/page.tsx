@@ -44,8 +44,15 @@ export default async function EpisodeReaderPage({
     notFound();
   }
 
-  const { series, episode, pages, prevEpisodeSlug, nextEpisodeSlug, allEpisodes } =
-    content;
+  const {
+    series,
+    episode,
+    pages,
+    textContent,
+    prevEpisodeSlug,
+    nextEpisodeSlug,
+    allEpisodes,
+  } = content;
 
   return (
     <ReaderShell
@@ -63,6 +70,7 @@ export default async function EpisodeReaderPage({
         episode_number: episode.episode_number,
       }}
       pages={pages}
+      textContent={textContent}
       prevEpisodeSlug={prevEpisodeSlug}
       nextEpisodeSlug={nextEpisodeSlug}
       allEpisodes={allEpisodes}

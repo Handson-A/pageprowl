@@ -140,7 +140,9 @@ export function AccountProfileManager({
       formData.append("timestamp", sigData.timestamp.toString());
       formData.append("signature", sigData.signature);
       formData.append("folder", sigData.folder);
-      formData.append("tags", "pageprowl,avatar");
+      if (sigData.tags) {
+        formData.append("tags", sigData.tags);
+      }
 
       const uploadRes = await fetch(
         `https://api.cloudinary.com/v1_1/${sigData.cloudName}/image/upload`,

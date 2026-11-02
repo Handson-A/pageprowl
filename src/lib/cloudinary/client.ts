@@ -15,7 +15,7 @@ export function getOptimizedImageUrl(
   publicIdOrUrl: string,
   options: CloudinaryImageOptions = {}
 ): string {
-  if (!publicIdOrUrl) return "/images/artwork-fallback.png";
+  if (!publicIdOrUrl) return "/images/artwork-fallback.svg";
 
   // If already a full URL and not a cloudinary URL, return as-is
   if (publicIdOrUrl.startsWith("http://") || publicIdOrUrl.startsWith("https://")) {

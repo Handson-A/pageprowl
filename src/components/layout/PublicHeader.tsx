@@ -22,7 +22,7 @@ export function PublicHeader() {
             .from("notifications")
             .select("id", { count: "exact", head: true })
             .eq("user_id", data.user.id)
-            .eq("is_read", false)
+            .eq("read", false)
             .then(({ count }) => {
               if (count !== null && count !== undefined) {
                 setUnreadCount(count);

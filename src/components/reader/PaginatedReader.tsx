@@ -154,6 +154,9 @@ export function PaginatedReader({
                 src={currentPage.imageUrl}
                 alt={`Page ${currentPage.pageNumber} of ${totalPages}`}
                 className={styles.artwork}
+                onError={(e) => {
+                  e.currentTarget.src = "/images/artwork-fallback.svg";
+                }}
               />
             </motion.div>
           </AnimatePresence>

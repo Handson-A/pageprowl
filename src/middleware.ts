@@ -11,12 +11,17 @@ export async function middleware(request: NextRequest) {
   });
 
   const pathname = request.nextUrl.pathname;
+  const isProtectedRoute =
+    pathname.startsWith("/studio") ||
+    pathname.startsWith("/account") ||
+    pathname.startsWith("/library");
+
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   // If Supabase environment is unconfigured, prevent unauthenticated access to protected routes
   if (!supabaseUrl || !supabaseAnonKey) {
-    if (pathname.startsWith("/studio")) {
+    if (isProtectedRoute) {
       const loginUrl = new URL("/login", request.url);
       loginUrl.searchParams.set("redirect", getSafeRedirectUrl(pathname + request.nextUrl.search));
       return NextResponse.redirect(loginUrl);
@@ -59,8 +64,8 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // 1. Route Protection Guard: All /studio routes require authentication
-  if (pathname.startsWith("/studio")) {
+  // 1. Route Protection Guard: /studio, /account, and /library require authentication
+  if (isProtectedRoute) {
     if (!user) {
       const originalDestination = pathname + request.nextUrl.search;
       const safeTarget = getSafeRedirectUrl(originalDestination, "/studio");

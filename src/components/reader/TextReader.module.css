@@ -1,0 +1,250 @@
+/* ==========================================================================
+   PageProwl Text Reader Styles
+   Dark, sleek, creator-first web fiction / light novel reading environment.
+   ========================================================================== */
+
+.textContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  min-height: 100vh;
+  background-color: var(--reader-bg, #0a0a0a);
+  color: var(--reader-text, #f5f5f5);
+  padding: 0 var(--space-4, 16px) var(--space-16, 64px);
+}
+
+.storyCanvas {
+  width: 100%;
+  max-width: 68ch;
+  margin: 0 auto;
+  padding: var(--space-8, 32px) 0;
+}
+
+/* Header inside story canvas */
+.storyHeader {
+  margin-bottom: var(--space-10, 40px);
+  padding-bottom: var(--space-6, 24px);
+  border-bottom: 1px solid var(--reader-border, #262626);
+  text-align: center;
+}
+
+.seriesBreadcrumb {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2, 8px);
+  font-size: var(--font-size-sm, 0.875rem);
+  color: var(--color-primary, #e44735);
+  text-decoration: none;
+  font-weight: var(--font-weight-medium, 500);
+  margin-bottom: var(--space-3, 12px);
+  transition: opacity var(--motion-fast, 120ms) ease;
+}
+
+.seriesBreadcrumb:hover {
+  opacity: 0.85;
+  text-decoration: underline;
+}
+
+.chapterNumber {
+  font-size: var(--font-size-xs, 0.75rem);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--reader-text-muted, #a3a3a3);
+  margin-bottom: var(--space-2, 8px);
+  font-weight: var(--font-weight-semibold, 600);
+}
+
+.chapterTitle {
+  font-family: var(--font-family-heading, "Space Grotesk", sans-serif);
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+  font-weight: var(--font-weight-bold, 700);
+  line-height: var(--line-height-tight, 1.25);
+  color: var(--reader-text, #ffffff);
+  margin: 0;
+}
+
+/* Story Body */
+.storyBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5, 20px);
+  font-family: var(--font-family-body, "Inter", sans-serif);
+  font-size: clamp(1.05rem, 1.1vw + 0.8rem, 1.18rem);
+  line-height: 1.85;
+  letter-spacing: -0.01em;
+}
+
+/* Prose Paragraphs */
+.proseParagraph {
+  margin: 0;
+  color: var(--reader-text, #ededed);
+  text-align: left;
+}
+
+/* Character Dialogue */
+.dialogueParagraph {
+  margin: 0;
+  color: #ffffff;
+  padding-left: var(--space-4, 16px);
+  border-left: 2px solid var(--color-primary, #e44735);
+  background: rgba(228, 71, 53, 0.04);
+  padding-top: var(--space-2, 8px);
+  padding-bottom: var(--space-2, 8px);
+  border-radius: 0 var(--radius-sm, 4px) var(--radius-sm, 4px) 0;
+  font-style: normal;
+}
+
+/* Scene Headings */
+.sceneHeading {
+  font-family: var(--font-family-heading, "Space Grotesk", sans-serif);
+  font-size: var(--font-size-lg, 1.125rem);
+  font-weight: var(--font-weight-semibold, 600);
+  color: var(--color-accent, #f2c14e);
+  margin: var(--space-6, 24px) 0 var(--space-2, 8px);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Scene Dividers */
+.sceneBreak {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3, 12px);
+  margin: var(--space-8, 32px) 0;
+  color: var(--reader-border, #3f3f46);
+  font-size: var(--font-size-sm, 0.875rem);
+  letter-spacing: 0.3em;
+  user-select: none;
+}
+
+.sceneBreak::before,
+.sceneBreak::after {
+  content: "";
+  display: inline-block;
+  width: 48px;
+  height: 1px;
+  background-color: var(--reader-border, #27272a);
+}
+
+/* End of Chapter Card */
+.endOfEpisodeCard {
+  margin-top: var(--space-12, 48px);
+  padding: var(--space-8, 32px) var(--space-6, 24px);
+  background-color: var(--reader-surface, #141414);
+  border: 1px solid var(--reader-border, #262626);
+  border-radius: var(--radius-lg, 12px);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4, 16px);
+}
+
+.completionBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2, 8px);
+  padding: var(--space-1, 4px) var(--space-3, 12px);
+  background-color: rgba(35, 122, 75, 0.15);
+  color: #4ade80;
+  border: 1px solid rgba(74, 222, 128, 0.3);
+  border-radius: var(--radius-full, 9999px);
+  font-size: var(--font-size-xs, 0.75rem);
+  font-weight: var(--font-weight-semibold, 600);
+}
+
+.endTitle {
+  font-family: var(--font-family-heading, "Space Grotesk", sans-serif);
+  font-size: var(--font-size-xl, 1.25rem);
+  font-weight: var(--font-weight-bold, 700);
+  color: var(--reader-text, #ffffff);
+  margin: 0;
+}
+
+.endSubtitle {
+  font-size: var(--font-size-sm, 0.875rem);
+  color: var(--reader-text-muted, #a3a3a3);
+  margin: 0;
+}
+
+.navigationActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-3, 12px);
+  margin-top: var(--space-4, 16px);
+  width: 100%;
+}
+
+.primaryBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2, 8px);
+  padding: var(--space-3, 12px) var(--space-5, 20px);
+  background-color: var(--color-primary, #e44735);
+  color: #ffffff;
+  border-radius: var(--radius-md, 8px);
+  font-weight: var(--font-weight-semibold, 600);
+  font-size: var(--font-size-sm, 0.875rem);
+  text-decoration: none;
+  transition: background-color var(--motion-fast, 120ms) ease;
+}
+
+.primaryBtn:hover {
+  background-color: var(--color-primary-hover, #c93928);
+}
+
+.secondaryBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2, 8px);
+  padding: var(--space-3, 12px) var(--space-5, 20px);
+  background-color: var(--reader-surface-muted, #242424);
+  color: var(--reader-text, #f5f5f5);
+  border: 1px solid var(--reader-border, #333333);
+  border-radius: var(--radius-md, 8px);
+  font-weight: var(--font-weight-medium, 500);
+  font-size: var(--font-size-sm, 0.875rem);
+  text-decoration: none;
+  transition: background-color var(--motion-fast, 120ms) ease;
+}
+
+.secondaryBtn:hover {
+  background-color: #2e2e2e;
+}
+
+/* Scroll to Top floating button */
+.scrollTopBtn {
+  position: fixed;
+  bottom: var(--space-6, 24px);
+  right: var(--space-6, 24px);
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full, 9999px);
+  background-color: var(--reader-surface, #1f1f1f);
+  color: var(--reader-text, #ffffff);
+  border: 1px solid var(--reader-border, #333333);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  transition: transform var(--motion-fast, 120ms) ease, background-color var(--motion-fast, 120ms) ease;
+  z-index: 50;
+}
+
+.scrollTopBtn:hover {
+  transform: translateY(-2px);
+  background-color: var(--color-primary, #e44735);
+}
+
+/* Empty Container */
+.emptyContainer {
+  padding: var(--space-16, 64px) var(--space-4, 16px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+}

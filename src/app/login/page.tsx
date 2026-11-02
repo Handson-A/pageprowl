@@ -20,6 +20,8 @@ function LoginForm() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isRecoveryMode, setIsRecoveryMode] = useState(false);
+  const [recoveryEmail, setRecoveryEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [infoMessage, setInfoMessage] = useState<string | null>(
     isSignOut ? "You have been successfully signed out." : null
@@ -66,6 +68,44 @@ function LoginForm() {
     }
   };
 
+  const handlePasswordRecovery = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!recoveryEmail || !recoveryEmail.includes("@")) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+
+    setError(null);
+    setIsLoading(true);
+
+    try {
+      const supabase = createClient();
+      const redirectUrl =
+        typeof window !== "undefined"
+          ? `${window.location.origin}/login?action=recovered`
+          : undefined;
+
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(
+        recoveryEmail,
+        { redirectTo: redirectUrl }
+      );
+
+      if (resetError) {
+        setError(resetError.message);
+      } else {
+        setInfoMessage(
+          `Password recovery email sent to ${recoveryEmail}. Please check your inbox for instructions.`
+        );
+        setIsRecoveryMode(false);
+        setRecoveryEmail("");
+      }
+    } catch (err: any) {
+      setError(err?.message || "Failed to send recovery instructions.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const signupHref =
     destination !== "/studio"
       ? `/signup?redirect=${encodeURIComponent(destination)}`
@@ -74,9 +114,13 @@ function LoginForm() {
   return (
     <div className={styles.card}>
       <div className={styles.header}>
-        <h1 className={styles.title}>Sign In</h1>
+        <h1 className={styles.title}>
+          {isRecoveryMode ? "Reset Password" : "Sign In"}
+        </h1>
         <p className={styles.subtitle}>
-          Access your creator studio and reading library
+          {isRecoveryMode
+            ? "Enter your account email to receive recovery instructions"
+            : "Access your creator studio and reading library"}
         </p>
       </div>
 
@@ -98,49 +142,120 @@ function LoginForm() {
 
       {error && <div className={styles.errorBanner}>{error}</div>}
 
-      <form onSubmit={handleSubmit} className={styles.form}>
-        <FormField label="Email Address" htmlFor="email" required>
-          <input
-            id="email"
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="creator@pageprowl.com"
-            style={{
-              padding: "8px 12px",
-              borderRadius: "6px",
-              border: "1px solid var(--color-border)",
-            }}
-          />
-        </FormField>
+      {isRecoveryMode ? (
+        <form onSubmit={handlePasswordRecovery} className={styles.form}>
+          <FormField label="Account Email" htmlFor="recoveryEmail" required>
+            <input
+              id="recoveryEmail"
+              type="email"
+              required
+              value={recoveryEmail}
+              onChange={(e) => setRecoveryEmail(e.target.value)}
+              placeholder="creator@pageprowl.com"
+              style={{
+                padding: "8px 12px",
+                borderRadius: "6px",
+                border: "1px solid var(--color-border)",
+              }}
+            />
+          </FormField>
 
-        <FormField label="Password" htmlFor="password" required>
-          <input
-            id="password"
-            type="password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="••••••••"
-            style={{
-              padding: "8px 12px",
-              borderRadius: "6px",
-              border: "1px solid var(--color-border)",
-            }}
-          />
-        </FormField>
+          <Button
+            type="submit"
+            variant="primary"
+            fullWidth
+            isLoading={isLoading}
+            style={{ marginTop: "8px" }}
+          >
+            Send Recovery Email
+          </Button>
 
-        <Button
-          type="submit"
-          variant="primary"
-          fullWidth
-          isLoading={isLoading}
-          style={{ marginTop: "8px" }}
-        >
-          Sign In
-        </Button>
-      </form>
+          <button
+            type="button"
+            onClick={() => {
+              setIsRecoveryMode(false);
+              setError(null);
+            }}
+            style={{
+              background: "none",
+              border: "none",
+              color: "var(--color-text-muted)",
+              fontSize: "0.875rem",
+              cursor: "pointer",
+              marginTop: "4px",
+              textAlign: "center",
+            }}
+          >
+            &larr; Back to Sign In
+          </button>
+        </form>
+      ) : (
+        <form onSubmit={handleSubmit} className={styles.form}>
+          <FormField label="Email Address" htmlFor="email" required>
+            <input
+              id="email"
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="creator@pageprowl.com"
+              style={{
+                padding: "8px 12px",
+                borderRadius: "6px",
+                border: "1px solid var(--color-border)",
+              }}
+            />
+          </FormField>
+
+          <FormField label="Password" htmlFor="password" required>
+            <input
+              id="password"
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              style={{
+                padding: "8px 12px",
+                borderRadius: "6px",
+                border: "1px solid var(--color-border)",
+              }}
+            />
+          </FormField>
+
+          <div style={{ textAlign: "right", marginTop: "-8px" }}>
+            <button
+              type="button"
+              onClick={() => {
+                setIsRecoveryMode(true);
+                setRecoveryEmail(email);
+                setError(null);
+                setInfoMessage(null);
+              }}
+              style={{
+                background: "none",
+                border: "none",
+                color: "var(--color-primary)",
+                fontSize: "0.75rem",
+                cursor: "pointer",
+                padding: 0,
+              }}
+            >
+              Forgot password?
+            </button>
+          </div>
+
+          <Button
+            type="submit"
+            variant="primary"
+            fullWidth
+            isLoading={isLoading}
+            style={{ marginTop: "8px" }}
+          >
+            Sign In
+          </Button>
+        </form>
+      )}
 
       <div className={styles.footer}>
         Don&apos;t have an account yet?{" "}

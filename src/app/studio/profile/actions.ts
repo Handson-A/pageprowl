@@ -127,14 +127,17 @@ export async function updateAccountPreferencesAction(preferences: {
   const user = await requireAuth();
   const supabase = createClient();
 
+  const notificationsEnabled =
+    (preferences.inAppNotifications ?? true) || (preferences.emailNotifications ?? true);
+  const notifyNewEpisodes = preferences.notifyNewEpisodes ?? true;
+
   const { error } = await supabase
     .from("notification_preferences")
     .upsert(
       {
         user_id: user.id,
-        email_notifications: preferences.emailNotifications ?? true,
-        in_app_notifications: preferences.inAppNotifications ?? true,
-        notify_new_episodes: preferences.notifyNewEpisodes ?? true,
+        notifications_enabled: notificationsEnabled,
+        notify_new_episodes: notifyNewEpisodes,
         updated_at: new Date().toISOString(),
       },
       { onConflict: "user_id" }

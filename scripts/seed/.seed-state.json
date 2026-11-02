@@ -1,0 +1,551 @@
+{
+  "version": "1.0.0",
+  "createdAt": "2026-11-01T03:14:43.920Z",
+  "updatedAt": "2026-11-02T00:37:44.145Z",
+  "creators": {
+    "elena_vance": {
+      "authUserId": "cebce035-612e-47de-9e44-78a006ad34b0",
+      "profileId": "cebce035-612e-47de-9e44-78a006ad34b0",
+      "referencedBySeries": [
+        "sub-orbital-drift"
+      ]
+    },
+    "marcus_kane": {
+      "authUserId": "a8d78306-909b-42b7-a696-af4d997e3012",
+      "profileId": "a8d78306-909b-42b7-a696-af4d997e3012",
+      "referencedBySeries": [
+        "the-runebound-chronicle"
+      ]
+    },
+    "soraya_mirza": {
+      "authUserId": "4c8eac75-09b2-4587-b038-acc8774067bf",
+      "profileId": "4c8eac75-09b2-4587-b038-acc8774067bf",
+      "referencedBySeries": [
+        "between-two-skylines",
+        "the-clockmakers-ledger",
+        "matcha-and-raindrops"
+      ]
+    },
+    "jin_woo_park": {
+      "authUserId": "0abf9b47-84ee-4cee-9e70-4aacec8dc703",
+      "profileId": "0abf9b47-84ee-4cee-9e70-4aacec8dc703",
+      "referencedBySeries": [
+        "vanguard-strike-neo-seoul"
+      ]
+    },
+    "clara_thorne": {
+      "authUserId": "667aa763-667b-46a2-837b-05e5c70a88a8",
+      "profileId": "667aa763-667b-46a2-837b-05e5c70a88a8",
+      "referencedBySeries": [
+        "whispers-of-the-black-bog",
+        "spirits-of-the-ironwood"
+      ]
+    },
+    "devon_reed": {
+      "authUserId": "af25ac88-f56e-4c2e-a97a-9cb6830627e9",
+      "profileId": "af25ac88-f56e-4c2e-a97a-9cb6830627e9",
+      "referencedBySeries": [
+        "vanguard-strike-neo-seoul",
+        "the-runebound-chronicle",
+        "demon-kings-barista"
+      ]
+    },
+    "tariq_al_mansoor": {
+      "authUserId": "71f6639b-2d84-4489-a73c-d2245c16b9f9",
+      "profileId": "71f6639b-2d84-4489-a73c-d2245c16b9f9",
+      "referencedBySeries": [
+        "sub-orbital-drift"
+      ]
+    },
+    "aiko_takahashi": {
+      "authUserId": "bc875c41-c36b-4e21-a5f4-254d63be7d13",
+      "profileId": "bc875c41-c36b-4e21-a5f4-254d63be7d13",
+      "referencedBySeries": [
+        "matcha-and-raindrops"
+      ]
+    },
+    "rowan_macleod": {
+      "authUserId": "f1fd12c1-081c-4086-9663-e35df0c659af",
+      "profileId": "f1fd12c1-081c-4086-9663-e35df0c659af",
+      "referencedBySeries": [
+        "the-runebound-chronicle"
+      ]
+    },
+    "maya_lin": {
+      "authUserId": "3061f661-b92f-43d2-bec8-41aaf14feb11",
+      "profileId": "3061f661-b92f-43d2-bec8-41aaf14feb11",
+      "referencedBySeries": [
+        "fogline-murders"
+      ]
+    },
+    "lucas_valerio": {
+      "authUserId": "1180af40-e7b8-4e70-8d63-1eaeace2ac07",
+      "profileId": "1180af40-e7b8-4e70-8d63-1eaeace2ac07",
+      "referencedBySeries": [
+        "spirits-of-the-ironwood"
+      ]
+    },
+    "chloe_dupont": {
+      "authUserId": "ae4d8059-8cf4-4ecb-b01c-2ff55193ce67",
+      "profileId": "ae4d8059-8cf4-4ecb-b01c-2ff55193ce67",
+      "referencedBySeries": [
+        "between-two-skylines",
+        "the-clockmakers-ledger"
+      ]
+    },
+    "sam_okoro": {
+      "authUserId": "29c32666-5211-4eb1-8db1-0ea43314bec4",
+      "profileId": "29c32666-5211-4eb1-8db1-0ea43314bec4",
+      "referencedBySeries": [
+        "sub-orbital-drift"
+      ]
+    },
+    "hannah_lindqvist": {
+      "authUserId": "bd7eb881-e441-43aa-a3ef-b1e3bff31eeb",
+      "profileId": "bd7eb881-e441-43aa-a3ef-b1e3bff31eeb",
+      "referencedBySeries": [
+        "whispers-of-the-black-bog",
+        "fogline-murders"
+      ]
+    },
+    "felix_castillo": {
+      "authUserId": "53c4ae76-503c-48de-ba6f-29010e6adc25",
+      "profileId": "53c4ae76-503c-48de-ba6f-29010e6adc25",
+      "referencedBySeries": [
+        "demon-kings-barista"
+      ]
+    }
+  },
+  "studios": {
+    "iron-quill-studios": {
+      "studioId": "9a04b0a5-3a2e-40e0-8bb7-5c2c51fe7076",
+      "referencedBySeries": [
+        "the-runebound-chronicle"
+      ]
+    },
+    "neon-district-collective": {
+      "studioId": "0dc1397c-aebd-4b9f-aa11-85f08d79f276",
+      "referencedBySeries": [
+        "sub-orbital-drift"
+      ]
+    },
+    "velvet-crow-press": {
+      "studioId": "4f7a4bae-c767-4934-b966-07660e453e3a",
+      "referencedBySeries": [
+        "whispers-of-the-black-bog",
+        "spirits-of-the-ironwood"
+      ]
+    },
+    "heartstring-comics": {
+      "studioId": "1fc3bf1f-a4bd-4e11-b378-a32cddd947f2",
+      "referencedBySeries": [
+        "matcha-and-raindrops"
+      ]
+    }
+  },
+  "series": {
+    "vanguard-strike-neo-seoul": {
+      "seriesId": "8fd577e9-5aee-4c50-8353-adaea82f20fb",
+      "batchNumber": 1
+    },
+    "the-runebound-chronicle": {
+      "seriesId": "1a9f228b-c38e-4706-8bd8-6144b80a1716",
+      "batchNumber": 1
+    },
+    "sub-orbital-drift": {
+      "seriesId": "210ce809-20f4-4a0c-80bd-0c159284eefc",
+      "batchNumber": 1
+    },
+    "between-two-skylines": {
+      "seriesId": "f7f9e0bf-d169-4c16-989f-0b381cac4b26",
+      "batchNumber": 1
+    },
+    "whispers-of-the-black-bog": {
+      "seriesId": "2b23d339-f264-448c-8a19-1c4e12cb1ecb",
+      "batchNumber": 1
+    },
+    "demon-kings-barista": {
+      "seriesId": "6889a9b0-fca0-4bfb-a155-12a5f47d39af",
+      "batchNumber": 1
+    },
+    "the-clockmakers-ledger": {
+      "seriesId": "c9917832-af23-4f8c-8e03-9a3ceb7efe26",
+      "batchNumber": 1
+    },
+    "matcha-and-raindrops": {
+      "seriesId": "c5b83519-b287-4fd7-bba6-a397a9d0154c",
+      "batchNumber": 1
+    },
+    "fogline-murders": {
+      "seriesId": "1c52fb58-48a2-4bbd-9f39-f2023a8cbbdc",
+      "batchNumber": 1
+    },
+    "spirits-of-the-ironwood": {
+      "seriesId": "0ade9945-59c0-4121-b536-014c970339e8",
+      "batchNumber": 1
+    }
+  },
+  "episodes": {
+    "vanguard-strike-neo-seoul:1": {
+      "episodeId": "a3fd99fd-ebc5-4b4a-9975-ab10410f0d1e",
+      "revisionId": "5fcf3f5f-7bf4-4297-8c7e-0bd4e536c903"
+    },
+    "vanguard-strike-neo-seoul:2": {
+      "episodeId": "bf8b03c5-ae4e-415a-8493-3f29472b666f",
+      "revisionId": "ab9173f4-522d-4417-aaa1-2fbc4018e666"
+    },
+    "vanguard-strike-neo-seoul:3": {
+      "episodeId": "9b22c4e4-09c6-4b99-bf60-9ff51ce66cd3",
+      "revisionId": "bb8e9881-338b-40e0-81d3-de30d96e963e"
+    },
+    "the-runebound-chronicle:1": {
+      "episodeId": "e9c889fa-5761-450a-9182-a4819a96b6c9",
+      "revisionId": "a2dfce6d-f71c-4e26-a68c-abc88b36ffcb"
+    },
+    "the-runebound-chronicle:2": {
+      "episodeId": "d671a3bc-0a18-43de-8619-c4965f8f4484",
+      "revisionId": "a6a435ac-cdbb-4454-82a8-2152fc072b38"
+    },
+    "the-runebound-chronicle:3": {
+      "episodeId": "7621e0d2-eb1c-41f0-b931-92b49135b334",
+      "revisionId": "d51d18aa-f5b2-4756-bb7a-1bf661bc6a65"
+    },
+    "sub-orbital-drift:1": {
+      "episodeId": "7eb91de9-65af-4d26-92a3-77b3f0f9acb0",
+      "revisionId": "d689eaf7-3d18-485a-b76b-9e44cb05e0d7"
+    },
+    "sub-orbital-drift:2": {
+      "episodeId": "5fd90117-fae4-4c4d-bc38-3261d9840915",
+      "revisionId": "8ec0df9e-19c4-49b4-966f-fc351c9ee162"
+    },
+    "sub-orbital-drift:3": {
+      "episodeId": "e3fe1d45-e95d-4e7f-aeef-1060052ba1bb",
+      "revisionId": "b9d53fc4-a7ab-4c7a-9f77-6b12e8ed63f9"
+    },
+    "between-two-skylines:1": {
+      "episodeId": "a1b16075-ee07-48b1-a39d-0f6d603ae932",
+      "revisionId": "39a6f97a-9d3d-4419-929e-22b07bb8a26c"
+    },
+    "between-two-skylines:2": {
+      "episodeId": "47190a7e-23a0-48d5-9c82-8c7d2e67370f",
+      "revisionId": "789f3287-f9db-482d-8e93-2600c9b9dbda"
+    },
+    "between-two-skylines:3": {
+      "episodeId": "f844222e-0d08-44d0-bb29-b67923e733a6",
+      "revisionId": "93f48577-4448-4852-9b01-b7dce138d428"
+    },
+    "whispers-of-the-black-bog:1": {
+      "episodeId": "76263db4-72d7-4e16-8600-7f2b103b6541",
+      "revisionId": "cdc5a184-d868-4914-9fec-2b0958214829"
+    },
+    "whispers-of-the-black-bog:2": {
+      "episodeId": "d90c1059-408a-4031-ae3b-2e80f26c2aec",
+      "revisionId": "46dc8088-f91e-4e0b-a9d1-901072fd9fcd"
+    },
+    "whispers-of-the-black-bog:3": {
+      "episodeId": "78e0aa16-c418-4cb8-9344-6d208b45e2ba",
+      "revisionId": "76fc7ad1-71a4-4895-a0f2-5d6a3e2dbf90"
+    },
+    "demon-kings-barista:1": {
+      "episodeId": "3dad73fe-cd30-468c-a518-6ecc18955baa",
+      "revisionId": "bff3a072-995a-4c07-a430-3b467a42ad3a"
+    },
+    "demon-kings-barista:2": {
+      "episodeId": "0824ed36-bc86-4a3e-89e6-695d25a61751",
+      "revisionId": "eb66d001-7c8c-4bc8-83e7-5b6818bce151"
+    },
+    "demon-kings-barista:3": {
+      "episodeId": "9c521663-869e-4706-ab02-8c1906cff106",
+      "revisionId": "b11c94fa-a8ff-4966-ac3c-244c85141692"
+    },
+    "the-clockmakers-ledger:1": {
+      "episodeId": "85b5c0ef-eff3-4318-8fa2-eccba0da71f2",
+      "revisionId": "08fdbddc-1e77-4a71-8c80-9ffb31e2a0e2"
+    },
+    "the-clockmakers-ledger:2": {
+      "episodeId": "b0c2ceda-e1d7-4368-a158-fa0f8cea2003",
+      "revisionId": "5ef54589-72b1-426c-ba0b-ec6c8f1fb74d"
+    },
+    "the-clockmakers-ledger:3": {
+      "episodeId": "010687ca-022c-45cd-b424-55bb925c0bd4",
+      "revisionId": "f4957f9d-7480-4459-8ca0-6d08150c3ccd"
+    },
+    "matcha-and-raindrops:1": {
+      "episodeId": "679a5cb9-0ec7-47d9-90f9-97ebcbb4da56",
+      "revisionId": "f4c0520f-5d21-466f-b5c3-8566685eab20"
+    },
+    "matcha-and-raindrops:2": {
+      "episodeId": "6c332d62-fef3-4f99-87a4-75a98bd1c929",
+      "revisionId": "50339c5a-dba9-4a4e-83f7-c35db09d8402"
+    },
+    "matcha-and-raindrops:3": {
+      "episodeId": "db30e4ef-5c2f-442a-bdec-0efbc69da63a",
+      "revisionId": "a7d420c8-d648-4248-a7f5-3eea885cd91b"
+    },
+    "fogline-murders:1": {
+      "episodeId": "2c3ebf53-ef66-4f88-83c5-c0168011b7eb",
+      "revisionId": "104ffdc5-8eb0-444e-974a-e0a81043c7cf"
+    },
+    "fogline-murders:2": {
+      "episodeId": "8fa357a7-b8d8-4425-b613-d7559c125c1a",
+      "revisionId": "3d7cc881-dc70-45cc-9f8e-09171225df4f"
+    },
+    "fogline-murders:3": {
+      "episodeId": "065763cd-b471-4862-b13f-aa5346b17ab6",
+      "revisionId": "7bf1e5fc-3499-492b-86f1-adf5eb6942e9"
+    },
+    "spirits-of-the-ironwood:1": {
+      "episodeId": "8d2bf770-6811-416a-ad9e-baf27c00f884",
+      "revisionId": "a8050d7b-c052-4741-8648-e2c71243b597"
+    },
+    "spirits-of-the-ironwood:2": {
+      "episodeId": "daee3e89-91b3-43dc-a403-6f6b07285edc",
+      "revisionId": "e93f2b70-e9f2-470a-8671-1bbbee566135"
+    },
+    "spirits-of-the-ironwood:3": {
+      "episodeId": "e77fe85f-dacb-4e7d-91b4-1b98422cd8bd",
+      "revisionId": "3569bc12-c63e-4efe-b2d0-f42b4324bf6a"
+    }
+  },
+  "mediaAssets": {
+    "cover:vanguard-strike-neo-seoul": {
+      "assetId": "75e31576-713d-4b85-b2b8-f0a51e762ef7",
+      "cloudinaryPublicId": "pageprowl/seed/series/vanguard-strike-neo-seoul/cover/vanguard-strike-neo-seoul",
+      "secureUrl": "https://res.cloudinary.com/ko3rdfhg/image/upload/v1793502694/pageprowl/seed/series/vanguard-strike-neo-seoul/cover/vanguard-strike-neo-seoul.jpg",
+      "width": 1376,
+      "height": 768,
+      "format": "jpg"
+    },
+    "page:vanguard-strike-neo-seoul:1:1": {
+      "assetId": "61b69d46-7945-4962-927c-0e5594d6a81f",
+      "cloudinaryPublicId": "pageprowl/seed/series/vanguard-strike-neo-seoul/episodes/chapter-1-breach-at-sub-level-4/ep1_p1",
+      "secureUrl": "https://res.cloudinary.com/ko3rdfhg/image/upload/v1793502829/pageprowl/seed/series/vanguard-strike-neo-seoul/episodes/chapter-1-breach-at-sub-level-4/ep1_p1.jpg",
+      "width": 768,
+      "height": 1376,
+      "format": "jpg"
+    },
+    "page:vanguard-strike-neo-seoul:1:2": {
+      "assetId": "54754ccf-dba5-452a-ae4a-316f71362c1e",
+      "cloudinaryPublicId": "pageprowl/seed/series/vanguard-strike-neo-seoul/episodes/chapter-1-breach-at-sub-level-4/ep1_p2",
+      "secureUrl": "https://res.cloudinary.com/ko3rdfhg/image/upload/v1793502831/pageprowl/seed/series/vanguard-strike-neo-seoul/episodes/chapter-1-breach-at-sub-level-4/ep1_p2.jpg",
+      "width": 768,
+      "height": 1376,
+      "format": "jpg"
+    },
+    "page:vanguard-strike-neo-seoul:1:3": {
+      "assetId": "622e5d25-a252-4be8-9367-b528c66e28bc",
+      "cloudinaryPublicId": "pageprowl/seed/series/vanguard-strike-neo-seoul/episodes/chapter-1-breach-at-sub-level-4/ep1_p3",
+      "secureUrl": "https://res.cloudinary.com/ko3rdfhg/image/upload/v1793502832/pageprowl/seed/series/vanguard-strike-neo-seoul/episodes/chapter-1-breach-at-sub-level-4/ep1_p3.jpg",
+      "width": 768,
+      "height": 1376,
+      "format": "jpg"
+    },
+    "page:vanguard-strike-neo-seoul:1:4": {
+      "assetId": "e4dd8b1c-0509-4f6e-b673-425456de8db7",
+      "cloudinaryPublicId": "pageprowl/seed/series/vanguard-strike-neo-seoul/episodes/chapter-1-breach-at-sub-level-4/ep1_p4",
+      "secureUrl": "https://res.cloudinary.com/ko3rdfhg/image/upload/v1793502834/pageprowl/seed/series/vanguard-strike-neo-seoul/episodes/chapter-1-breach-at-sub-level-4/ep1_p4.jpg",
+      "width": 768,
+      "height": 1376,
+      "format": "jpg"
+    },
+    "fallback:vanguard-strike-neo-seoul:2:1": {
+      "assetId": "3b2b1fa1-672f-4c7e-9da9-f42524f53ee4",
+      "cloudinaryPublicId": "pageprowl/fallback/vanguard-strike-neo-seoul/ep2_p1",
+      "secureUrl": "/images/artwork-fallback.svg",
+      "width": 1200,
+      "height": 1600,
+      "format": "svg"
+    },
+    "fallback:vanguard-strike-neo-seoul:2:2": {
+      "assetId": "19ea78d0-5649-43e8-a006-fb3b40d796a8",
+      "cloudinaryPublicId": "pageprowl/fallback/vanguard-strike-neo-seoul/ep2_p2",
+      "secureUrl": "/images/artwork-fallback.svg",
+      "width": 1200,
+      "height": 1600,
+      "format": "svg"
+    },
+    "fallback:vanguard-strike-neo-seoul:2:3": {
+      "assetId": "2e298f1c-ae4d-43f1-bbf9-0030c9454055",
+      "cloudinaryPublicId": "pageprowl/fallback/vanguard-strike-neo-seoul/ep2_p3",
+      "secureUrl": "/images/artwork-fallback.svg",
+      "width": 1200,
+      "height": 1600,
+      "format": "svg"
+    },
+    "fallback:vanguard-strike-neo-seoul:2:4": {
+      "assetId": "0180caab-36a8-49d6-ace3-dba1878d904c",
+      "cloudinaryPublicId": "pageprowl/fallback/vanguard-strike-neo-seoul/ep2_p4",
+      "secureUrl": "/images/artwork-fallback.svg",
+      "width": 1200,
+      "height": 1600,
+      "format": "svg"
+    },
+    "fallback:vanguard-strike-neo-seoul:3:1": {
+      "assetId": "6efc2cfc-6c3d-43e8-bef7-d258c6dd5132",
+      "cloudinaryPublicId": "pageprowl/fallback/vanguard-strike-neo-seoul/ep3_p1",
+      "secureUrl": "/images/artwork-fallback.svg",
+      "width": 1200,
+      "height": 1600,
+      "format": "svg"
+    },
+    "fallback:vanguard-strike-neo-seoul:3:2": {
+      "assetId": "492159c3-beaa-4de6-b581-95aeb9f2e195",
+      "cloudinaryPublicId": "pageprowl/fallback/vanguard-strike-neo-seoul/ep3_p2",
+      "secureUrl": "/images/artwork-fallback.svg",
+      "width": 1200,
+      "height": 1600,
+      "format": "svg"
+    },
+    "fallback:vanguard-strike-neo-seoul:3:3": {
+      "assetId": "c9b38ea7-6d98-44d8-b398-87b2e1a34404",
+      "cloudinaryPublicId": "pageprowl/fallback/vanguard-strike-neo-seoul/ep3_p3",
+      "secureUrl": "/images/artwork-fallback.svg",
+      "width": 1200,
+      "height": 1600,
+      "format": "svg"
+    },
+    "fallback:vanguard-strike-neo-seoul:3:4": {
+      "assetId": "56e30818-0b9d-42ea-a993-f48f4fbe4915",
+      "cloudinaryPublicId": "pageprowl/fallback/vanguard-strike-neo-seoul/ep3_p4",
+      "secureUrl": "/images/artwork-fallback.svg",
+      "width": 1200,
+      "height": 1600,
+      "format": "svg"
+    },
+    "page:vanguard-strike-neo-seoul:2:1": {
+      "assetId": "ef5032c5-f2c1-47d4-bf22-3a87cda43e7c",
+      "cloudinaryPublicId": "pageprowl/seed/series/vanguard-strike-neo-seoul/episodes/chapter-2-kinetic-velocity/ep2_p1",
+      "secureUrl": "https://res.cloudinary.com/ko3rdfhg/image/upload/v1793503330/pageprowl/seed/series/vanguard-strike-neo-seoul/episodes/chapter-2-kinetic-velocity/ep2_p1.jpg",
+      "width": 768,
+      "height": 1376,
+      "format": "jpg",
+      "seriesSlug": "vanguard-strike-neo-seoul"
+    },
+    "page:vanguard-strike-neo-seoul:2:2": {
+      "assetId": "e64c9eaf-8e14-438e-a892-7e1448ff95de",
+      "cloudinaryPublicId": "pageprowl/seed/series/vanguard-strike-neo-seoul/episodes/chapter-2-kinetic-velocity/ep2_p2",
+      "secureUrl": "https://res.cloudinary.com/ko3rdfhg/image/upload/v1793503332/pageprowl/seed/series/vanguard-strike-neo-seoul/episodes/chapter-2-kinetic-velocity/ep2_p2.jpg",
+      "width": 768,
+      "height": 1376,
+      "format": "jpg",
+      "seriesSlug": "vanguard-strike-neo-seoul"
+    },
+    "page:vanguard-strike-neo-seoul:2:3": {
+      "assetId": "08bee653-fed8-4fae-b1a7-f8fa77ed3aa5",
+      "cloudinaryPublicId": "pageprowl/seed/series/vanguard-strike-neo-seoul/episodes/chapter-2-kinetic-velocity/ep2_p3",
+      "secureUrl": "https://res.cloudinary.com/ko3rdfhg/image/upload/v1793503334/pageprowl/seed/series/vanguard-strike-neo-seoul/episodes/chapter-2-kinetic-velocity/ep2_p3.jpg",
+      "width": 768,
+      "height": 1376,
+      "format": "jpg",
+      "seriesSlug": "vanguard-strike-neo-seoul"
+    },
+    "page:vanguard-strike-neo-seoul:2:4": {
+      "assetId": "5413864c-c52d-4681-9448-83d3b38c588a",
+      "cloudinaryPublicId": "pageprowl/seed/series/vanguard-strike-neo-seoul/episodes/chapter-2-kinetic-velocity/ep2_p4",
+      "secureUrl": "https://res.cloudinary.com/ko3rdfhg/image/upload/v1793503336/pageprowl/seed/series/vanguard-strike-neo-seoul/episodes/chapter-2-kinetic-velocity/ep2_p4.jpg",
+      "width": 768,
+      "height": 1376,
+      "format": "jpg",
+      "seriesSlug": "vanguard-strike-neo-seoul"
+    },
+    "page:vanguard-strike-neo-seoul:3:1": {
+      "assetId": "6d69a96a-5dc9-4248-9b66-ca716f50d140",
+      "cloudinaryPublicId": "pageprowl/seed/series/vanguard-strike-neo-seoul/episodes/chapter-3-into-the-mag-lev-dark/ep3_p1",
+      "secureUrl": "https://res.cloudinary.com/ko3rdfhg/image/upload/v1793503339/pageprowl/seed/series/vanguard-strike-neo-seoul/episodes/chapter-3-into-the-mag-lev-dark/ep3_p1.jpg",
+      "width": 768,
+      "height": 1376,
+      "format": "jpg",
+      "seriesSlug": "vanguard-strike-neo-seoul"
+    },
+    "page:vanguard-strike-neo-seoul:3:2": {
+      "assetId": "17e2904a-2b8c-4d01-9e7c-7b1052e11090",
+      "cloudinaryPublicId": "pageprowl/seed/series/vanguard-strike-neo-seoul/episodes/chapter-3-into-the-mag-lev-dark/ep3_p2",
+      "secureUrl": "https://res.cloudinary.com/ko3rdfhg/image/upload/v1793503341/pageprowl/seed/series/vanguard-strike-neo-seoul/episodes/chapter-3-into-the-mag-lev-dark/ep3_p2.jpg",
+      "width": 768,
+      "height": 1376,
+      "format": "jpg",
+      "seriesSlug": "vanguard-strike-neo-seoul"
+    },
+    "cover:the-runebound-chronicle": {
+      "assetId": "80ae7aba-1823-4f25-824f-a6ec78b635f0",
+      "cloudinaryPublicId": "pageprowl/seed/series/the-runebound-chronicle/cover/the-runebound-chronicle",
+      "secureUrl": "https://res.cloudinary.com/ko3rdfhg/image/upload/v1793579699/pageprowl/seed/series/the-runebound-chronicle/cover/the-runebound-chronicle.jpg",
+      "width": 848,
+      "height": 1264,
+      "format": "jpg",
+      "seriesSlug": "the-runebound-chronicle"
+    },
+    "cover:sub-orbital-drift": {
+      "assetId": "9f585cef-46e6-46df-870d-78aa447e7450",
+      "cloudinaryPublicId": "pageprowl/seed/series/sub-orbital-drift/cover/sub-orbital-drift",
+      "secureUrl": "https://res.cloudinary.com/ko3rdfhg/image/upload/v1793579701/pageprowl/seed/series/sub-orbital-drift/cover/sub-orbital-drift.jpg",
+      "width": 1376,
+      "height": 768,
+      "format": "jpg",
+      "seriesSlug": "sub-orbital-drift"
+    },
+    "cover:between-two-skylines": {
+      "assetId": "c88898f3-0e03-4d8b-9b50-897d233a145a",
+      "cloudinaryPublicId": "pageprowl/seed/series/between-two-skylines/cover/between-two-skylines",
+      "secureUrl": "https://res.cloudinary.com/ko3rdfhg/image/upload/v1793579704/pageprowl/seed/series/between-two-skylines/cover/between-two-skylines.jpg",
+      "width": 1376,
+      "height": 768,
+      "format": "jpg",
+      "seriesSlug": "between-two-skylines"
+    },
+    "cover:whispers-of-the-black-bog": {
+      "assetId": "520dfa9e-9f59-47e7-ad77-39c0af79e29b",
+      "cloudinaryPublicId": "pageprowl/seed/series/whispers-of-the-black-bog/cover/whispers-of-the-black-bog",
+      "secureUrl": "https://res.cloudinary.com/ko3rdfhg/image/upload/v1793579706/pageprowl/seed/series/whispers-of-the-black-bog/cover/whispers-of-the-black-bog.jpg",
+      "width": 848,
+      "height": 1264,
+      "format": "jpg",
+      "seriesSlug": "whispers-of-the-black-bog"
+    },
+    "cover:demon-kings-barista": {
+      "assetId": "f804548f-0abc-483c-af41-222cef0bdf4b",
+      "cloudinaryPublicId": "pageprowl/seed/series/demon-kings-barista/cover/demon-kings-barista",
+      "secureUrl": "https://res.cloudinary.com/ko3rdfhg/image/upload/v1793579709/pageprowl/seed/series/demon-kings-barista/cover/demon-kings-barista.jpg",
+      "width": 1376,
+      "height": 768,
+      "format": "jpg",
+      "seriesSlug": "demon-kings-barista"
+    },
+    "cover:the-clockmakers-ledger": {
+      "assetId": "86f8ff87-fc09-4c91-ad55-da547e7d6633",
+      "cloudinaryPublicId": "pageprowl/seed/series/the-clockmakers-ledger/cover/the-clockmakers-ledger",
+      "secureUrl": "https://res.cloudinary.com/ko3rdfhg/image/upload/v1793579711/pageprowl/seed/series/the-clockmakers-ledger/cover/the-clockmakers-ledger.jpg",
+      "width": 848,
+      "height": 1264,
+      "format": "jpg",
+      "seriesSlug": "the-clockmakers-ledger"
+    },
+    "cover:matcha-and-raindrops": {
+      "assetId": "1fd41ca8-8173-4c48-a287-5feb388e1b4e",
+      "cloudinaryPublicId": "pageprowl/seed/series/matcha-and-raindrops/cover/matcha-and-raindrops",
+      "secureUrl": "https://res.cloudinary.com/ko3rdfhg/image/upload/v1793579714/pageprowl/seed/series/matcha-and-raindrops/cover/matcha-and-raindrops.jpg",
+      "width": 1376,
+      "height": 768,
+      "format": "jpg",
+      "seriesSlug": "matcha-and-raindrops"
+    },
+    "cover:fogline-murders": {
+      "assetId": "aa058f2b-6f27-4705-8eb2-790c91fb4442",
+      "cloudinaryPublicId": "pageprowl/seed/series/fogline-murders/cover/fogline-murders",
+      "secureUrl": "https://res.cloudinary.com/ko3rdfhg/image/upload/v1793579716/pageprowl/seed/series/fogline-murders/cover/fogline-murders.jpg",
+      "width": 848,
+      "height": 1264,
+      "format": "jpg",
+      "seriesSlug": "fogline-murders"
+    },
+    "cover:spirits-of-the-ironwood": {
+      "assetId": "edb25c2d-1e09-423a-ae7c-124d7a1c0c1e",
+      "cloudinaryPublicId": "pageprowl/seed/series/spirits-of-the-ironwood/cover/spirits-of-the-ironwood",
+      "secureUrl": "https://res.cloudinary.com/ko3rdfhg/image/upload/v1793579719/pageprowl/seed/series/spirits-of-the-ironwood/cover/spirits-of-the-ironwood.jpg",
+      "width": 1376,
+      "height": 768,
+      "format": "jpg",
+      "seriesSlug": "spirits-of-the-ironwood"
+    }
+  }
+}
