@@ -16,12 +16,12 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      NEXT_PUBLIC_SUPABASE_URL: "https://placeholder.supabase.co"
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: "placeholder-anon-key"
-      SUPABASE_SERVICE_ROLE_KEY: "placeholder-service-role-key"
-      NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: "demo"
-      CLOUDINARY_API_KEY: "placeholder-key"
-      CLOUDINARY_API_SECRET: "placeholder-secret"
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co' }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-anon-key' }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY || 'placeholder-service-role-key' }}
+      NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: ${{ secrets.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'demo' }}
+      CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY || 'placeholder-key' }}
+      CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET || 'placeholder-secret' }}
 
     steps:
       - name: Check out repository
@@ -30,7 +30,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20.x
+          node-version: 22.x
           cache: "npm"
 
       - name: Install dependencies

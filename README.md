@@ -1,8 +1,8 @@
 # PageProwl
 
-PageProwl (formerly Panelverse) is a web-based, collaborative comic publishing platform for creators, with a public-facing experience for readers and viewers.
+PageProwl is a web-based, collaborative comic publishing platform for creators, with a public-facing experience for readers and viewers.
 
-This repository contains the PageProwl application. The project is being developed by a solo project owner with AI-assisted implementation. The project owner is the final authority on product scope and architectural decisions.
+This repository contains the PageProwl application.
 
 ## Technology stack
 
@@ -17,11 +17,6 @@ This repository contains the PageProwl application. The project is being develop
 
 See [the technical stack](docs/TECH_STACK.md) and [architecture guide](docs/ARCHITECTURE.md) for the project's conventions.
 
-## Project status
-
-The repository and Supabase account are established. The technology choices and high-level workflow are agreed. Features, database schema, detailed authorization policies, and final visual design will be implemented and documented incrementally.
-
-Do not treat illustrative folder names, route examples, or future feature ideas in the documentation as proof that those features already exist.
 
 ## Getting started
 
