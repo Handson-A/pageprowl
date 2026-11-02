@@ -176,7 +176,7 @@ export function TextReader({
             <span>Chapter Complete</span>
           </div>
 
-          <h3 className={styles.endTitle}>You've reached the end of this chapter</h3>
+          <h3 className={styles.endTitle}>You&apos;ve reached the end of this chapter</h3>
           <p className={styles.endSubtitle}>
             {nextEpisodeSlug
               ? "Continue following the journey in the next chapter."
