@@ -27,6 +27,8 @@ export interface VerticalReaderProps {
   episodeNumber?: number;
   nextEpisodeSlug?: string | null;
   onImageClick?: () => void;
+  backHref?: string;
+  backLabel?: string;
 }
 
 export function VerticalReader({
@@ -37,7 +39,11 @@ export function VerticalReader({
   episodeNumber,
   nextEpisodeSlug,
   onImageClick,
+  backHref,
+  backLabel,
 }: VerticalReaderProps) {
+  const resolvedBackHref = backHref || `/series/${seriesSlug}`;
+  const resolvedBackText = backLabel || "Back to Series";
   const [showScrollTop, setShowScrollTop] = useState(false);
 
   useEffect(() => {
@@ -61,9 +67,9 @@ export function VerticalReader({
           title="No Artwork Published"
           description="This episode currently has no artwork pages published in this revision."
           action={
-            <Link href={`/series/${seriesSlug}`} className={styles.primaryBtn}>
+            <Link href={resolvedBackHref} className={styles.primaryBtn}>
               <LuArrowLeft size={16} aria-hidden="true" />
-              <span>Back to Series</span>
+              <span>{resolvedBackText}</span>
             </Link>
           }
         />
@@ -129,9 +135,9 @@ export function VerticalReader({
               </div>
             )}
 
-            <Link href={`/series/${seriesSlug}`} className={styles.secondaryBtn}>
+            <Link href={resolvedBackHref} className={styles.secondaryBtn}>
               <LuArrowLeft size={16} aria-hidden="true" />
-              <span>Series Overview</span>
+              <span>{backLabel || "Series Overview"}</span>
             </Link>
           </div>
         </section>

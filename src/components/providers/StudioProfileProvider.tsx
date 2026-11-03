@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 export interface StudioProfile {
@@ -155,8 +155,13 @@ export function StudioProfileProvider({
     };
   }, [refreshProfile]);
 
+  const contextValue = useMemo(
+    () => ({ profile, isLoading, error, refreshProfile }),
+    [profile, isLoading, error, refreshProfile]
+  );
+
   return (
-    <StudioProfileContext.Provider value={{ profile, isLoading, error, refreshProfile }}>
+    <StudioProfileContext.Provider value={contextValue}>
       {children}
     </StudioProfileContext.Provider>
   );

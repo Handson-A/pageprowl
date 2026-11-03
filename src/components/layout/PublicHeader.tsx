@@ -15,13 +15,13 @@ export function PublicHeader() {
   useEffect(() => {
     try {
       const supabase = createClient();
-      supabase.auth.getUser().then(({ data }) => {
-        if (data?.user) {
-          setUser(data.user);
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session?.user) {
+          setUser(session.user);
           supabase
             .from("notifications")
             .select("id", { count: "exact", head: true })
-            .eq("user_id", data.user.id)
+            .eq("user_id", session.user.id)
             .eq("read", false)
             .then(({ count }) => {
               if (count !== null && count !== undefined) {
@@ -30,6 +30,16 @@ export function PublicHeader() {
             });
         }
       });
+
+      const {
+        data: { subscription },
+      } = supabase.auth.onAuthStateChange((_event, session) => {
+        setUser(session?.user || null);
+      });
+
+      return () => {
+        subscription.unsubscribe();
+      };
     } catch {
       // Non-fatal if offline or placeholder
     }

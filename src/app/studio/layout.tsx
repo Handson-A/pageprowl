@@ -1,33 +1,29 @@
 import React from "react";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { getCachedAuthUser, getCachedUserProfile } from "@/lib/supabase/server";
 import { StudioProfileProvider, type StudioProfile } from "@/components/providers/StudioProfileProvider";
+import { CreatorSidebar } from "@/components/layout/CreatorSidebar";
+import styles from "./page.module.css";
 
 /**
  * Server Component Layout: Creator Studio Root Layout.
- * Enforces server-side authentication defense-in-depth across all /studio routes
- * and hydrates the persistent StudioProfileProvider with authenticated creator identity.
+ * Enforces server-side authentication defense-in-depth across all /studio routes,
+ * renders the persistent CreatorSidebar once (preventing layout shifts and unmounts on tab switches),
+ * and hydrates the StudioProfileProvider with authenticated creator identity.
  */
 export default async function StudioLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCachedAuthUser();
 
   if (!user) {
     redirect("/login?redirect=/studio");
   }
 
-  // Hydrate creator identity on server to eliminate layout shift or identity resets during route transitions
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("id, username, display_name, avatar_url, role")
-    .eq("id", user.id)
-    .maybeSingle();
+  // Hydrate creator identity on server
+  const profile = await getCachedUserProfile(user.id);
 
   const displayName =
     profile?.display_name?.trim() ||
@@ -52,7 +48,14 @@ export default async function StudioLayout({
 
   return (
     <StudioProfileProvider initialProfile={initialProfile}>
-      {children}
+      <div className={styles.layout}>
+        <CreatorSidebar
+          userName={displayName}
+          userRole={userRole}
+          avatarUrl={profile?.avatar_url || null}
+        />
+        {children}
+      </div>
     </StudioProfileProvider>
   );
 }

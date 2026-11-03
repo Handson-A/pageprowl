@@ -1,15 +1,11 @@
 import React from "react";
-import { CreatorSidebar } from "@/components/layout/CreatorSidebar";
 import { Skeleton } from "@/components/ui/Skeleton";
 import styles from "@/app/studio/page.module.css";
 import wsStyles from "./SeriesWorkspace.module.css";
 
 export default function SeriesWorkspaceLoading() {
   return (
-    <div className={styles.layout}>
-      <CreatorSidebar />
-
-      <main className={styles.main}>
+    <main className={styles.main}>
         {/* Breadcrumb Skeleton */}
         <div style={{ display: "flex", gap: "var(--space-2)", alignItems: "center", marginBottom: "var(--space-2)" }}>
           <Skeleton width="100px" height="16px" />
@@ -54,6 +50,5 @@ export default function SeriesWorkspaceLoading() {
           ))}
         </div>
       </main>
-    </div>
   );
 }

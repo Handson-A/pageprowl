@@ -15,6 +15,14 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith("/studio") ||
     pathname.startsWith("/account") ||
     pathname.startsWith("/library");
+  const isAuthRoute = pathname === "/login" || pathname === "/signup";
+  const requiresAuthCheck = isProtectedRoute || isAuthRoute;
+
+  // On public browsing routes (e.g. /, /browse, /search, /genres, /discover, /series/*),
+  // skip external Supabase auth network calls in middleware to eliminate navigation waterfalls.
+  if (!requiresAuthCheck) {
+    return response;
+  }
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;

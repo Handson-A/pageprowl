@@ -24,6 +24,8 @@ export interface PaginatedReaderProps {
   onPageChange?: (pageNumber: number) => void;
   isImmersive?: boolean;
   onToggleImmersive?: () => void;
+  backHref?: string;
+  backLabel?: string;
 }
 
 export function PaginatedReader({
@@ -34,7 +36,11 @@ export function PaginatedReader({
   onPageChange,
   isImmersive = false,
   onToggleImmersive,
+  backHref,
+  backLabel,
 }: PaginatedReaderProps) {
+  const resolvedBackHref = backHref || `/series/${seriesSlug}`;
+  const resolvedBackText = backLabel || "Back to Series";
   const [currentPageIndex, setCurrentPageIndex] = useState(
     Math.max(0, Math.min(initialPage - 1, (pages?.length || 1) - 1))
   );
@@ -105,9 +111,9 @@ export function PaginatedReader({
           title="No Pages Available"
           description="This episode currently has no artwork pages published in this revision."
           action={
-            <Link href={`/series/${seriesSlug}`} className={styles.primaryBtn}>
+            <Link href={resolvedBackHref} className={styles.primaryBtn}>
               <LuArrowLeft size={16} aria-hidden="true" />
-              <span>Back to Series</span>
+              <span>{resolvedBackText}</span>
             </Link>
           }
         />

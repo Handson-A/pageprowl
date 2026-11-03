@@ -1,7 +1,6 @@
 import React from "react";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { CreatorSidebar } from "@/components/layout/CreatorSidebar";
 import { Button } from "@/components/ui/Button";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { FormField } from "@/components/ui/FormField";
@@ -107,10 +106,7 @@ export default async function StudioWorkspacePage({ params }: StudioWorkspacePag
   };
 
   return (
-    <div className={styles.layout}>
-      <CreatorSidebar />
-
-      <main className={styles.main}>
+    <main className={styles.main}>
         <header className={styles.header}>
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", marginBottom: "var(--space-1)" }}>
@@ -349,41 +345,43 @@ export default async function StudioWorkspacePage({ params }: StudioWorkspacePag
           </div>
 
           {seriesList.length > 0 ? (
-            <table className={styles.seriesTable}>
-              <thead>
-                <tr>
-                  <th>Series Title</th>
-                  <th>Format</th>
-                  <th>Genre</th>
-                  <th>Visibility</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {seriesList.map((s) => (
-                  <tr key={s.id}>
-                    <td>
-                      <strong>{s.title}</strong>
-                    </td>
-                    <td>{s.format === "scroll" ? "Vertical Scroll" : "Page-by-Page"}</td>
-                    <td>{s.genre}</td>
-                    <td>
-                      <span style={{ textTransform: "capitalize" }}>{s.visibility}</span>
-                    </td>
-                    <td>
-                      <Link href={`/studio/series/${s.id}`}>
-                        <Button variant="secondary" size="sm">
-                          <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
-                            <span>Workspace</span>
-                            <LuArrowRight size={14} aria-hidden="true" />
-                          </span>
-                        </Button>
-                      </Link>
-                    </td>
+            <div className={styles.tableWrapper}>
+              <table className={styles.seriesTable}>
+                <thead>
+                  <tr>
+                    <th>Series Title</th>
+                    <th>Format</th>
+                    <th>Genre</th>
+                    <th>Visibility</th>
+                    <th>Action</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {seriesList.map((s) => (
+                    <tr key={s.id}>
+                      <td>
+                        <strong>{s.title}</strong>
+                      </td>
+                      <td>{s.format === "scroll" ? "Vertical Scroll" : "Page-by-Page"}</td>
+                      <td>{s.genre}</td>
+                      <td>
+                        <span style={{ textTransform: "capitalize" }}>{s.visibility}</span>
+                      </td>
+                      <td>
+                        <Link href={`/studio/series/${s.id}`}>
+                          <Button variant="secondary" size="sm">
+                            <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                              <span>Workspace</span>
+                              <LuArrowRight size={14} aria-hidden="true" />
+                            </span>
+                          </Button>
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           ) : (
             <div
               style={{
@@ -406,107 +404,136 @@ export default async function StudioWorkspacePage({ params }: StudioWorkspacePag
             <h2 className={styles.sectionTitle}>Team Members ({members.length})</h2>
           </div>
 
-          <table className={styles.seriesTable}>
-            <thead>
-              <tr>
-                <th>Member</th>
-                <th>Role</th>
-                <th>Joined</th>
-                {canManage && <th>Management</th>}
-              </tr>
-            </thead>
-            <tbody>
-              {members.map((member) => (
-                <tr key={member.user_id}>
-                  <td>
-                    <strong>{member.display_name}</strong>
-                    <span style={{ color: "var(--color-text-muted)", marginLeft: "var(--space-2)", fontSize: "var(--font-size-xs)" }}>
-                      (@{member.username})
-                    </span>
-                  </td>
-                  <td>
-                    <StatusBadge
-                      status={
-                        member.role === "owner"
-                          ? "published"
-                          : member.role === "admin"
-                          ? "ready_to_publish"
-                          : member.role === "editor"
-                          ? "in_review"
-                          : "draft"
-                      }
-                      label={member.role.toUpperCase()}
-                    />
-                  </td>
-                  <td>{new Date(member.created_at).toLocaleDateString()}</td>
-                  {canManage && (
+          <div className={styles.tableWrapper}>
+            <table className={styles.seriesTable}>
+              <thead>
+                <tr>
+                  <th>Member</th>
+                  <th>Role</th>
+                  <th>Joined</th>
+                  {canManage && <th>Management</th>}
+                </tr>
+              </thead>
+              <tbody>
+                {members.map((member) => (
+                  <tr key={member.user_id}>
                     <td>
-                      <div style={{ display: "flex", gap: "var(--space-2)", alignItems: "center" }}>
-                        {member.user_id !== user.id && (
-                          <>
-                            <form
-                              action={async (formData: FormData) => {
-                                "use server";
-                                const newRole = formData.get("role") as StudioRole;
-                                await updateStudioMemberRoleAction(studioId, member.user_id, newRole);
-                              }}
-                              style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-1)" }}
-                            >
-                              <select
-                                name="role"
-                                defaultValue={member.role}
-                                className={styles.selectInput}
-                                style={{ padding: "2px 6px", fontSize: "11px" }}
-                              >
-                                {userRole === "owner" && <option value="owner">Owner</option>}
-                                <option value="admin">Admin</option>
-                                <option value="editor">Editor</option>
-                                <option value="member">Member</option>
-                              </select>
-                              <Button variant="secondary" size="sm" type="submit">
-                                Update
-                              </Button>
-                            </form>
-
-                            <form
-                              action={async () => {
-                                "use server";
-                                await removeStudioMemberAction(studioId, member.user_id);
-                              }}
-                            >
-                              <Button variant="danger" size="sm" type="submit">
-                                Remove
-                              </Button>
-                            </form>
-                          </>
-                        )}
+                      <div className={styles.memberCell}>
+                        <span className={styles.memberPrimary}>{member.display_name}</span>
+                        <span className={styles.memberSecondary}>@{member.username}</span>
                       </div>
                     </td>
-                  )}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                    <td>
+                      <StatusBadge
+                        status={
+                          member.role === "owner"
+                            ? "published"
+                            : member.role === "admin"
+                            ? "ready_to_publish"
+                            : member.role === "editor"
+                            ? "in_review"
+                            : "draft"
+                        }
+                        label={member.role.toUpperCase()}
+                      />
+                    </td>
+                    <td>{new Date(member.created_at).toLocaleDateString()}</td>
+                    {canManage && (
+                      <td>
+                        <div style={{ display: "flex", gap: "var(--space-2)", alignItems: "center" }}>
+                          {member.user_id !== user.id && (
+                            <>
+                              <form
+                                action={async (formData: FormData) => {
+                                  "use server";
+                                  const newRole = formData.get("role") as StudioRole;
+                                  await updateStudioMemberRoleAction(studioId, member.user_id, newRole);
+                                }}
+                                style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-1)" }}
+                              >
+                                <select
+                                  name="role"
+                                  defaultValue={member.role}
+                                  className={styles.selectField}
+                                  style={{ height: "32px", padding: "0 8px", fontSize: "12px", width: "auto" }}
+                                >
+                                  {userRole === "owner" && <option value="owner">Owner</option>}
+                                  <option value="admin">Admin</option>
+                                  <option value="editor">Editor</option>
+                                  <option value="member">Member</option>
+                                </select>
+                                <Button variant="secondary" size="sm" type="submit">
+                                  Update
+                                </Button>
+                              </form>
+
+                              <form
+                                action={async () => {
+                                  "use server";
+                                  await removeStudioMemberAction(studioId, member.user_id);
+                                }}
+                              >
+                                <Button variant="danger" size="sm" type="submit">
+                                  Remove
+                                </Button>
+                              </form>
+                            </>
+                          )}
+                        </div>
+                      </td>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
           {canManage && (
-            <div style={{ marginTop: "var(--space-6)", padding: "var(--space-4)", backgroundColor: "var(--color-surface)", borderRadius: "var(--pv-radius-md)", border: "1px solid var(--color-border)" }}>
-              <h3 style={{ fontSize: "var(--font-size-sm)", fontWeight: "bold", marginBottom: "var(--space-3)" }}>
-                Invite Team Member
-              </h3>
-              <form action={handleInvite} style={{ display: "flex", gap: "var(--space-3)", alignItems: "flex-end", flexWrap: "wrap" }}>
-                <FormField label="Collaborator Email" required htmlFor="inviteEmail">
-                  <input id="inviteEmail" name="email" type="email" placeholder="colleague@domain.com" required />
-                </FormField>
-                <FormField label="Assigned Role" required htmlFor="inviteRole">
-                  <select id="inviteRole" name="role" defaultValue="member">
-                    <option value="admin">Admin</option>
-                    <option value="editor">Editor</option>
-                    <option value="member">Member</option>
+            <div className={styles.inviteCard}>
+              <div className={styles.inviteHeader}>
+                <h3 className={styles.inviteTitle}>Invite Team Member</h3>
+                <p className={styles.inviteDescription}>
+                  Send an email invitation to collaborate on comic series, production workflows, and reviews in this studio workspace.
+                </p>
+              </div>
+              <form action={handleInvite} className={styles.inviteForm}>
+                <div className={styles.formFieldWrapper}>
+                  <label htmlFor="inviteEmail" className={styles.fieldLabel}>
+                    <span>Collaborator Email</span>
+                    <span className={styles.fieldRequired} aria-hidden="true">*</span>
+                  </label>
+                  <input
+                    id="inviteEmail"
+                    name="email"
+                    type="email"
+                    placeholder="colleague@domain.com"
+                    required
+                    className={styles.inputField}
+                  />
+                </div>
+
+                <div className={styles.formFieldWrapper}>
+                  <label htmlFor="inviteRole" className={styles.fieldLabel}>
+                    <span>Assigned Role</span>
+                    <span className={styles.fieldRequired} aria-hidden="true">*</span>
+                  </label>
+                  <select
+                    id="inviteRole"
+                    name="role"
+                    defaultValue="member"
+                    className={styles.selectField}
+                  >
+                    <option value="admin">Admin (Manage settings &amp; members)</option>
+                    <option value="editor">Editor (Create &amp; edit series)</option>
+                    <option value="member">Member (Contributor &amp; artist)</option>
                   </select>
-                </FormField>
-                <Button type="submit" variant="primary">
-                  <LuMail size={16} style={{ marginRight: "4px" }} />
-                  Send Invitation
+                </div>
+
+                <Button type="submit" variant="primary" className={styles.inviteBtn}>
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                    <LuMail size={16} aria-hidden="true" />
+                    <span>Send Invitation</span>
+                  </span>
                 </Button>
               </form>
             </div>
@@ -543,6 +570,5 @@ export default async function StudioWorkspacePage({ params }: StudioWorkspacePag
           )}
         </section>
       </main>
-    </div>
   );
 }

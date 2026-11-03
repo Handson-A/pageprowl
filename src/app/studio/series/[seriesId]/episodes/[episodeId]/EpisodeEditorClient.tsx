@@ -8,6 +8,7 @@ import { FormField } from "@/components/ui/FormField";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { VerticalReader } from "@/components/reader/VerticalReader";
 import { PaginatedReader } from "@/components/reader/PaginatedReader";
+import { TextReader } from "@/components/reader/TextReader";
 import {
   saveRevisionPagesAction,
   updateEpisodeMetadataAction,
@@ -24,6 +25,8 @@ import {
   deleteEpisodeAction,
   postReviewCommentAction,
   getEpisodeReleaseHistoryAction,
+  publishDueScheduledReleaseAction,
+  saveRevisionTextContentAction,
 } from "../actions";
 import {
   formatReleaseDisplayDate,
@@ -46,6 +49,7 @@ import {
   LuCalendar,
   LuClock,
   LuHistory,
+  LuFileText,
   LuX,
 } from "react-icons/lu";
 import type { RevisionStatus, ComicFormat, SeriesRole } from "@/types/database";
@@ -78,6 +82,7 @@ interface EpisodeEditorClientProps {
   initialStatus: RevisionStatus;
   initialEpisodeStatus?: string;
   initialPages: PageItem[];
+  initialTextContent?: string;
   initialComments: ReviewComment[];
   initialScheduledPublication?: {
     id: string;
@@ -109,6 +114,7 @@ export function EpisodeEditorClient({
   initialStatus,
   initialEpisodeStatus,
   initialPages,
+  initialTextContent,
   initialComments,
   initialScheduledPublication,
   initialReleaseEvents,
@@ -117,8 +123,12 @@ export function EpisodeEditorClient({
   userRole,
 }: EpisodeEditorClientProps) {
   const [activeTab, setActiveTab] = useState<
-    "production" | "details" | "review" | "preview" | "publishing"
+    "production" | "story" | "details" | "review" | "preview" | "publishing"
   >("production");
+
+  const [textContent, setTextContent] = useState(initialTextContent || "");
+  const [isSavingText, setIsSavingText] = useState(false);
+  const [textSaveMessage, setTextSaveMessage] = useState<string | null>(null);
 
   const [revisionId] = useState(initialRevisionId);
   const [status, setStatus] = useState<RevisionStatus>(initialStatus);
@@ -607,6 +617,48 @@ export function EpisodeEditorClient({
     }
   };
 
+  // Publish due scheduled release immediately
+  const handlePublishOverdueScheduled = async () => {
+    if (!canEdit) return;
+    setIsTransitioning(true);
+    setMessage(null);
+    try {
+      await publishDueScheduledReleaseAction(seriesId, episodeId);
+      setEpisodeStatus("published");
+      setStatus("published");
+      setPublished(true);
+      setScheduledPub(null);
+      setMessage({
+        type: "success",
+        text: "Chapter published successfully and is now live on the public reader!",
+      });
+      await refreshReleaseEvents();
+    } catch (err: any) {
+      setMessage({
+        type: "error",
+        text: err?.message || "Failed to publish overdue scheduled release.",
+      });
+    } finally {
+      setIsTransitioning(false);
+    }
+  };
+
+  // Save text-based story script
+  const handleSaveStoryText = async () => {
+    if (!canEdit) return;
+    setIsSavingText(true);
+    setTextSaveMessage(null);
+    try {
+      await saveRevisionTextContentAction(seriesId, episodeId, revisionId, textContent);
+      setTextSaveMessage("Story script saved successfully.");
+      setTimeout(() => setTextSaveMessage(null), 3500);
+    } catch (err: any) {
+      alert(err?.message || "Failed to save story script.");
+    } finally {
+      setIsSavingText(false);
+    }
+  };
+
   // Unpublish episode
   const handleUnpublish = async () => {
     if (!canEdit) return;
@@ -809,29 +861,37 @@ export function EpisodeEditorClient({
         </button>
         {canEdit && (
           <button
+            className={`${styles.tab} ${activeTab === "story" ? styles.tabActive : ""}`}
+            onClick={() => setActiveTab("story")}
+          >
+            2. Story Script / Text {textContent.trim().length > 0 ? "✓" : ""}
+          </button>
+        )}
+        {canEdit && (
+          <button
             className={`${styles.tab} ${activeTab === "details" ? styles.tabActive : ""}`}
             onClick={() => setActiveTab("details")}
           >
-            2. Episode Details
+            3. Episode Details
           </button>
         )}
         <button
           className={`${styles.tab} ${activeTab === "review" ? styles.tabActive : ""}`}
           onClick={() => setActiveTab("review")}
         >
-          3. Review Notes ({comments.length})
+          4. Review Notes ({comments.length})
         </button>
         <button
           className={`${styles.tab} ${activeTab === "preview" ? styles.tabActive : ""}`}
           onClick={() => setActiveTab("preview")}
         >
-          4. Live Preview
+          5. Live Preview
         </button>
         <button
           className={`${styles.tab} ${activeTab === "publishing" ? styles.tabActive : ""}`}
           onClick={() => setActiveTab("publishing")}
         >
-          5. Release &amp; Lifecycle
+          6. Release &amp; Lifecycle
         </button>
       </nav>
 
@@ -1011,7 +1071,86 @@ export function EpisodeEditorClient({
         </div>
       )}
 
-      {/* Tab 2: Episode Details Form */}
+      {/* Tab 2: Story Script / Text Episode (Web Novel Mode) */}
+      {activeTab === "story" && canEdit && (
+        <div className={styles.card}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "12px" }}>
+            <div>
+              <h2 style={{ fontSize: "1.25rem", fontWeight: "bold" }}>
+                Story Script &amp; Text Episode (Web Novel Mode)
+              </h2>
+              <p style={{ fontSize: "0.875rem", color: "var(--color-text-muted)" }}>
+                Write or paste your chapter&apos;s story script. Readers will view this formatted experience when no comic image slices are uploaded.
+              </p>
+            </div>
+            <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+              {textSaveMessage && (
+                <span style={{ fontSize: "0.8rem", color: "var(--color-success)", fontWeight: 600 }}>
+                  ✓ {textSaveMessage}
+                </span>
+              )}
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={handleSaveStoryText}
+                isLoading={isSavingText}
+              >
+                <span>Save Story Script</span>
+              </Button>
+            </div>
+          </div>
+
+          <div style={{ marginTop: "16px", display: "flex", flexDirection: "column", gap: "12px" }}>
+            <div
+              style={{
+                padding: "10px 14px",
+                borderRadius: "6px",
+                backgroundColor: "var(--color-surface-muted)",
+                fontSize: "0.8rem",
+                color: "var(--color-text-muted)",
+                lineHeight: "1.5",
+              }}
+            >
+              <strong style={{ color: "var(--color-text-main)" }}>Formatting Guide:</strong>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "16px", marginTop: "4px" }}>
+                <span>• <code>Character: &quot;Dialogue here&quot;</code> &rarr; Speech bubble</span>
+                <span>• <code>### Scene Title</code> &rarr; Scene header</span>
+                <span>• <code>***</code> &rarr; Scene divider</span>
+                <span>• Standard paragraphs &rarr; Narrative prose</span>
+              </div>
+            </div>
+
+            <textarea
+              value={textContent}
+              onChange={(e) => setTextContent(e.target.value)}
+              placeholder="Write or paste chapter story text here...&#10;&#10;### Prologue&#10;The neon signs flickered above the rain-slicked alleyway.&#10;&#10;Detective: &quot;Did anyone see which way the runner turned?&quot;&#10;Informant: &quot;Toward Sector 4. They won't make it past the checkpoint.&quot;"
+              rows={18}
+              style={{
+                width: "100%",
+                padding: "14px 16px",
+                borderRadius: "8px",
+                border: "1px solid var(--color-border)",
+                backgroundColor: "var(--color-surface)",
+                color: "var(--color-text-main)",
+                fontSize: "0.9375rem",
+                fontFamily: "inherit",
+                lineHeight: "1.6",
+                resize: "vertical",
+                boxSizing: "border-box",
+              }}
+            />
+
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.75rem", color: "var(--color-text-muted)" }}>
+              <span>
+                {textContent.trim().length === 0 ? "0 words" : `${textContent.trim().split(/\s+/).length} words`} &bull; {textContent.length} characters
+              </span>
+              <span>Saved in revision {currentNumber}</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Tab 3: Episode Details Form */}
       {activeTab === "details" && canEdit && (
         <div className={styles.card} style={{ maxWidth: "600px" }}>
           <div>
@@ -1152,7 +1291,15 @@ export function EpisodeEditorClient({
               backgroundColor: "var(--reader-bg)",
             }}
           >
-            {seriesFormat === "scroll" ? (
+            {pages.length === 0 && textContent.trim().length > 0 ? (
+              <TextReader
+                textContent={textContent}
+                seriesSlug={seriesSlug}
+                seriesTitle={seriesTitle}
+                episodeTitle={currentTitle}
+                episodeNumber={currentNumber}
+              />
+            ) : seriesFormat === "scroll" ? (
               <VerticalReader pages={pages} seriesSlug={seriesSlug} />
             ) : (
               <PaginatedReader pages={pages} seriesSlug={seriesSlug} />
@@ -1420,7 +1567,7 @@ export function EpisodeEditorClient({
                       variant="primary"
                       onClick={handlePublish}
                       isLoading={isTransitioning}
-                      disabled={pages.length === 0}
+                      disabled={pages.length === 0 && textContent.trim().length === 0}
                     >
                       <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
                         <LuUpload size={16} />
@@ -1430,7 +1577,7 @@ export function EpisodeEditorClient({
                     <Button
                       variant="secondary"
                       onClick={() => setShowSchedulePicker(true)}
-                      disabled={isTransitioning || pages.length === 0}
+                      disabled={isTransitioning || (pages.length === 0 && textContent.trim().length === 0)}
                     >
                       <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
                         <LuCalendar size={16} />
@@ -1456,6 +1603,43 @@ export function EpisodeEditorClient({
                 <p style={{ fontSize: "0.75rem", color: "var(--color-text-muted)" }}>
                   The scheduled processor will automatically release this chapter to public readers and notify followers when the release time arrives.
                 </p>
+
+                {scheduledPub && new Date(scheduledPub.scheduled_for) <= new Date() && (
+                  <div
+                    style={{
+                      margin: "12px 0",
+                      padding: "12px 16px",
+                      borderRadius: "8px",
+                      backgroundColor: "rgba(34, 197, 94, 0.12)",
+                      border: "1px solid rgba(34, 197, 94, 0.35)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      flexWrap: "wrap",
+                      gap: "12px",
+                    }}
+                  >
+                    <div>
+                      <span style={{ fontWeight: 600, color: "var(--color-success)", fontSize: "0.875rem" }}>
+                        Release time has arrived! Ready for immediate publication.
+                      </span>
+                      <p style={{ margin: "2px 0 0", fontSize: "0.8rem", color: "var(--color-text-muted)" }}>
+                        Scheduled time has elapsed. Click Publish Now to immediately push this chapter live to public readers.
+                      </p>
+                    </div>
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      onClick={handlePublishOverdueScheduled}
+                      isLoading={isTransitioning}
+                    >
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                        <LuUpload size={14} />
+                        <span>Publish Now</span>
+                      </span>
+                    </Button>
+                  </div>
+                )}
 
                 {showSchedulePicker ? (
                   <div className={styles.scheduleCard} style={{ marginTop: "8px" }}>

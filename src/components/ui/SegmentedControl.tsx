@@ -22,6 +22,7 @@ export interface SegmentedControlProps<T extends string = string> {
   layoutId?: string;
   className?: string;
   ariaLabel?: string;
+  wrap?: boolean;
 }
 
 export function SegmentedControl<T extends string = string>({
@@ -33,9 +34,16 @@ export function SegmentedControl<T extends string = string>({
   layoutId = "segmentedControlIndicator",
   className,
   ariaLabel = "Filter options",
+  wrap = true,
 }: SegmentedControlProps<T>) {
   const isLine = variant === "line";
-  const trackClass = isLine ? styles.lineTrack : styles.pillTrack;
+  const shouldWrap = !isLine && wrap;
+  const trackClass = isLine
+    ? styles.lineTrack
+    : shouldWrap
+    ? styles.pillTrackWrap
+    : styles.pillTrack;
+  const wrapperClass = `${styles.wrapper} ${shouldWrap ? styles.wrapperWrap : ""} ${className || ""}`;
   const sizeClass = isLine
     ? size === "sm"
       ? styles.lineSm
@@ -49,7 +57,7 @@ export function SegmentedControl<T extends string = string>({
     : styles.pillMd;
 
   return (
-    <div className={`${styles.wrapper} ${className || ""}`} role="navigation" aria-label={ariaLabel}>
+    <div className={wrapperClass} role="navigation" aria-label={ariaLabel}>
       <div className={trackClass} role={onChange ? "tablist" : undefined}>
         {options.map((option) => {
           const isActive = option.value === value;

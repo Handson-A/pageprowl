@@ -1,32 +1,16 @@
 import React from "react";
 import { redirect } from "next/navigation";
-import { CreatorSidebar } from "@/components/layout/CreatorSidebar";
 import { ReviewsClient } from "./ReviewsClient";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getCachedAuthUser } from "@/lib/supabase/server";
 import { getUserStudios } from "@/lib/data/studios";
 import { getStudioReviewRequests, type ReviewRequestWithDetails } from "@/lib/data/workflows";
-import styles from "@/app/studio/page.module.css";
 
 export default async function StudioReviewsPage() {
   const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCachedAuthUser();
 
   if (!user) {
     redirect("/login?redirect=/studio/reviews");
-  }
-
-  // Fetch user profile
-  let userName = "Creator";
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("display_name")
-    .eq("id", user.id)
-    .single();
-
-  if (profile?.display_name) {
-    userName = profile.display_name;
   }
 
   // Fetch user studios
@@ -68,13 +52,10 @@ export default async function StudioReviewsPage() {
   }
 
   return (
-    <div className={styles.layout}>
-      <CreatorSidebar userName={userName} userRole="Creator" />
-      <ReviewsClient
-        initialRequests={allRequests}
-        initialComments={comments}
-        currentUserId={user.id}
-      />
-    </div>
+    <ReviewsClient
+      initialRequests={allRequests}
+      initialComments={comments}
+      currentUserId={user.id}
+    />
   );
 }

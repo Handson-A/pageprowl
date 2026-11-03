@@ -1,14 +1,10 @@
 import React from "react";
-import { CreatorSidebar } from "@/components/layout/CreatorSidebar";
 import { Skeleton } from "@/components/ui/Skeleton";
 import styles from "./page.module.css";
 
 export default function StudioLoading() {
   return (
-    <div className={styles.layout}>
-      <CreatorSidebar />
-
-      <main className={styles.main}>
+    <main className={styles.main}>
         <div className={styles.dashboardContainer}>
           {/* Welcome Banner Skeleton */}
           <div className={styles.welcomeBanner}>
@@ -125,6 +121,5 @@ export default function StudioLoading() {
           </div>
         </div>
       </main>
-    </div>
   );
 }

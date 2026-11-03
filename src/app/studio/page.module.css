@@ -825,3 +825,185 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+/* ==========================================================================
+   Modern Dashboard Tables (Teams, Members, Studio Series)
+   ========================================================================== */
+
+.tableWrapper {
+  width: 100%;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--pv-radius-md);
+  box-shadow: var(--pv-shadow-card);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.seriesTable {
+  width: 100%;
+  min-width: 640px;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.seriesTable th {
+  background-color: var(--color-surface-muted);
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
+}
+
+.seriesTable td {
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
+}
+
+.seriesTable tr:last-child td {
+  border-bottom: none;
+}
+
+.seriesTable tr:hover td {
+  background-color: rgba(23, 23, 23, 0.02);
+}
+
+.tableCodeBadge {
+  display: inline-block;
+  padding: 2px 6px;
+  font-family: var(--font-family-mono, monospace);
+  font-size: var(--font-size-xs);
+  background-color: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--pv-radius-sm);
+  color: var(--color-text);
+}
+
+.memberCell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.memberPrimary {
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+}
+
+.memberSecondary {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+/* ==========================================================================
+   Modern Structured Invite Form Card
+   ========================================================================== */
+
+.inviteCard {
+  margin-top: var(--space-6);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--pv-radius-md);
+  box-shadow: var(--pv-shadow-card);
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.inviteHeader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.inviteTitle {
+  font-family: var(--font-family-heading);
+  font-size: 1rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+  margin: 0;
+}
+
+.inviteDescription {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  margin: 0;
+  line-height: var(--line-height-normal);
+}
+
+.inviteForm {
+  display: grid;
+  grid-template-columns: minmax(260px, 2fr) minmax(160px, 1.2fr) auto;
+  gap: var(--space-4);
+  align-items: flex-end;
+}
+
+.formFieldWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.fieldLabel {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.fieldRequired {
+  color: var(--color-primary);
+}
+
+.inputField,
+.selectField {
+  height: 42px;
+  padding: 0 var(--space-3);
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--pv-radius-md);
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color var(--pv-motion-fast) var(--pv-ease-standard),
+              box-shadow var(--pv-motion-fast) var(--pv-ease-standard);
+}
+
+.inputField:focus,
+.selectField:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(228, 71, 53, 0.15);
+}
+
+.inviteBtn {
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .inviteForm {
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+  }
+
+  .inviteBtn {
+    width: 100%;
+  }
+}

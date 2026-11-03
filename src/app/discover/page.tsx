@@ -121,6 +121,7 @@ export default async function DiscoverPage({ searchParams }: DiscoverPageProps) 
               size="md"
               layoutId="discoverGenreIndicator"
               ariaLabel="Comic Genre Selection"
+              wrap={true}
             />
           </div>
 
@@ -134,6 +135,7 @@ export default async function DiscoverPage({ searchParams }: DiscoverPageProps) 
                 size="sm"
                 layoutId="discoverFormatIndicator"
                 ariaLabel="Reading Format Selection"
+                wrap={true}
               />
             </div>
 

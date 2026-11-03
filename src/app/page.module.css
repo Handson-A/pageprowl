@@ -3,34 +3,18 @@
   flex-direction: column;
   min-height: 100vh;
   background-color: var(--color-bg);
+  overflow-x: hidden;
 }
 
 .mainContent {
   flex: 1;
 }
 
+/* Base Content Sections */
 .section {
   background-color: var(--color-bg);
   padding: var(--space-10) var(--space-6);
-}
-
-.genreSection {
-  background-color: var(--color-surface);
-  border-top: 1px solid var(--color-border);
-  border-bottom: 1px solid var(--color-border);
-  padding: var(--space-10) var(--space-6);
-}
-
-.creatorsSection {
-  background-color: var(--color-surface);
-  border-top: 1px solid var(--color-border);
-  border-bottom: 1px solid var(--color-border);
-  padding: var(--space-10) var(--space-6);
-}
-
-.bannerSection {
-  background-color: var(--color-bg);
-  padding: var(--space-6) var(--space-6) var(--space-16);
+  position: relative;
 }
 
 .sectionInner {
@@ -41,14 +25,15 @@
   gap: var(--space-6);
 }
 
+/* Editorial Section Headers (No rigid divider lines) */
 .sectionHeader {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  border-bottom: 2px solid var(--color-border);
-  padding-bottom: var(--space-4);
+  padding-bottom: var(--space-2);
   flex-wrap: wrap;
   gap: var(--space-2);
+  position: relative;
 }
 
 .titleWithIcon {
@@ -63,7 +48,9 @@
 }
 
 .eyebrow {
-  display: block;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-bold);
   text-transform: uppercase;
@@ -79,6 +66,7 @@
   color: var(--color-text);
   letter-spacing: -0.02em;
   margin: 0;
+  line-height: var(--line-height-tight);
 }
 
 .viewAllLink {
@@ -89,24 +77,87 @@
   align-items: center;
   gap: 4px;
   text-decoration: none;
-  transition: transform var(--pv-motion-fast) var(--pv-ease-standard);
+  padding: 4px 8px;
+  border-radius: var(--pv-radius-sm);
+  transition: transform var(--pv-motion-fast) var(--pv-ease-standard),
+              background var(--pv-motion-fast) var(--pv-ease-standard);
 }
 
 .viewAllLink:hover {
   transform: translateX(4px);
+  background: rgba(228, 71, 53, 0.08);
 }
 
-.grid {
+.viewAllLink:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* 1. Featured Comics Section (Desktop Grid / Mobile Horizontal Swipe Carousel) */
+.featuredTrack {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: var(--space-6);
 }
 
-/* Genre Pills */
+.featuredCardSlot {
+  height: 100%;
+}
+
+/* 2. Responsive Two-Column Grid (New on PageProwl & Recently Updated) */
+.twoColumnGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-6);
+}
+
+/* 3. Browse by Genre Section (Soft Organic Parchment Layer) */
+.genreSection {
+  position: relative;
+  background: linear-gradient(
+    180deg,
+    var(--color-bg) 0%,
+    rgba(237, 228, 213, 0.65) 12%,
+    rgba(237, 228, 213, 0.75) 50%,
+    rgba(237, 228, 213, 0.65) 88%,
+    var(--color-bg) 100%
+  );
+  padding: var(--space-10) var(--space-6);
+  overflow: hidden;
+}
+
+.genreTopCurve,
+.genreBottomCurve {
+  position: absolute;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 20px;
+  line-height: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.genreTopCurve {
+  top: -1px;
+}
+
+.genreBottomCurve {
+  bottom: -1px;
+}
+
+.genreCurveSvg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
 .genrePills {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-3);
+  position: relative;
+  z-index: 2;
 }
 
 .genrePill {
@@ -114,7 +165,7 @@
   align-items: center;
   gap: 8px;
   padding: var(--space-3) var(--space-5);
-  background: var(--color-surface-muted);
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--pv-radius-md);
   color: var(--color-text);
@@ -123,22 +174,44 @@
   font-weight: var(--font-weight-semibold);
   transition: transform var(--pv-motion-fast) var(--pv-ease-standard),
               border-color var(--pv-motion-fast) var(--pv-ease-standard),
-              background var(--pv-motion-fast) var(--pv-ease-standard);
+              background var(--pv-motion-fast) var(--pv-ease-standard),
+              box-shadow var(--pv-motion-fast) var(--pv-ease-standard);
+  box-shadow: 0 1px 3px rgba(23, 23, 23, 0.04);
 }
 
 .genrePill:hover {
   transform: translateY(-2px);
   border-color: var(--color-primary);
-  background: rgba(228, 71, 53, 0.06);
+  background: #FFFBF5;
   color: var(--color-primary);
+  box-shadow: 0 4px 12px rgba(228, 71, 53, 0.1);
+}
+
+.genrePill:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 .genreIcon {
   color: var(--color-primary);
 }
 
-/* Creator Spotlight Grid */
-.creatorsGrid {
+/* 4. Creator Spotlight Section (Soft layered community tone) */
+.creatorsSection {
+  position: relative;
+  background: linear-gradient(
+    180deg,
+    var(--color-bg) 0%,
+    rgba(244, 235, 221, 0.7) 10%,
+    rgba(244, 235, 221, 0.8) 50%,
+    rgba(244, 235, 221, 0.7) 90%,
+    var(--color-bg) 100%
+  );
+  padding: var(--space-10) var(--space-6);
+  overflow: hidden;
+}
+
+.creatorsTrack {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: var(--space-4);
@@ -149,27 +222,37 @@
   align-items: center;
   gap: var(--space-4);
   padding: var(--space-4);
-  background-color: var(--color-surface-muted);
+  background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--pv-radius-md);
   text-decoration: none;
+  box-shadow: 0 2px 6px rgba(23, 23, 23, 0.04);
   transition: transform var(--pv-motion-fast) var(--pv-ease-standard),
-              border-color var(--pv-motion-fast) var(--pv-ease-standard);
+              border-color var(--pv-motion-fast) var(--pv-ease-standard),
+              box-shadow var(--pv-motion-fast) var(--pv-ease-standard);
 }
 
 .creatorCard:hover {
   transform: translateY(-2px);
   border-color: var(--color-primary);
+  box-shadow: var(--pv-shadow-card);
+}
+
+.creatorCard:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-color: var(--color-primary);
 }
 
 .creatorAvatarWrapper {
-  width: 54px;
-  height: 54px;
-  min-width: 54px;
+  width: 52px;
+  height: 52px;
+  min-width: 52px;
   border-radius: 50%;
   overflow: hidden;
   background-color: var(--palette-ink);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  border: 2px solid var(--color-surface);
 }
 
 .creatorAvatar {
@@ -210,6 +293,9 @@
 .creatorHandle {
   font-size: var(--font-size-xs);
   color: var(--color-text-subtle);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .creatorCount {
@@ -219,7 +305,12 @@
   margin-top: 2px;
 }
 
-/* Creator Invitation Banner */
+/* 5. Creator Invitation Banner */
+.bannerSection {
+  background-color: var(--color-bg);
+  padding: var(--space-6) var(--space-6) var(--space-16);
+}
+
 .creatorBanner {
   background-color: #171717;
   color: #F7F0E3;
@@ -232,7 +323,7 @@
   position: relative;
   overflow: hidden;
   box-shadow: var(--pv-shadow-overlay);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(242, 193, 78, 0.2);
 }
 
 .creatorBanner::after {
@@ -240,7 +331,7 @@
   position: absolute;
   top: 0;
   right: 0;
-  width: 280px;
+  width: 320px;
   height: 100%;
   background: radial-gradient(circle at top right, rgba(228, 71, 53, 0.3) 0%, transparent 70%);
   pointer-events: none;
@@ -291,22 +382,124 @@
   flex-shrink: 0;
 }
 
+/* Tablet Media Query (769px - 1024px) */
+@media (max-width: 1024px) {
+  .twoColumnGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-5);
+  }
+}
+
+/* Mobile Media Query (<= 768px) */
 @media (max-width: 768px) {
   .page {
-    padding-bottom: var(--mobile-bottom-nav-height);
+    padding-bottom: calc(var(--mobile-bottom-nav-height) + env(safe-area-inset-bottom, 0px));
   }
 
   .section,
   .genreSection,
   .creatorsSection,
   .bannerSection {
-    padding: var(--space-8) var(--space-4);
+    padding: var(--space-6) var(--space-4);
   }
 
-  .grid {
-    grid-template-columns: 1fr;
+  /* Requirement 1: Featured Comics — Horizontal Swipe Carousel */
+  .featuredTrack {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    gap: var(--space-3);
+    padding: var(--space-1) var(--space-4) var(--space-3);
+    margin-left: calc(-1 * var(--space-4));
+    margin-right: calc(-1 * var(--space-4));
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    overscroll-behavior-x: contain;
   }
 
+  .featuredTrack::-webkit-scrollbar {
+    display: none;
+  }
+
+  .featuredCardSlot {
+    flex: 0 0 clamp(220px, 72vw, 280px);
+    scroll-snap-align: start;
+    height: 100%;
+  }
+
+  /* Requirement 2: Two-Column Responsive Grid */
+  .twoColumnGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3);
+  }
+
+  /* Requirement 3: Creator Discovery — Compact Horizontal Carousel */
+  .creatorsTrack {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    gap: var(--space-3);
+    padding: var(--space-1) var(--space-4) var(--space-3);
+    margin-left: calc(-1 * var(--space-4));
+    margin-right: calc(-1 * var(--space-4));
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    overscroll-behavior-x: contain;
+  }
+
+  .creatorsTrack::-webkit-scrollbar {
+    display: none;
+  }
+
+  .creatorCard {
+    flex: 0 0 clamp(190px, 58vw, 230px);
+    scroll-snap-align: start;
+    padding: var(--space-3);
+    gap: var(--space-3);
+  }
+
+  .creatorAvatarWrapper {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+  }
+
+  /* Genre Pills on Mobile (Horizontal Smooth Touch-Scroll Rail) */
+  .genrePills {
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    flex-wrap: nowrap;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+    gap: var(--space-2);
+    padding: 2px 2px 6px 2px;
+    width: 100%;
+  }
+
+  .genrePills::-webkit-scrollbar {
+    display: none;
+  }
+
+  .genrePill {
+    flex-shrink: 0;
+    white-space: nowrap;
+    scroll-snap-align: start;
+    border-radius: var(--radius-full);
+    padding: 8px 16px;
+    min-height: 38px;
+    font-size: var(--font-size-xs);
+  }
+
+  /* Creator Invitation Banner on Mobile */
   .creatorBanner {
     flex-direction: column;
     align-items: flex-start;
@@ -320,5 +513,37 @@
   .creatorActions a,
   .creatorActions button {
     width: 100%;
+    min-height: 48px;
+  }
+}
+
+/* Extra-Compact Mobile (<= 360px) */
+@media (max-width: 360px) {
+  .section,
+  .genreSection,
+  .creatorsSection,
+  .bannerSection {
+    padding: var(--space-5) 12px;
+  }
+
+  .featuredTrack,
+  .creatorsTrack {
+    padding: var(--space-1) 12px var(--space-3);
+    margin-left: -12px;
+    margin-right: -12px;
+    gap: var(--space-2);
+  }
+
+  .featuredCardSlot {
+    flex: 0 0 216px;
+  }
+
+  .twoColumnGrid {
+    gap: var(--space-2);
+  }
+
+  .creatorCard {
+    flex: 0 0 186px;
+    padding: 10px;
   }
 }

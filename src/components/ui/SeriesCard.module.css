@@ -18,6 +18,12 @@
   box-shadow: var(--pv-shadow-hover);
 }
 
+.card:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+  border-color: var(--color-primary);
+}
+
 .card:hover .actionArrow {
   transform: translateX(4px);
 }
@@ -115,6 +121,7 @@
   padding: 3px 8px;
   border-radius: var(--radius-sm);
   letter-spacing: 0.02em;
+  z-index: 1;
 }
 
 .info {
@@ -151,11 +158,18 @@
   font-weight: var(--font-weight-bold);
   color: var(--color-text);
   line-height: var(--line-height-tight);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .creator {
   font-size: var(--font-size-xs);
   color: var(--color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .creator span {
@@ -191,4 +205,102 @@
 
 .actionArrow {
   transition: transform var(--pv-motion-fast) var(--pv-ease-standard);
+}
+
+/* Featured Card Variant */
+.featuredCard {
+  border-color: rgba(228, 71, 53, 0.2);
+}
+
+@media (max-width: 768px) {
+  .featuredCard .coverWrapper {
+    aspect-ratio: 3 / 4;
+  }
+
+  .featuredCard .synopsis {
+    display: none;
+  }
+
+  .featuredCard .info {
+    padding: var(--space-3);
+    gap: 6px;
+  }
+
+  .featuredCard .title {
+    font-size: 0.9375rem;
+  }
+}
+
+/* Compact Card Variant (Two-Column Responsive Grid) */
+.compactCard {
+  border-radius: var(--pv-radius-md);
+}
+
+.compactCard .coverWrapper {
+  aspect-ratio: 3 / 4;
+}
+
+.compactCard .info {
+  padding: var(--space-3);
+  gap: 4px;
+}
+
+.compactCard .title {
+  font-size: 0.875rem;
+  line-height: 1.25;
+  margin: 0;
+}
+
+.compactCard .creator {
+  font-size: 11px;
+  margin: 0;
+}
+
+.compactCard .synopsis {
+  font-size: 11px;
+  line-height: 1.35;
+  -webkit-line-clamp: 2;
+  margin-top: 2px;
+}
+
+.compactCard .metaRow {
+  gap: 4px;
+}
+
+.compactCard .genreBadge {
+  font-size: 10px;
+}
+
+.compactCard .episodeCount {
+  font-size: 10px;
+}
+
+.compactCard .actionRow {
+  padding-top: var(--space-2);
+  margin-top: auto;
+}
+
+.compactCard .actionLink {
+  font-size: 11px;
+}
+
+@media (max-width: 380px) {
+  .compactCard .info {
+    padding: 8px;
+    gap: 3px;
+  }
+
+  .compactCard .title {
+    font-size: 0.8125rem;
+  }
+
+  .compactCard .synopsis {
+    font-size: 10px;
+    -webkit-line-clamp: 2;
+  }
+
+  .compactCard .formatTag {
+    font-size: 9px;
+    padding: 2px 6px;
+  }
 }

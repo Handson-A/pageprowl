@@ -35,3 +35,13 @@
   font-size: var(--font-size-base);
   color: var(--color-text-muted);
 }
+
+@media (max-width: 768px) {
+  .container {
+    padding-bottom: calc(var(--mobile-bottom-nav-height) + env(safe-area-inset-bottom, 0px));
+  }
+
+  .content {
+    padding: var(--space-6) var(--space-4) calc(var(--space-10) + var(--mobile-bottom-nav-height));
+  }
+}

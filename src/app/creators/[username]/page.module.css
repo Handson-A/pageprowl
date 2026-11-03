@@ -207,22 +207,44 @@
 }
 
 @media (max-width: 768px) {
+  .container {
+    padding-bottom: calc(var(--mobile-bottom-nav-height) + env(safe-area-inset-bottom, 0px));
+  }
+
+  .content {
+    padding: var(--space-6) var(--space-4) calc(var(--space-10) + var(--mobile-bottom-nav-height));
+  }
+
+  .heroSection {
+    padding: var(--space-6) var(--space-4);
+    margin-bottom: var(--space-6);
+  }
+
   .heroInner {
     flex-direction: column;
     align-items: center;
     text-align: center;
+    gap: var(--space-4);
   }
 
   .titleRow {
     flex-direction: column;
     align-items: center;
+    gap: var(--space-2);
   }
 
   .linksRow {
     justify-content: center;
+    gap: var(--space-2);
+  }
+
+  .socialLink {
+    min-height: 38px;
+    padding: 6px 14px;
   }
 
   .grid {
     grid-template-columns: 1fr;
+    gap: var(--space-4);
   }
 }

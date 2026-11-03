@@ -361,14 +361,23 @@ export async function publishEpisodeImmediately(params: {
     );
   }
 
-  // 2. Verify revision has pages
+  // 2. Verify revision has pages OR written story content
   const { count: pageCount } = await supabase
     .from("revision_pages")
     .select("*", { count: "exact", head: true })
     .eq("revision_id", params.revisionId);
 
-  if (!pageCount || pageCount < 1) {
-    throw new Error("Cannot publish an episode without any comic pages.");
+  const { data: revDetails } = await supabase
+    .from("episode_revisions")
+    .select("text_content")
+    .eq("id", params.revisionId)
+    .maybeSingle();
+
+  const hasPages = Boolean(pageCount && pageCount >= 1);
+  const hasText = Boolean(revDetails?.text_content && revDetails.text_content.trim().length > 0);
+
+  if (!hasPages && !hasText) {
+    throw new Error("Cannot publish an episode without any comic pages or written story content.");
   }
 
   const isRepublish = currentStatus === "unpublished";
@@ -861,14 +870,23 @@ export async function processScheduledReleases(): Promise<{
         );
       }
 
-      // 4. Verify revision has pages
+      // 4. Verify revision has pages OR written story content
       const { count: pageCount } = await supabase
         .from("revision_pages")
         .select("*", { count: "exact", head: true })
         .eq("revision_id", pub.revision_id);
 
-      if (!pageCount || pageCount < 1) {
-        throw new Error("Revision has no comic pages uploaded.");
+      const { data: revDetails } = await supabase
+        .from("episode_revisions")
+        .select("text_content")
+        .eq("id", pub.revision_id)
+        .maybeSingle();
+
+      const hasPages = Boolean(pageCount && pageCount >= 1);
+      const hasText = Boolean(revDetails?.text_content && revDetails.text_content.trim().length > 0);
+
+      if (!hasPages && !hasText) {
+        throw new Error("Revision has no comic pages or written story content uploaded.");
       }
 
       const executedTime = new Date().toISOString();
@@ -946,3 +964,18 @@ export async function processScheduledReleases(): Promise<{
     errors,
   };
 }
+
+/**
+ * Opportunistically processes due scheduled releases without throwing to caller.
+ * Used by server page routes to lazily ensure scheduled releases are published when due.
+ */
+export async function processDueReleasesOpportunistically(): Promise<number> {
+  try {
+    const result = await processScheduledReleases();
+    return result.processedCount;
+  } catch (err) {
+    logger.error("Opportunistic release processing skipped/failed:", err);
+    return 0;
+  }
+}
+

@@ -1,11 +1,10 @@
 import React from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { CreatorSidebar } from "@/components/layout/CreatorSidebar";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { StatusBadge } from "@/components/ui/StatusBadge";
-import { createClient } from "@/lib/supabase/server";
+import { getCachedAuthUser } from "@/lib/supabase/server";
 import { getCreatorSeries } from "@/lib/data/series";
 import {
   LuPlus,
@@ -16,39 +15,16 @@ import {
 import styles from "@/app/studio/page.module.css";
 
 export default async function StudioSeriesListPage() {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCachedAuthUser();
 
   if (!user) {
     redirect("/login?redirect=/studio/series");
   }
 
   const seriesList = await getCreatorSeries(user.id);
-  let userName = "Creator";
-  let avatarUrl: string | null = null;
-
-  const { data: profile } = await supabase
-      .from("profiles")
-      .select("display_name, avatar_url")
-      .eq("id", user.id)
-      .single();
-
-  if (profile?.display_name) {
-    userName = profile.display_name;
-  } else if (user.email) {
-    userName = user.email.split("@")[0];
-  }
-  if (profile?.avatar_url) {
-    avatarUrl = profile.avatar_url;
-  }
 
   return (
-    <div className={styles.layout}>
-      <CreatorSidebar userName={userName} userRole="Creator" avatarUrl={avatarUrl} />
-
-      <main className={styles.main}>
+    <main className={styles.main}>
         <header className={styles.header}>
           <div>
             <h1 className={styles.sectionTitle} style={{ fontSize: "2rem" }}>All Series</h1>
@@ -131,6 +107,5 @@ export default async function StudioSeriesListPage() {
           )}
         </section>
       </main>
-    </div>
   );
 }

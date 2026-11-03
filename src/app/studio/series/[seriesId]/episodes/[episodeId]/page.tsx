@@ -1,10 +1,8 @@
 import { notFound, redirect } from "next/navigation";
-import styles from "./page.module.css";
-import { CreatorSidebar } from "@/components/layout/CreatorSidebar";
 import { EpisodeEditorClient } from "./EpisodeEditorClient";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getCachedAuthUser } from "@/lib/supabase/server";
 import { requireSeriesRole } from "@/lib/auth/guards";
-import { getEpisodeReleaseEvents } from "@/lib/data/publishing";
+import { getEpisodeReleaseEvents, processDueReleasesOpportunistically } from "@/lib/data/publishing";
 
 interface EpisodeWorkspaceProps {
   params: {
@@ -17,9 +15,7 @@ export default async function EpisodeWorkspacePage({
   params,
 }: EpisodeWorkspaceProps) {
   const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCachedAuthUser();
 
   if (!user) {
     redirect(
@@ -42,7 +38,7 @@ export default async function EpisodeWorkspacePage({
     notFound();
   }
 
-  const { data: episode } = await supabase
+  let { data: episode } = await supabase
     .from("episodes")
     .select("*")
     .eq("id", params.episodeId)
@@ -112,12 +108,35 @@ export default async function EpisodeWorkspacePage({
   const isPublished = episode.published_revision_id === currentRevision.id || episode.status === "published";
 
   // Fetch active schedule if scheduled
-  const { data: schedData } = await supabase
+  let { data: schedData } = await supabase
     .from("scheduled_publications")
     .select("id, scheduled_for, status")
     .eq("episode_id", episode.id)
     .eq("status", "scheduled")
     .maybeSingle();
+
+  // Opportunistic auto-publishing: if scheduled time has passed, process due releases immediately
+  if (schedData && new Date(schedData.scheduled_for) <= new Date()) {
+    const processed = await processDueReleasesOpportunistically();
+    if (processed > 0) {
+      // Re-fetch episode and schedule state after automated release
+      const { data: updatedEp } = await supabase
+        .from("episodes")
+        .select("*")
+        .eq("id", episode.id)
+        .single();
+      if (updatedEp) {
+        episode = updatedEp;
+      }
+      const { data: updatedSched } = await supabase
+        .from("scheduled_publications")
+        .select("id, scheduled_for, status")
+        .eq("episode_id", episode.id)
+        .eq("status", "scheduled")
+        .maybeSingle();
+      schedData = updatedSched;
+    }
+  }
 
   // Fetch durable release events
   const initialReleaseEvents = await getEpisodeReleaseEvents(episode.id);
@@ -142,28 +161,26 @@ export default async function EpisodeWorkspacePage({
   const episodeStatus = (episode.status || currentRevision.status || "draft") as any;
 
   return (
-    <div className={styles.layout}>
-      <CreatorSidebar />
-      <EpisodeEditorClient
-        seriesId={series.id}
-        seriesSlug={series.slug}
-        seriesFormat={series.format}
-        seriesTitle={series.title}
-        episodeId={episode.id}
-        episodeNumber={episode.episode_number}
-        episodeTitle={episode.title}
-        episodeSlug={episode.slug}
-        initialRevisionId={currentRevision.id}
-        initialStatus={currentRevision.status}
-        initialEpisodeStatus={episodeStatus}
-        initialPages={initialPages}
-        initialComments={initialComments}
-        initialScheduledPublication={schedData || null}
-        initialReleaseEvents={initialReleaseEvents}
-        latestReviewRequest={latestReview as any}
-        isPublished={isPublished}
-        userRole={effectiveRole}
-      />
-    </div>
+    <EpisodeEditorClient
+      seriesId={series.id}
+      seriesSlug={series.slug}
+      seriesFormat={series.format}
+      seriesTitle={series.title}
+      episodeId={episode.id}
+      episodeNumber={episode.episode_number}
+      episodeTitle={episode.title}
+      episodeSlug={episode.slug}
+      initialRevisionId={currentRevision.id}
+      initialStatus={currentRevision.status}
+      initialEpisodeStatus={episodeStatus}
+      initialPages={initialPages}
+      initialTextContent={(currentRevision as any).text_content || ""}
+      initialComments={initialComments}
+      initialScheduledPublication={schedData || null}
+      initialReleaseEvents={initialReleaseEvents}
+      latestReviewRequest={latestReview as any}
+      isPublished={isPublished}
+      userRole={effectiveRole}
+    />
   );
 }

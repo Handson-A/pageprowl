@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import styles from "./NewSeries.module.css";
 import pageStyles from "@/app/studio/page.module.css";
-import { CreatorSidebar } from "@/components/layout/CreatorSidebar";
 import { Button } from "@/components/ui/Button";
 import { FormField } from "@/components/ui/FormField";
 import { createClient } from "@/lib/supabase/client";
@@ -825,14 +824,10 @@ function NewSeriesWizard() {
 
 export default function NewSeriesPage() {
   return (
-    <div className={pageStyles.layout}>
-      <CreatorSidebar />
-
-      <main className={pageStyles.main}>
-        <Suspense fallback={<div style={{ padding: "32px", color: "#9CA3AF" }}>Loading series wizard...</div>}>
-          <NewSeriesWizard />
-        </Suspense>
-      </main>
-    </div>
+    <main className={pageStyles.main}>
+      <Suspense fallback={<div style={{ padding: "32px", color: "#9CA3AF" }}>Loading series wizard...</div>}>
+        <NewSeriesWizard />
+      </Suspense>
+    </main>
   );
 }
