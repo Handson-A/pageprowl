@@ -9,10 +9,10 @@ export function PublicFooter() {
       <div className={styles.inner}>
         <div className={styles.top}>
           <div className={styles.brand}>
-            <Link href="/" aria-label="PageProwl Home">
+            <Link href="/" aria-label="PageProwl Home" className={styles.logoLink}>
               <PageProwlLogo variant="full" size="sm" />
             </Link>
-            <p className={styles.tagline} style={{ marginTop: "var(--space-3)" }}>
+            <p className={styles.tagline}>
               A collaborative comic publishing platform connecting readers, independent creators, and creative studios.
             </p>
           </div>
@@ -44,8 +44,8 @@ export function PublicFooter() {
         </div>
 
         <div className={styles.bottom}>
-          <span>&copy; {new Date().getFullYear()} PageProwl. All rights reserved.</span>
-          <span>Made for comic creators &amp; readers worldwide.</span>
+          <span className={styles.copyright}>&copy; {new Date().getFullYear()} PageProwl. All rights reserved.</span>
+          <span className={styles.credit}>Made for comic creators &amp; readers worldwide.</span>
         </div>
       </div>
     </footer>

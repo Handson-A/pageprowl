@@ -1,8 +1,7 @@
 .shelfSection {
   width: 100%;
   padding: var(--space-6) var(--space-4);
-  background-color: var(--color-surface);
-  border-bottom: 1px solid var(--color-border);
+  background: linear-gradient(180deg, var(--color-bg) 0%, rgba(237, 228, 213, 0.45) 100%);
 }
 
 .container {
@@ -61,7 +60,7 @@
   flex-direction: column;
   justify-content: space-between;
   padding: var(--space-4);
-  background: var(--color-surface-muted);
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--pv-radius-md);
   text-decoration: none;
@@ -147,18 +146,21 @@
 
 .dismissBtn {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: 6px;
+  right: 6px;
   background: transparent;
   border: none;
   cursor: pointer;
-  padding: 4px;
+  padding: 6px;
+  min-width: 36px;
+  min-height: 36px;
   border-radius: 50%;
   color: var(--color-text-subtle);
   display: flex;
   align-items: center;
   justify-content: center;
   transition: background var(--pv-motion-fast), color var(--pv-motion-fast);
+  z-index: 2;
 }
 
 .dismissBtn:hover {

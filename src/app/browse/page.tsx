@@ -74,6 +74,36 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
     },
   ];
 
+  const sortOptions = [
+    {
+      value: "latest",
+      label: "Newest",
+      href: `/browse?sort=latest${
+        currentSearch ? `&q=${encodeURIComponent(currentSearch)}` : ""
+      }${currentGenre !== "All" ? `&genre=${encodeURIComponent(currentGenre)}` : ""}${
+        currentFormat ? `&format=${currentFormat}` : ""
+      }`,
+    },
+    {
+      value: "updated",
+      label: "Recently Updated",
+      href: `/browse?sort=updated${
+        currentSearch ? `&q=${encodeURIComponent(currentSearch)}` : ""
+      }${currentGenre !== "All" ? `&genre=${encodeURIComponent(currentGenre)}` : ""}${
+        currentFormat ? `&format=${currentFormat}` : ""
+      }`,
+    },
+    {
+      value: "title_asc",
+      label: "Title A-Z",
+      href: `/browse?sort=title_asc${
+        currentSearch ? `&q=${encodeURIComponent(currentSearch)}` : ""
+      }${currentGenre !== "All" ? `&genre=${encodeURIComponent(currentGenre)}` : ""}${
+        currentFormat ? `&format=${currentFormat}` : ""
+      }`,
+    },
+  ];
+
   return (
     <div className={styles.container}>
       <PublicHeader />
@@ -124,6 +154,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
               size="md"
               layoutId="browseGenreIndicator"
               ariaLabel="Comic Genre Selection"
+              wrap={true}
             />
           </div>
 
@@ -139,6 +170,23 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
               size="sm"
               layoutId="browseFormatIndicator"
               ariaLabel="Reading Format Selection"
+              wrap={true}
+            />
+          </div>
+
+          {/* Tertiary Sorting Filter */}
+          <div className={styles.filterGroup}>
+            <div className={styles.filterHeader}>
+              <span className={styles.filterLabel}>Sort</span>
+            </div>
+            <SegmentedControl
+              options={sortOptions}
+              value={currentSort}
+              variant="pill"
+              size="sm"
+              layoutId="browseSortIndicator"
+              ariaLabel="Sort Order Selection"
+              wrap={true}
             />
           </div>
         </div>
@@ -154,7 +202,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
             </MotionReveal>
 
             {totalPages > 1 && (
-              <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "16px", padding: "24px 0" }}>
+              <div className={styles.pagination}>
                 <Link
                   href={`/browse?page=${currentPage - 1}${
                     currentSearch ? `&q=${encodeURIComponent(currentSearch)}` : ""
@@ -170,7 +218,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
                   </Button>
                 </Link>
 
-                <span style={{ fontSize: "var(--font-size-sm)", color: "var(--color-text-muted)" }}>
+                <span className={styles.pageInfo}>
                   Page {currentPage} of {totalPages} ({total} series)
                 </span>
 

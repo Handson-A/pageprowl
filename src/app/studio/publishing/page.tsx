@@ -2,7 +2,6 @@ import React from "react";
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import styles from "./page.module.css";
-import { CreatorSidebar } from "@/components/layout/CreatorSidebar";
 import { PublishingCalendarClient } from "./PublishingCalendarClient";
 import { requireAuth } from "@/lib/auth/guards";
 import { getCreatorSeries } from "@/lib/data/series";
@@ -30,9 +29,7 @@ export default async function PublishingCalendarPage() {
   }));
 
   return (
-    <div className={styles.layout}>
-      <CreatorSidebar />
-      <main className={styles.main}>
+    <main className={styles.main}>
         <div className={styles.header}>
           <div className={styles.headerLeft}>
             <h1 className={styles.title}>Publishing Calendar</h1>
@@ -64,6 +61,5 @@ export default async function PublishingCalendarPage() {
           seriesList={seriesList}
         />
       </main>
-    </div>
   );
 }

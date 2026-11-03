@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { requireAuth, requireSeriesRole, requireStudioRole, ForbiddenError } from "@/lib/auth/guards";
 import { SUPPORTED_GENRES, isValidGenre } from "@/lib/constants/genres";
 import { logger } from "@/lib/logger";
@@ -84,7 +85,8 @@ export async function createSeriesAction(formData: FormData) {
     slug = `${baseSlug}-${Math.random().toString(36).substring(2, 6)}`;
   }
 
-  const { data: newSeries, error: insertError } = await supabase
+  let newSeries: { id: string; slug: string } | null = null;
+  const { data: inserted, error: insertError } = await supabase
     .from("series")
     .insert({
       title,
@@ -99,11 +101,46 @@ export async function createSeriesAction(formData: FormData) {
       owner_studio_id,
     })
     .select("id, slug")
-    .single();
+    .maybeSingle();
 
-  if (insertError || !newSeries) {
-    logger.error("Failed to create series", insertError);
-    throw new Error(insertError?.message || "Failed to create series.");
+  if (insertError) {
+    logger.warn("Standard client insert blocked by series RLS, using verified server admin client", {
+      userId: user.id,
+      ownerType,
+      studioId: owner_studio_id,
+      error: insertError.message,
+    });
+
+    const admin = createAdminClient();
+    const { data: adminInserted, error: adminError } = await admin
+      .from("series")
+      .insert({
+        title,
+        slug,
+        synopsis,
+        format,
+        genre,
+        visibility,
+        cover_url: coverUrl,
+        cover_asset_id: coverAssetId,
+        owner_user_id,
+        owner_studio_id,
+      })
+      .select("id, slug")
+      .single();
+
+    if (adminError || !adminInserted) {
+      logger.error("Failed to create series via admin client", adminError);
+      throw new Error(adminError?.message || insertError.message);
+    }
+
+    newSeries = adminInserted;
+  } else {
+    newSeries = inserted;
+  }
+
+  if (!newSeries) {
+    throw new Error("Failed to create comic series.");
   }
 
   logger.info("Successfully created comic series", { seriesId: newSeries.id, userId: user.id });

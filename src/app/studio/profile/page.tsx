@@ -1,8 +1,7 @@
 import React from "react";
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
-import { CreatorSidebar } from "@/components/layout/CreatorSidebar";
-import { createClient } from "@/lib/supabase/server";
+import { getCachedAuthUser } from "@/lib/supabase/server";
 import { getUserProfile } from "@/lib/data/profiles";
 import { getNotificationPreferences } from "@/lib/data/reader";
 import { AccountProfileManager } from "@/components/profile/AccountProfileManager";
@@ -14,29 +13,22 @@ export const metadata: Metadata = {
 };
 
 export default async function ProfileSettingsPage() {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCachedAuthUser();
 
   if (!user) {
     redirect("/login?redirect=/studio/profile");
   }
 
-  const userProfile = await getUserProfile(user.id);
+  const [userProfile, preferences] = await Promise.all([
+    getUserProfile(user.id),
+    getNotificationPreferences(user.id),
+  ]);
+
   const profile = userProfile?.profile;
   const creatorProfile = userProfile?.creatorProfile;
-  const preferences = await getNotificationPreferences(user.id);
 
   return (
-    <div className={styles.layout}>
-      <CreatorSidebar
-        userName={profile?.display_name}
-        userRole={profile?.role}
-        avatarUrl={profile?.avatar_url}
-      />
-
-      <main className={styles.main}>
+    <main className={styles.main}>
         <header className={styles.header}>
           <div>
             <h1 className={styles.title}>Creator Profile Settings</h1>
@@ -72,6 +64,5 @@ export default async function ProfileSettingsPage() {
           }}
         />
       </main>
-    </div>
   );
 }

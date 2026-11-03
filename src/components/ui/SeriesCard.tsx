@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import styles from "./SeriesCard.module.css";
 import { LuArrowRight } from "react-icons/lu";
 import type { SeriesWithCreator } from "@/lib/data/series";
@@ -11,29 +11,42 @@ export interface SeriesCardProps {
   series: SeriesWithCreator;
   aspectRatio?: "cinematic" | "portrait";
   showAction?: boolean;
+  variant?: "standard" | "featured" | "compact";
+  className?: string;
 }
 
 export function SeriesCard({
   series,
   aspectRatio = "cinematic",
   showAction = true,
+  variant = "standard",
+  className = "",
 }: SeriesCardProps) {
+  const shouldReduceMotion = useReducedMotion();
   const formatLabel = series.format === "scroll" ? "Vertical Scroll" : "Page-by-Page";
   const episodeCountText =
     typeof series.episode_count === "number"
       ? `${series.episode_count} ${series.episode_count === 1 ? "episode" : "episodes"}`
       : null;
 
+  const isFeatured = variant === "featured";
+  const isCompact = variant === "compact";
+
   return (
     <motion.div
-      whileHover={{ y: -4 }}
-      whileTap={{ scale: 0.99 }}
+      whileHover={shouldReduceMotion ? undefined : { y: -4 }}
+      whileTap={shouldReduceMotion ? undefined : { scale: 0.99 }}
       transition={{ type: "spring", stiffness: 350, damping: 25 }}
       style={{ height: "100%" }}
+      className={className}
     >
       <Link
         href={`/series/${series.slug}`}
-        className={`${styles.card} ${aspectRatio === "portrait" ? styles.portraitCard : ""}`}
+        className={`${styles.card} ${
+          aspectRatio === "portrait" ? styles.portraitCard : ""
+        } ${isFeatured ? styles.featuredCard : ""} ${
+          isCompact ? styles.compactCard : ""
+        }`}
         aria-label={`View series ${series.title}`}
       >
         <div className={styles.coverWrapper}>
@@ -49,7 +62,7 @@ export function SeriesCard({
             />
           ) : (
             <div className={styles.coverFallback} aria-label="Cover artwork placeholder">
-              {/* Artistic Comic-Panel Placeholder Graphic */}
+              {/* Authentic Comic-Panel Placeholder Graphic */}
               <div className={styles.fallbackGraphic}>
                 <div className={styles.panelTopLeft} />
                 <div className={styles.panelTopRight} />

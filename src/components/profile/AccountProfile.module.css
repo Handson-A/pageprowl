@@ -408,3 +408,46 @@
 .statusInactive {
   color: var(--color-text-muted);
 }
+
+@media (max-width: 640px) {
+  .heroCard {
+    padding: var(--space-4);
+  }
+
+  .section {
+    padding: var(--space-4);
+  }
+
+  .heroLeft {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: var(--space-3);
+  }
+
+  .badgeRow {
+    justify-content: center;
+  }
+
+  .sectionHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-3);
+  }
+
+  .editButton {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .formActions {
+    flex-direction: column-reverse;
+    width: 100%;
+  }
+
+  .saveButton,
+  .cancelButton {
+    width: 100%;
+    min-height: 44px;
+  }
+}

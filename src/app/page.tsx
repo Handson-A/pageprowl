@@ -69,11 +69,17 @@ export default async function HomePage() {
 
             {hasAnyComics ? (
               <MotionReveal delay={0.1}>
-                <div className={styles.grid}>
+                <div className={styles.featuredTrack}>
                   {(featuredSeries.length > 0 ? featuredSeries : recentUpdates)
                     .slice(0, 3)
                     .map((s) => (
-                      <SeriesCard key={s.id} series={s} aspectRatio="cinematic" />
+                      <div key={s.id} className={styles.featuredCardSlot}>
+                        <SeriesCard
+                          series={s}
+                          aspectRatio="cinematic"
+                          variant="featured"
+                        />
+                      </div>
                     ))}
                 </div>
               </MotionReveal>
@@ -94,8 +100,22 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* 3. Browse by Genre Shelf */}
+        {/* 3. Browse by Genre Shelf (Soft Organic Parchment Layer) */}
         <section className={styles.genreSection} aria-label="Browse by Genre">
+          <div className={styles.genreTopCurve} aria-hidden="true">
+            <svg
+              viewBox="0 0 1440 20"
+              fill="none"
+              preserveAspectRatio="none"
+              className={styles.genreCurveSvg}
+            >
+              <path
+                d="M0,20 C360,2 1080,2 1440,20 L1440,0 L0,0 Z"
+                fill="var(--color-bg)"
+              />
+            </svg>
+          </div>
+
           <div className={styles.sectionInner}>
             <div className={styles.sectionHeader}>
               <div>
@@ -121,6 +141,20 @@ export default async function HomePage() {
               ))}
             </div>
           </div>
+
+          <div className={styles.genreBottomCurve} aria-hidden="true">
+            <svg
+              viewBox="0 0 1440 20"
+              fill="none"
+              preserveAspectRatio="none"
+              className={styles.genreCurveSvg}
+            >
+              <path
+                d="M0,0 C360,18 1080,18 1440,0 L1440,20 L0,20 Z"
+                fill="var(--color-bg)"
+              />
+            </svg>
+          </div>
         </section>
 
         {/* 4. Recently Updated Series Section */}
@@ -144,9 +178,14 @@ export default async function HomePage() {
               </MotionReveal>
 
               <MotionReveal delay={0.1}>
-                <div className={styles.grid}>
+                <div className={styles.twoColumnGrid}>
                   {recentUpdates.slice(0, 4).map((s) => (
-                    <SeriesCard key={s.id} series={s} aspectRatio="portrait" />
+                    <SeriesCard
+                      key={s.id}
+                      series={s}
+                      aspectRatio="portrait"
+                      variant="compact"
+                    />
                   ))}
                 </div>
               </MotionReveal>
@@ -175,9 +214,14 @@ export default async function HomePage() {
               </MotionReveal>
 
               <MotionReveal delay={0.1}>
-                <div className={styles.grid}>
+                <div className={styles.twoColumnGrid}>
                   {newReleases.slice(0, 4).map((s) => (
-                    <SeriesCard key={s.id} series={s} aspectRatio="portrait" />
+                    <SeriesCard
+                      key={s.id}
+                      series={s}
+                      aspectRatio="portrait"
+                      variant="compact"
+                    />
                   ))}
                 </div>
               </MotionReveal>
@@ -199,7 +243,7 @@ export default async function HomePage() {
                 </div>
               </div>
 
-              <div className={styles.creatorsGrid}>
+              <div className={styles.creatorsTrack}>
                 {featuredCreators.map((creator) => (
                   <Link
                     key={creator.id}

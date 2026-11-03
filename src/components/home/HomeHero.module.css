@@ -3,13 +3,12 @@
   color: #F7F0E3;
   position: relative;
   overflow: hidden;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .heroContainer {
   max-width: var(--container-max-width);
   margin: 0 auto;
-  padding: var(--space-16) var(--space-6) var(--space-12);
+  padding: var(--space-16) var(--space-6) calc(var(--space-12) + 16px);
   display: grid;
   grid-template-columns: 1.1fr 0.9fr;
   align-items: center;
@@ -135,11 +134,36 @@
   background-color: var(--color-primary);
 }
 
+/* Organic curved boundary into the warm cream page */
+.heroCurve {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 24px;
+  line-height: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.curveSvg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+@media (min-width: 769px) {
+  .heroCurve {
+    height: 36px;
+  }
+}
+
 @media (max-width: 960px) {
   .heroContainer {
     grid-template-columns: 1fr;
     gap: var(--space-8);
-    padding: var(--space-12) var(--space-4) var(--space-8);
+    padding: var(--space-12) var(--space-4) calc(var(--space-8) + 16px);
   }
 
   .heroCopy {
@@ -153,7 +177,7 @@
 
 @media (max-width: 640px) {
   .heroContainer {
-    padding: var(--space-8) var(--space-4);
+    padding: var(--space-8) var(--space-4) calc(var(--space-6) + 16px);
   }
 
   .actions {

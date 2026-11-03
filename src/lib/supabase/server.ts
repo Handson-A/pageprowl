@@ -1,5 +1,8 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { cache } from "react";
+import type { User } from "@supabase/supabase-js";
+import type { Database } from "@/types/database";
 
 export function createClient() {
   const cookieStore = cookies();
@@ -30,3 +33,35 @@ export function createClient() {
     },
   });
 }
+
+/**
+ * Request-scoped cached getter for the authenticated user.
+ * Deduplicates multiple supabase.auth.getUser() calls within the same Server Component render tree.
+ */
+export const getCachedAuthUser = cache(async (): Promise<User | null> => {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  return user;
+});
+
+/**
+ * Request-scoped cached getter for user profile.
+ * Deduplicates multiple profile queries within the same Server Component render tree.
+ */
+export const getCachedUserProfile = cache(async (userId: string) => {
+  const supabase = createClient();
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("id, username, display_name, avatar_url, role")
+    .eq("id", userId)
+    .maybeSingle();
+  return profile as {
+    id: string;
+    username: string | null;
+    display_name: string | null;
+    avatar_url: string | null;
+    role: string | null;
+  } | null;
+});

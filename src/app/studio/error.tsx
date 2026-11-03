@@ -3,7 +3,6 @@
 import React, { useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
-import { CreatorSidebar } from "@/components/layout/CreatorSidebar";
 import { LuShieldAlert } from "react-icons/lu";
 import styles from "./page.module.css";
 
@@ -19,9 +18,7 @@ export default function StudioError({
   }, [error]);
 
   return (
-    <div className={styles.layout}>
-      <CreatorSidebar />
-      <main
+    <main
         className={styles.main}
         style={{
           display: "flex",
@@ -68,6 +65,5 @@ export default function StudioError({
           </Link>
         </div>
       </main>
-    </div>
   );
 }

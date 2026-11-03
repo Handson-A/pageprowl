@@ -47,6 +47,7 @@
   display: flex;
   gap: var(--space-3);
   margin-bottom: var(--space-5);
+  width: 100%;
 }
 
 .inputContainer {
@@ -67,7 +68,7 @@
   width: 100%;
   height: 48px;
   padding: 0 var(--space-10) 0 var(--space-11);
-  font-size: var(--font-size-base);
+  font-size: 1rem;
   border: 1px solid var(--color-border-strong);
   border-radius: var(--pv-radius-md);
   background-color: var(--color-surface-muted);
@@ -86,7 +87,9 @@
   position: absolute;
   right: var(--space-3);
   color: var(--color-text-subtle);
-  padding: 6px;
+  padding: 8px;
+  min-width: 36px;
+  min-height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -109,10 +112,12 @@
 
 .filterGroup {
   display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  overflow-x: auto;
-  padding-bottom: 2px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .filterLabel {
@@ -121,7 +126,6 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--color-text-subtle);
-  min-width: 50px;
 }
 
 .resultsSection {
@@ -136,7 +140,7 @@
   border-bottom: 1px solid var(--color-border);
   padding-bottom: var(--space-3);
   flex-wrap: wrap;
-  gap: var(--space-2);
+  gap: var(--space-3);
 }
 
 .resultsCount {
@@ -148,7 +152,8 @@
 .sortLinks {
   display: flex;
   align-items: center;
-  gap: 4px;
+  flex-wrap: wrap;
+  gap: var(--space-2);
 }
 
 .sortLabel {
@@ -162,20 +167,30 @@
   font-weight: var(--font-weight-medium);
   color: var(--color-text-muted);
   text-decoration: none;
-  padding: 3px 8px;
-  border-radius: var(--pv-radius-sm);
-  transition: all var(--pv-motion-fast);
+  padding: 6px 14px;
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  background-color: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  transition: all var(--pv-motion-fast) var(--pv-ease-standard);
+  white-space: nowrap;
 }
 
 .sortBtn:hover {
-  color: var(--color-text);
-  background-color: var(--color-surface-muted);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  background-color: rgba(229, 57, 53, 0.08);
 }
 
 .sortBtnActive {
-  color: var(--color-primary);
-  background-color: rgba(228, 71, 53, 0.08);
+  color: var(--color-primary-foreground);
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
   font-weight: var(--font-weight-semibold);
+  box-shadow: 0 2px 8px rgba(229, 57, 53, 0.35);
 }
 
 .grid {
@@ -191,6 +206,7 @@
   justify-content: center;
   gap: var(--space-4);
   padding: var(--space-6) 0;
+  flex-wrap: wrap;
 }
 
 .pageInfo {
@@ -203,12 +219,90 @@
   padding: var(--space-8) 0;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
+  .container {
+    padding-bottom: calc(var(--mobile-bottom-nav-height) + env(safe-area-inset-bottom, 0px));
+  }
+
+  .content {
+    padding: var(--space-6) var(--space-4) calc(var(--space-10) + var(--mobile-bottom-nav-height));
+  }
+
+  .searchSection {
+    padding: var(--space-4);
+    margin-bottom: var(--space-6);
+  }
+
   .searchForm {
     flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .searchForm button {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .filterBar {
+    padding-top: var(--space-3);
+    gap: var(--space-3);
+    overflow: hidden;
+  }
+
+  .filterGroup {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    gap: var(--space-1);
+  }
+
+  .resultsMeta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-3);
+  }
+
+  .sortLinks {
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    flex-wrap: nowrap;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+    width: 100%;
+    gap: var(--space-2);
+    padding: 2px 2px 4px 2px;
+  }
+
+  .sortLinks::-webkit-scrollbar {
+    display: none;
+  }
+
+  .sortBtn {
+    flex-shrink: 0;
+    white-space: nowrap;
+    scroll-snap-align: start;
+    border-radius: var(--radius-full);
+    min-height: 38px;
+    padding: 8px 16px;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
   }
 
   .grid {
     grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  .pagination {
+    gap: var(--space-2);
+  }
+
+  .pageInfo {
+    width: 100%;
+    text-align: center;
+    order: -1;
   }
 }

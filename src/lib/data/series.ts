@@ -465,22 +465,21 @@ export async function getPublicEpisodeContent(seriesSlug: string, episodeSlug: s
 export async function getCreatorSeries(userId: string): Promise<SeriesWithCreator[]> {
   const supabase = createClient();
 
-  // Find studios where user is owner or admin
-  const { data: userStudios } = await supabase
-    .from("studio_members")
-    .select("studio_id")
-    .eq("user_id", userId)
-    .in("role", ["owner", "admin"]);
+  // Find studios and explicit series memberships in parallel
+  const [userStudiosRes, memberSeriesRes] = await Promise.all([
+    supabase
+      .from("studio_members")
+      .select("studio_id")
+      .eq("user_id", userId)
+      .in("role", ["owner", "admin"]),
+    supabase
+      .from("series_members")
+      .select("series_id")
+      .eq("user_id", userId),
+  ]);
 
-  const studioIds = (userStudios || []).map((s) => s.studio_id);
-
-  // Find series where user has an explicit series membership
-  const { data: memberSeries } = await supabase
-    .from("series_members")
-    .select("series_id")
-    .eq("user_id", userId);
-
-  const memberSeriesIds = (memberSeries || []).map((m) => m.series_id);
+  const studioIds = (userStudiosRes.data || []).map((s) => s.studio_id);
+  const memberSeriesIds = (memberSeriesRes.data || []).map((m) => m.series_id);
 
   let query = supabase
     .from("series")

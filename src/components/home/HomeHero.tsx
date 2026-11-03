@@ -28,7 +28,7 @@ export function HomeHero() {
           transition={transitionConfig}
         >
           <div className={styles.badge}>
-            <LuSparkles size={13} className={styles.badgeIcon} aria-hidden="true" />
+            {/* <LuSparkles size={13} className={styles.badgeIcon} aria-hidden="true" /> */}
             <span>Independent Comic Publishing Platform</span>
           </div>
 
@@ -191,6 +191,21 @@ export function HomeHero() {
             </div>
           </div>
         </motion.div>
+      </div>
+
+      {/* Organic Bottom Curve Transition into warm page background */}
+      <div className={styles.heroCurve} aria-hidden="true">
+        <svg
+          viewBox="0 0 1440 36"
+          fill="none"
+          preserveAspectRatio="none"
+          className={styles.curveSvg}
+        >
+          <path
+            d="M0,0 C360,28 820,36 1140,16 C1280,8 1380,2 1440,0 L1440,36 L0,36 Z"
+            fill="var(--color-bg)"
+          />
+        </svg>
       </div>
     </section>
   );

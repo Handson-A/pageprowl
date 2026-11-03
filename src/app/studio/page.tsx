@@ -2,12 +2,13 @@ import React from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import styles from "./page.module.css";
-import { CreatorSidebar } from "@/components/layout/CreatorSidebar";
 import { Button } from "@/components/ui/Button";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { MotionReveal, MotionItem } from "@/components/ui/MotionReveal";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getCachedAuthUser, getCachedUserProfile } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { processDueReleasesOpportunistically } from "@/lib/data/publishing";
 import { getCreatorSeries } from "@/lib/data/series";
 import { getPersonalDashboardData } from "@/lib/data/dashboards";
 import { formatActivityDescription } from "@/lib/data/activity";
@@ -27,32 +28,20 @@ import {
 
 export default async function CreatorDashboardPage() {
   const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCachedAuthUser();
 
   if (!user) {
     redirect("/login?redirect=/studio");
   }
 
-  let userName = "Creator";
-  let avatarUrl: string | null = null;
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("display_name, avatar_url")
-    .eq("id", user.id)
-    .single();
+  const profile = await getCachedUserProfile(user.id);
+  const userName =
+    profile?.display_name?.trim() ||
+    profile?.username?.trim() ||
+    (user.email ? user.email.split("@")[0] : "Creator");
+  const avatarUrl = profile?.avatar_url || null;
 
-  if (profile?.display_name) {
-    userName = profile.display_name;
-  } else if (user.email) {
-    userName = user.email.split("@")[0];
-  }
-  if (profile?.avatar_url) {
-    avatarUrl = profile.avatar_url;
-  }
-
-  // 1. Fetch accessible series and studios count
+  // 1. Fetch accessible series, studios count, personal data, and opportunistic releases in parallel
   const [seriesList, { count: studiosCount }, personalData] = await Promise.all([
     getCreatorSeries(user.id),
     supabase
@@ -60,6 +49,7 @@ export default async function CreatorDashboardPage() {
       .select("*", { count: "exact", head: true })
       .eq("user_id", user.id),
     getPersonalDashboardData(user.id),
+    processDueReleasesOpportunistically(),
   ]);
 
   const { myTasks, dueSoonTasks, needsAttention, myReviews, recentActivity } = personalData;
@@ -70,7 +60,7 @@ export default async function CreatorDashboardPage() {
   let latestEpisode: any = null;
 
   if (recentProject) {
-    const { data: epData } = await supabase
+    const { data: epData, error: epError } = await supabase
       .from("episodes")
       .select(`
         id,
@@ -78,19 +68,46 @@ export default async function CreatorDashboardPage() {
         title,
         slug,
         status,
-        episode_revisions (
-          id,
-          revision_number,
-          status,
-          updated_at
-        )
+        published_revision_id,
+        updated_at
       `)
       .eq("series_id", recentProject.id)
       .order("updated_at", { ascending: false })
       .limit(1)
       .maybeSingle();
 
+    if (epError) {
+      console.error("Error fetching latest episode for studio dashboard:", epError);
+    }
+
     latestEpisode = epData;
+
+    // Fallback to verified admin client if RLS filters out creator's episodes
+    if (!latestEpisode) {
+      try {
+        const admin = createAdminClient();
+        const { data: adminEp } = await admin
+          .from("episodes")
+          .select(`
+            id,
+            episode_number,
+            title,
+            slug,
+            status,
+            published_revision_id,
+            updated_at
+          `)
+          .eq("series_id", recentProject.id)
+          .order("updated_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (adminEp) {
+          latestEpisode = adminEp;
+        }
+      } catch {
+        // ignore
+      }
+    }
   }
 
   const overdueCount = needsAttention.overdueTasks.length;
@@ -98,11 +115,8 @@ export default async function CreatorDashboardPage() {
   const attentionTotal = overdueCount + pendingReviewsCount;
 
   return (
-    <div className={styles.layout}>
-      <CreatorSidebar userName={userName} userRole="Creator" avatarUrl={avatarUrl} />
-
-      <main className={styles.main}>
-        <div className={styles.dashboardContainer}>
+    <main className={styles.main}>
+      <div className={styles.dashboardContainer}>
           {/* Welcome Banner matching reference */}
           <MotionReveal delay={0.05}>
             <section className={styles.welcomeBanner}>
@@ -591,6 +605,5 @@ export default async function CreatorDashboardPage() {
         </MotionReveal>
       </div>
     </main>
-  </div>
   );
 }

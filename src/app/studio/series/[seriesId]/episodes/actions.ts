@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { requireAuth, requireSeriesRole, ForbiddenError } from "@/lib/auth/guards";
 import { logger } from "@/lib/logger";
 import {
@@ -16,6 +17,7 @@ import {
   unpublishEpisode,
   republishEpisode,
   getEpisodeReleaseEvents,
+  processScheduledReleases,
 } from "@/lib/data/publishing";
 import type { RevisionStatus } from "@/types/database";
 
@@ -287,15 +289,24 @@ export async function transitionRevisionStatusAction(
     );
   }
 
-  // If transitioning to ready_to_publish, require at least 1 page
+  // If transitioning to ready_to_publish, require at least 1 comic page OR written story content
   if (targetStatus === "ready_to_publish") {
     const { count } = await supabase
       .from("revision_pages")
       .select("*", { count: "exact", head: true })
       .eq("revision_id", revisionId);
 
-    if (!count || count < 1) {
-      throw new Error("Cannot mark ready to publish: revision must have at least one uploaded page.");
+    const { data: revContent } = await supabase
+      .from("episode_revisions")
+      .select("text_content")
+      .eq("id", revisionId)
+      .maybeSingle();
+
+    const hasPages = Boolean(count && count >= 1);
+    const hasText = Boolean(revContent?.text_content && revContent.text_content.trim().length > 0);
+
+    if (!hasPages && !hasText) {
+      throw new Error("Cannot mark ready to publish: revision must have at least one uploaded page or written story content.");
     }
   }
 
@@ -706,3 +717,111 @@ export async function postReviewCommentAction(
     },
   };
 }
+
+/**
+ * Server Action: Process and publish a due scheduled release immediately.
+ */
+export async function publishDueScheduledReleaseAction(
+  seriesId: string,
+  episodeId: string
+) {
+  await requireAuth();
+  await requireSeriesRole(seriesId, "editor");
+
+  const result = await processScheduledReleases();
+
+  const supabase = createClient();
+  const { data: series } = await supabase
+    .from("series")
+    .select("slug")
+    .eq("id", seriesId)
+    .single();
+
+  const { data: episode } = await supabase
+    .from("episodes")
+    .select("slug")
+    .eq("id", episodeId)
+    .single();
+
+  if (series) {
+    revalidatePath(`/series/${series.slug}`);
+    if (episode) {
+      revalidatePath(`/series/${series.slug}/episodes/${episode.slug}`);
+    }
+  }
+
+  revalidatePath(`/studio/series/${seriesId}`);
+  revalidatePath(`/studio/series/${seriesId}/episodes/${episodeId}`);
+  revalidatePath("/studio/publishing");
+
+  return result;
+}
+
+/**
+ * Server Action: Save text-based story script content for an episode revision.
+ */
+export async function saveRevisionTextContentAction(
+  seriesId: string,
+  episodeId: string,
+  revisionId: string,
+  textContent: string
+) {
+  await requireAuth();
+  await requireSeriesRole(seriesId, "editor");
+
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("episode_revisions")
+    .update({
+      text_content: textContent,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", revisionId);
+
+  if (error) {
+    logger.error("Failed to save revision text content", error);
+    throw new Error(error.message || "Failed to save story script.");
+  }
+
+  revalidatePath(`/studio/series/${seriesId}/episodes/${episodeId}`);
+  return { success: true };
+}
+
+/**
+ * Server Action: Determine the next sequential episode number for a series.
+ */
+export async function getNextEpisodeNumberAction(seriesId: string): Promise<number> {
+  await requireAuth();
+  await requireSeriesRole(seriesId, "viewer");
+
+  const supabase = createClient();
+  const { data } = await supabase
+    .from("episodes")
+    .select("episode_number")
+    .eq("series_id", seriesId)
+    .order("episode_number", { ascending: false })
+    .limit(1);
+
+  if (data && data.length > 0) {
+    return data[0].episode_number + 1;
+  }
+
+  // Fallback to verified admin client if RLS filters out non-published episodes
+  try {
+    const admin = createAdminClient();
+    const { data: adminData } = await admin
+      .from("episodes")
+      .select("episode_number")
+      .eq("series_id", seriesId)
+      .order("episode_number", { ascending: false })
+      .limit(1);
+    if (adminData && adminData.length > 0) {
+      return adminData[0].episode_number + 1;
+    }
+  } catch {
+    // ignore
+  }
+
+  return 1;
+}
+

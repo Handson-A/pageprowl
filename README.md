@@ -30,7 +30,7 @@ The exact commands depend on the initial project setup and the package versions 
    npm ci
    ```
 
-4. Create a local `.env.local` based on `.env.example`.
+4. Create a local `.env.local` based on the `.env.example`.
 5. Fill in the development credentials for Supabase and Cloudinary as needed. Never use production secrets for local development.
 6. Start the development server:
 

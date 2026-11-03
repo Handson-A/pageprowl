@@ -118,6 +118,36 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     },
   ];
 
+  const sortOptions = [
+    {
+      value: "latest",
+      label: "Newest",
+      href: `/search?sort=latest${
+        currentQuery ? `&q=${encodeURIComponent(currentQuery)}` : ""
+      }${currentGenre !== "All" ? `&genre=${encodeURIComponent(currentGenre)}` : ""}${
+        currentFormat ? `&format=${currentFormat}` : ""
+      }`,
+    },
+    {
+      value: "updated",
+      label: "Recently Updated",
+      href: `/search?sort=updated${
+        currentQuery ? `&q=${encodeURIComponent(currentQuery)}` : ""
+      }${currentGenre !== "All" ? `&genre=${encodeURIComponent(currentGenre)}` : ""}${
+        currentFormat ? `&format=${currentFormat}` : ""
+      }`,
+    },
+    {
+      value: "title_asc",
+      label: "Title A-Z",
+      href: `/search?sort=title_asc${
+        currentQuery ? `&q=${encodeURIComponent(currentQuery)}` : ""
+      }${currentGenre !== "All" ? `&genre=${encodeURIComponent(currentGenre)}` : ""}${
+        currentFormat ? `&format=${currentFormat}` : ""
+      }`,
+    },
+  ];
+
   return (
     <div className={styles.container}>
       <PublicHeader />
@@ -181,6 +211,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                 size="sm"
                 layoutId="searchGenreIndicator"
                 ariaLabel="Genre Selection"
+                wrap={true}
               />
             </div>
 
@@ -193,6 +224,20 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                 size="sm"
                 layoutId="searchFormatIndicator"
                 ariaLabel="Reading Format Selection"
+                wrap={true}
+              />
+            </div>
+
+            <div className={styles.filterGroup}>
+              <span className={styles.filterLabel}>Sort</span>
+              <SegmentedControl
+                options={sortOptions}
+                value={currentSort}
+                variant="pill"
+                size="sm"
+                layoutId="searchSortIndicator"
+                ariaLabel="Sort Order Selection"
+                wrap={true}
               />
             </div>
           </div>

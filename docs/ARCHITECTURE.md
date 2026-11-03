@@ -5,7 +5,7 @@
 The following is the intended structure. Create directories when they are needed; Not necessarily adding empty folders merely to match this tree. The exact routes and features may evolve as product requirements are finalized.
 
 ```text
-pageprowl/ (repository: panelverse)
+pageprowl/
 ├── public/
 │   ├── images/
 │   ├── icons/

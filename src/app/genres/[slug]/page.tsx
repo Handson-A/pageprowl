@@ -119,6 +119,7 @@ export default async function GenreComicsPage({
               size="sm"
               layoutId="genreFormatIndicator"
               ariaLabel="Comic Reading Format"
+              wrap={true}
             />
           </div>
 

@@ -5,11 +5,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import styles from "./NewEpisode.module.css";
 import pageStyles from "@/app/studio/page.module.css";
-import { CreatorSidebar } from "@/components/layout/CreatorSidebar";
 import { Button } from "@/components/ui/Button";
 import { FormField } from "@/components/ui/FormField";
 import { createClient } from "@/lib/supabase/client";
-import { createEpisodeAction } from "../actions";
+import { createEpisodeAction, getNextEpisodeNumberAction } from "../actions";
 import {
   LuArrowLeft,
   LuSparkles,
@@ -63,18 +62,11 @@ export default function NewEpisodePage({ params }: NewEpisodePageProps) {
         setSeriesTitle(series.title);
       }
 
-      const { data } = await supabase
-        .from("episodes")
-        .select("episode_number")
-        .eq("series_id", params.seriesId)
-        .order("episode_number", { ascending: false })
-        .limit(1);
-
-      if (data && data.length > 0) {
-        const nextNum = data[0].episode_number + 1;
+      try {
+        const nextNum = await getNextEpisodeNumberAction(params.seriesId);
         setEpisodeNumber(nextNum);
         setSlug(`chapter-${nextNum}`);
-      } else {
+      } catch {
         setEpisodeNumber(1);
         setSlug("chapter-1");
       }
@@ -112,10 +104,7 @@ export default function NewEpisodePage({ params }: NewEpisodePageProps) {
   };
 
   return (
-    <div className={pageStyles.layout}>
-      <CreatorSidebar />
-
-      <main className={pageStyles.main}>
+    <main className={pageStyles.main}>
         {/* Header */}
         <header className={styles.pageHeader}>
           <Link
@@ -246,8 +235,8 @@ export default function NewEpisodePage({ params }: NewEpisodePageProps) {
             <div className={styles.previewCard}>
               <div className={styles.previewHeader}>
                 <span className={styles.previewTag}>
-                  <LuSparkles size={14} aria-hidden="true" />
-                  <span>Episode Preview</span>
+                  {/* <LuSparkles size={14} aria-hidden="true" /> */}
+                  <span>Live Episode Preview</span>
                 </span>
                 <span className={styles.previewBadge}>Active</span>
               </div>
@@ -312,6 +301,5 @@ export default function NewEpisodePage({ params }: NewEpisodePageProps) {
           </aside>
         </div>
       </main>
-    </div>
   );
 }

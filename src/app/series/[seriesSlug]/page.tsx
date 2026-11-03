@@ -11,6 +11,7 @@ import { ContinueReadingButton } from "@/components/series/ContinueReadingButton
 import { SeriesEngagementButtons } from "@/components/series/SeriesEngagementButtons";
 import { getPublicSeriesBySlug, getPublishedEpisodes, genreToSlug } from "@/lib/data/series";
 import { isSeriesInLibrary, isFollowingSeries } from "@/lib/data/reader";
+import { processDueReleasesOpportunistically } from "@/lib/data/publishing";
 import { createClient } from "@/lib/supabase/server";
 import { LuBookOpen, LuArrowRight, LuLayers, LuUser, LuCalendar } from "react-icons/lu";
 
@@ -59,6 +60,9 @@ export default async function SeriesOverviewPage({ params }: SeriesPageProps) {
   if (!series) {
     notFound();
   }
+
+  // Opportunistically publish due scheduled releases so public readers see them immediately
+  await processDueReleasesOpportunistically();
 
   const episodes = await getPublishedEpisodes(series.id);
   const firstEpisode = episodes.length > 0 ? episodes[0] : null;
