@@ -60,6 +60,7 @@
   left: var(--space-3);
   color: var(--color-text-muted);
   pointer-events: none;
+  z-index: 1;
 }
 
 .searchInput {
@@ -73,6 +74,11 @@
   color: var(--color-text);
   transition: border-color var(--pv-motion-fast) var(--pv-ease-standard),
               box-shadow var(--pv-motion-fast) var(--pv-ease-standard);
+}
+
+.searchInput::placeholder {
+  color: var(--color-text-muted);
+  opacity: 1;
 }
 
 .searchInput:focus {

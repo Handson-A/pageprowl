@@ -9,10 +9,14 @@ interface EpisodeWorkspaceProps {
     seriesId: string;
     episodeId: string;
   };
+  searchParams?: {
+    tab?: string;
+  };
 }
 
 export default async function EpisodeWorkspacePage({
   params,
+  searchParams,
 }: EpisodeWorkspaceProps) {
   const supabase = createClient();
   const user = await getCachedAuthUser();
@@ -181,6 +185,7 @@ export default async function EpisodeWorkspacePage({
       latestReviewRequest={latestReview as any}
       isPublished={isPublished}
       userRole={effectiveRole}
+      initialTab={searchParams?.tab}
     />
   );
 }

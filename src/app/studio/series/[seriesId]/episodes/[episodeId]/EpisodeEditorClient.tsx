@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import Link from "next/link";
 import styles from "./page.module.css";
 import { Button } from "@/components/ui/Button";
@@ -99,7 +99,31 @@ interface EpisodeEditorClientProps {
   } | null;
   isPublished: boolean;
   userRole: SeriesRole;
+  initialTab?: string;
 }
+
+export type EpisodeWorkspaceTab = "production" | "story" | "details" | "review" | "preview" | "publishing";
+
+const VALID_TABS: EpisodeWorkspaceTab[] = [
+  "production",
+  "story",
+  "details",
+  "review",
+  "preview",
+  "publishing",
+];
+
+const TAB_CONFIG: Record<
+  EpisodeWorkspaceTab,
+  { label: string; shortTitle: string; stepNumber: number }
+> = {
+  production: { label: "1. Production Artwork", shortTitle: "Artwork & Pages", stepNumber: 1 },
+  story: { label: "2. Story Script / Text", shortTitle: "Story Script", stepNumber: 2 },
+  details: { label: "3. Episode Details", shortTitle: "Episode Details", stepNumber: 3 },
+  review: { label: "4. Review Notes", shortTitle: "Review Notes", stepNumber: 4 },
+  preview: { label: "5. Live Preview", shortTitle: "Live Preview", stepNumber: 5 },
+  publishing: { label: "6. Release & Lifecycle", shortTitle: "Publishing & Release", stepNumber: 6 },
+};
 
 export function EpisodeEditorClient({
   seriesId,
@@ -121,10 +145,20 @@ export function EpisodeEditorClient({
   latestReviewRequest,
   isPublished,
   userRole,
+  initialTab,
 }: EpisodeEditorClientProps) {
-  const [activeTab, setActiveTab] = useState<
-    "production" | "story" | "details" | "review" | "preview" | "publishing"
-  >("production");
+  const [activeTab, setActiveTabState] = useState<EpisodeWorkspaceTab>(() => {
+    if (initialTab && VALID_TABS.includes(initialTab as EpisodeWorkspaceTab)) {
+      return initialTab as EpisodeWorkspaceTab;
+    }
+    if (typeof window !== "undefined") {
+      const param = new URLSearchParams(window.location.search).get("tab");
+      if (param && VALID_TABS.includes(param as EpisodeWorkspaceTab)) {
+        return param as EpisodeWorkspaceTab;
+      }
+    }
+    return "production";
+  });
 
   const [textContent, setTextContent] = useState(initialTextContent || "");
   const [isSavingText, setIsSavingText] = useState(false);
@@ -169,6 +203,71 @@ export function EpisodeEditorClient({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const canEdit = userRole === "owner" || userRole === "editor";
+  const hasContent = pages.length > 0 || textContent.trim().length > 0;
+
+  const availableTabs: EpisodeWorkspaceTab[] = useMemo(() => {
+    const tabs: EpisodeWorkspaceTab[] = ["production"];
+    if (canEdit) {
+      tabs.push("story");
+      tabs.push("details");
+    }
+    tabs.push("review");
+    tabs.push("preview");
+    tabs.push("publishing");
+    return tabs;
+  }, [canEdit]);
+
+  const setActiveTab = (tab: EpisodeWorkspaceTab, pushHistory = true) => {
+    setActiveTabState(tab);
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      if (url.searchParams.get("tab") !== tab) {
+        url.searchParams.set("tab", tab);
+        if (pushHistory) {
+          window.history.pushState({ tab }, "", url.toString());
+        } else {
+          window.history.replaceState({ tab }, "", url.toString());
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    const handlePopState = (e: PopStateEvent) => {
+      const param = new URLSearchParams(window.location.search).get("tab") as EpisodeWorkspaceTab | null;
+      if (param && VALID_TABS.includes(param)) {
+        setActiveTabState(param);
+      } else if (e.state?.tab && VALID_TABS.includes(e.state.tab)) {
+        setActiveTabState(e.state.tab);
+      } else {
+        setActiveTabState("production");
+      }
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
+
+  const currentTabIdx = availableTabs.indexOf(activeTab);
+  const previousTab = currentTabIdx > 0 ? availableTabs[currentTabIdx - 1] : null;
+  const nextTab = currentTabIdx < availableTabs.length - 1 ? availableTabs[currentTabIdx + 1] : null;
+
+  const goToNextTab = () => {
+    if (nextTab) {
+      setActiveTab(nextTab);
+      if (typeof window !== "undefined") {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    }
+  };
+
+  const goToPrevTab = () => {
+    if (previousTab) {
+      setActiveTab(previousTab);
+      if (typeof window !== "undefined") {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    }
+  };
 
   // Reorder page up/down
   const movePage = (index: number, direction: "left" | "right") => {
@@ -759,10 +858,11 @@ export function EpisodeEditorClient({
           <div className={styles.breadcrumb}>
             <Link
               href={`/studio/series/${seriesId}`}
-              style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}
+              style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
+              title="Return to series workspace"
             >
               <LuArrowLeft size={14} aria-hidden="true" />
-              <span>{seriesTitle}</span>
+              <span>Exit to Series: {seriesTitle}</span>
             </Link>
           </div>
           <h1 className={styles.title}>
@@ -851,49 +951,51 @@ export function EpisodeEditorClient({
         </div>
       )}
 
-      {/* Workspace Tabs */}
-      <nav className={styles.tabBar} aria-label="Episode Workspace Tabs">
-        <button
-          className={`${styles.tab} ${activeTab === "production" ? styles.tabActive : ""}`}
-          onClick={() => setActiveTab("production")}
-        >
-          1. Production Artwork ({pages.length})
-        </button>
-        {canEdit && (
+      {/* Sticky Workspace Tabs */}
+      <div className={styles.tabBarStickyContainer}>
+        <nav className={styles.tabBar} aria-label="Episode Workspace Tabs">
           <button
-            className={`${styles.tab} ${activeTab === "story" ? styles.tabActive : ""}`}
-            onClick={() => setActiveTab("story")}
+            className={`${styles.tab} ${activeTab === "production" ? styles.tabActive : ""}`}
+            onClick={() => setActiveTab("production")}
           >
-            2. Story Script / Text {textContent.trim().length > 0 ? "✓" : ""}
+            1. Production Artwork ({pages.length})
           </button>
-        )}
-        {canEdit && (
+          {canEdit && (
+            <button
+              className={`${styles.tab} ${activeTab === "story" ? styles.tabActive : ""}`}
+              onClick={() => setActiveTab("story")}
+            >
+              2. Story Script / Text {textContent.trim().length > 0 ? "✓" : ""}
+            </button>
+          )}
+          {canEdit && (
+            <button
+              className={`${styles.tab} ${activeTab === "details" ? styles.tabActive : ""}`}
+              onClick={() => setActiveTab("details")}
+            >
+              3. Episode Details
+            </button>
+          )}
           <button
-            className={`${styles.tab} ${activeTab === "details" ? styles.tabActive : ""}`}
-            onClick={() => setActiveTab("details")}
+            className={`${styles.tab} ${activeTab === "review" ? styles.tabActive : ""}`}
+            onClick={() => setActiveTab("review")}
           >
-            3. Episode Details
+            4. Review Notes ({comments.length})
           </button>
-        )}
-        <button
-          className={`${styles.tab} ${activeTab === "review" ? styles.tabActive : ""}`}
-          onClick={() => setActiveTab("review")}
-        >
-          4. Review Notes ({comments.length})
-        </button>
-        <button
-          className={`${styles.tab} ${activeTab === "preview" ? styles.tabActive : ""}`}
-          onClick={() => setActiveTab("preview")}
-        >
-          5. Live Preview
-        </button>
-        <button
-          className={`${styles.tab} ${activeTab === "publishing" ? styles.tabActive : ""}`}
-          onClick={() => setActiveTab("publishing")}
-        >
-          6. Release &amp; Lifecycle
-        </button>
-      </nav>
+          <button
+            className={`${styles.tab} ${activeTab === "preview" ? styles.tabActive : ""}`}
+            onClick={() => setActiveTab("preview")}
+          >
+            5. Live Preview
+          </button>
+          <button
+            className={`${styles.tab} ${activeTab === "publishing" ? styles.tabActive : ""}`}
+            onClick={() => setActiveTab("publishing")}
+          >
+            6. Release &amp; Lifecycle
+          </button>
+        </nav>
+      </div>
 
       {/* Tab 1: Production Artwork & Ordering */}
       {activeTab === "production" && (
@@ -1068,6 +1170,30 @@ export function EpisodeEditorClient({
               )}
             </div>
           )}
+
+          {/* Bottom Step Navigation Footer for Tab 1 */}
+          <div className={styles.stepFooter}>
+            <div className={styles.stepFooterLeft}>
+              <Link href={`/studio/series/${seriesId}`}>
+                <Button type="button" variant="ghost">
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                    <LuArrowLeft size={14} />
+                    <span>Exit to Series Overview</span>
+                  </span>
+                </Button>
+              </Link>
+            </div>
+            <div className={styles.stepFooterRight}>
+              {nextTab && (
+                <Button type="button" variant="primary" onClick={goToNextTab}>
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                    <span>Continue to {TAB_CONFIG[nextTab].shortTitle}</span>
+                    <LuArrowRight size={16} />
+                  </span>
+                </Button>
+              )}
+            </div>
+          </div>
         </div>
       )}
 
@@ -1147,6 +1273,47 @@ export function EpisodeEditorClient({
               <span>Saved in revision {currentNumber}</span>
             </div>
           </div>
+
+          {/* Bottom Step Navigation Footer for Tab 2 */}
+          <div className={styles.stepFooter}>
+            <div className={styles.stepFooterLeft}>
+              {previousTab && (
+                <Button type="button" variant="secondary" onClick={goToPrevTab}>
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                    <LuChevronLeft size={16} />
+                    <span>Back to {TAB_CONFIG[previousTab].shortTitle}</span>
+                  </span>
+                </Button>
+              )}
+            </div>
+            <div className={styles.stepFooterRight}>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={handleSaveStoryText}
+                isLoading={isSavingText}
+              >
+                <span>Save Story Script</span>
+              </Button>
+              {nextTab && (
+                <Button
+                  type="button"
+                  variant="primary"
+                  onClick={async () => {
+                    if (textContent.trim() !== (initialTextContent || "").trim()) {
+                      await handleSaveStoryText();
+                    }
+                    goToNextTab();
+                  }}
+                >
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                    <span>Continue to {TAB_CONFIG[nextTab].shortTitle}</span>
+                    <LuArrowRight size={16} />
+                  </span>
+                </Button>
+              )}
+            </div>
+          </div>
         </div>
       )}
 
@@ -1199,23 +1366,44 @@ export function EpisodeEditorClient({
               />
             </FormField>
 
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "12px" }}>
-              {!published && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  style={{ color: "var(--color-danger)" }}
-                  onClick={handleDeleteEpisode}
-                >
-                  <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
-                    <LuTrash2 size={14} />
-                    <span>Delete Episode</span>
-                  </span>
+            {/* Bottom Step Navigation Footer for Tab 3 */}
+            <div className={styles.stepFooter} style={{ borderTop: "none", paddingTop: "12px", marginTop: "12px" }}>
+              <div className={styles.stepFooterLeft}>
+                {previousTab && (
+                  <Button type="button" variant="secondary" onClick={goToPrevTab}>
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                      <LuChevronLeft size={16} />
+                      <span>Back to {TAB_CONFIG[previousTab].shortTitle}</span>
+                    </span>
+                  </Button>
+                )}
+                {!published && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    style={{ color: "var(--color-danger)" }}
+                    onClick={handleDeleteEpisode}
+                  >
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                      <LuTrash2 size={14} />
+                      <span>Delete Episode</span>
+                    </span>
+                  </Button>
+                )}
+              </div>
+              <div className={styles.stepFooterRight}>
+                <Button type="submit" variant="secondary" isLoading={isSavingMeta}>
+                  Save Details
                 </Button>
-              )}
-              <Button type="submit" variant="primary" isLoading={isSavingMeta}>
-                Save Details
-              </Button>
+                {nextTab && (
+                  <Button type="button" variant="primary" onClick={goToNextTab}>
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                      <span>Continue to {TAB_CONFIG[nextTab].shortTitle}</span>
+                      <LuArrowRight size={16} />
+                    </span>
+                  </Button>
+                )}
+              </div>
             </div>
           </form>
         </div>
@@ -1268,6 +1456,30 @@ export function EpisodeEditorClient({
               </div>
             ))}
           </div>
+
+          {/* Bottom Step Navigation Footer for Tab 4 */}
+          <div className={styles.stepFooter}>
+            <div className={styles.stepFooterLeft}>
+              {previousTab && (
+                <Button type="button" variant="secondary" onClick={goToPrevTab}>
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                    <LuChevronLeft size={16} />
+                    <span>Back to {TAB_CONFIG[previousTab].shortTitle}</span>
+                  </span>
+                </Button>
+              )}
+            </div>
+            <div className={styles.stepFooterRight}>
+              {nextTab && (
+                <Button type="button" variant="primary" onClick={goToNextTab}>
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                    <span>Continue to {TAB_CONFIG[nextTab].shortTitle}</span>
+                    <LuArrowRight size={16} />
+                  </span>
+                </Button>
+              )}
+            </div>
+          </div>
         </div>
       )}
 
@@ -1305,6 +1517,30 @@ export function EpisodeEditorClient({
               <PaginatedReader pages={pages} seriesSlug={seriesSlug} />
             )}
           </div>
+
+          {/* Bottom Step Navigation Footer for Tab 5 */}
+          <div className={styles.stepFooter}>
+            <div className={styles.stepFooterLeft}>
+              {previousTab && (
+                <Button type="button" variant="secondary" onClick={goToPrevTab}>
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                    <LuChevronLeft size={16} />
+                    <span>Back to {TAB_CONFIG[previousTab].shortTitle}</span>
+                  </span>
+                </Button>
+              )}
+            </div>
+            <div className={styles.stepFooterRight}>
+              {nextTab && (
+                <Button type="button" variant="primary" onClick={goToNextTab}>
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                    <span>Proceed to {TAB_CONFIG[nextTab].shortTitle}</span>
+                    <LuArrowRight size={16} />
+                  </span>
+                </Button>
+              )}
+            </div>
+          </div>
         </div>
       )}
 
@@ -1340,9 +1576,9 @@ export function EpisodeEditorClient({
               )}
             </div>
 
-            {pages.length === 0 && episodeStatus !== "published" && (
+            {!hasContent && episodeStatus !== "published" && (
               <div style={{ fontSize: "0.875rem", color: "var(--color-warning)" }}>
-                At least one comic page must be uploaded and saved before this episode can be submitted, scheduled, or published.
+                At least one comic page or story script must be added and saved before this episode can be submitted, scheduled, or published.
               </div>
             )}
 
@@ -1350,7 +1586,7 @@ export function EpisodeEditorClient({
             {(episodeStatus === "draft" || episodeStatus === "in_production") && (
               <div className={styles.statusCallout}>
                 <p style={{ fontSize: "0.875rem" }}>
-                  This episode is in production draft. Once artwork pages are finalized, submit it for editorial review.
+                  This episode is in production draft. Once artwork pages or story script are finalized, submit it for editorial review.
                 </p>
 
                 {showSubmitNotes ? (
@@ -1374,7 +1610,7 @@ export function EpisodeEditorClient({
                         variant="primary"
                         onClick={handleSubmitApproval}
                         isLoading={isTransitioning}
-                        disabled={pages.length === 0}
+                        disabled={!hasContent}
                       >
                         <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
                           <LuSend size={14} />
@@ -1391,7 +1627,7 @@ export function EpisodeEditorClient({
                     <Button
                       variant="primary"
                       onClick={() => setShowSubmitNotes(true)}
-                      disabled={pages.length === 0}
+                      disabled={!hasContent}
                     >
                       <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
                         <LuSend size={14} />
@@ -1450,7 +1686,7 @@ export function EpisodeEditorClient({
                           variant="primary"
                           onClick={handleApprove}
                           isLoading={isTransitioning}
-                          disabled={pages.length === 0}
+                          disabled={!hasContent}
                         >
                           <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
                             <LuCheck size={16} />
@@ -1503,7 +1739,7 @@ export function EpisodeEditorClient({
                     variant="primary"
                     onClick={handleSubmitApproval}
                     isLoading={isTransitioning}
-                    disabled={pages.length === 0}
+                    disabled={!hasContent}
                   >
                     <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
                       <LuSend size={14} />
@@ -1567,7 +1803,7 @@ export function EpisodeEditorClient({
                       variant="primary"
                       onClick={handlePublish}
                       isLoading={isTransitioning}
-                      disabled={pages.length === 0 && textContent.trim().length === 0}
+                      disabled={!hasContent}
                     >
                       <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
                         <LuUpload size={16} />
@@ -1577,7 +1813,7 @@ export function EpisodeEditorClient({
                     <Button
                       variant="secondary"
                       onClick={() => setShowSchedulePicker(true)}
-                      disabled={isTransitioning || (pages.length === 0 && textContent.trim().length === 0)}
+                      disabled={isTransitioning || !hasContent}
                     >
                       <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
                         <LuCalendar size={16} />
@@ -1793,6 +2029,44 @@ export function EpisodeEditorClient({
                 No publishing lifecycle events recorded yet.
               </p>
             )}
+          </div>
+
+          {/* Bottom Step Navigation Footer for Tab 6 */}
+          <div className={styles.stepFooter}>
+            <div className={styles.stepFooterLeft}>
+              {previousTab && (
+                <Button type="button" variant="secondary" onClick={goToPrevTab}>
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                    <LuChevronLeft size={16} />
+                    <span>Back to {TAB_CONFIG[previousTab].shortTitle}</span>
+                  </span>
+                </Button>
+              )}
+            </div>
+            <div className={styles.stepFooterRight}>
+              {published && (
+                <Link
+                  href={`/series/${seriesSlug}/episodes/${episodeSlug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Button type="button" variant="secondary">
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                      <LuExternalLink size={14} />
+                      <span>View in Public Reader</span>
+                    </span>
+                  </Button>
+                </Link>
+              )}
+              <Link href={`/studio/series/${seriesId}`}>
+                <Button type="button" variant="primary">
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                    <LuArrowLeft size={14} />
+                    <span>Return to Series Workspace</span>
+                  </span>
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       )}

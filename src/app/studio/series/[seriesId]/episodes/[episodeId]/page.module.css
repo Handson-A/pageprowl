@@ -59,12 +59,32 @@
   line-height: var(--line-height-tight);
 }
 
+.tabBarStickyContainer {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background-color: var(--color-bg);
+  padding-top: var(--space-2);
+  margin-top: calc(-1 * var(--space-2));
+  border-bottom: 2px solid var(--color-border);
+}
+
 .tabBar {
   display: flex;
   gap: var(--space-2);
-  border-bottom: 2px solid var(--color-border);
   padding-bottom: 0;
   overflow-x: auto;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tabBar::-webkit-scrollbar {
+  height: 4px;
+}
+
+.tabBar::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: var(--pv-radius-sm);
 }
 
 .tab {
@@ -101,6 +121,46 @@
   flex-direction: column;
   gap: var(--space-6);
   box-shadow: var(--pv-shadow-card);
+}
+
+.stepFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  padding-top: var(--space-6);
+  margin-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.stepFooterLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.stepFooterRight {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-left: auto;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 640px) {
+  .stepFooter {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .stepFooterLeft,
+  .stepFooterRight {
+    width: 100%;
+    justify-content: space-between;
+    margin-left: 0;
+  }
 }
 
 /* Two-Column Studio Production Layout from Reference Screen 4 */
